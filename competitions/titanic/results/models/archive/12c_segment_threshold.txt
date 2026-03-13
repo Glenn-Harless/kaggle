@@ -1,0 +1,204 @@
+============================================================
+EXPERIMENT 12c: SEGMENTED LOGREG + THRESHOLD TUNING
+============================================================
+
+Using 12a C values: Female C=0.5, Male C=0.05
+Female: 314 train, 152 test
+Male:   577 train, 266 test
+
+--- Collecting OOF Probabilities ---
+  Baseline (0.50/0.50): 0.8384
+
+--- OOF Probability Distribution ---
+  female Pclass 1: n= 94  prob_mean=0.954  prob_median=0.963  [0.792 - 1.000]  actual=0.968
+  female Pclass 2: n= 76  prob_mean=0.916  prob_median=0.923  [0.544 - 0.994]  actual=0.921
+  female Pclass 3: n=144  prob_mean=0.503  prob_median=0.487  [0.080 - 0.892]  actual=0.500
+  male   Pclass 1: n=122  prob_mean=0.349  prob_median=0.332  [0.060 - 0.929]  actual=0.369
+  male   Pclass 2: n=108  prob_mean=0.167  prob_median=0.106  [0.087 - 0.782]  actual=0.157
+  male   Pclass 3: n=347  prob_mean=0.138  prob_median=0.117  [0.010 - 0.941]  actual=0.135
+
+--- Threshold Sweep (OOF) ---
+  F_thresh  M_thresh    CV Acc   Surv Rate   F3_acc   M1_acc   F3_pred   M1_pred
+  --------  --------  --------  ----------  -------  -------  --------  --------
+      0.45      0.45    0.8294       0.341    0.632    0.631     0.632     0.197 <-- best
+      0.45      0.50    0.8339       0.330    0.632    0.664     0.632     0.115 <-- best
+      0.50      0.45    0.8339       0.316    0.660    0.631     0.479     0.197
+      0.50      0.50    0.8384       0.305    0.660    0.664     0.479     0.115 <-- best
+      0.55      0.45    0.8339       0.308    0.667    0.631     0.431     0.197
+      0.55      0.50    0.8384       0.296    0.667    0.664     0.431     0.115
+
+  Best: female=0.5, male=0.5 (CV=0.8384)
+  vs 12a (0.50/0.50): +0.0000
+
+--- Subgroup Behavior (OOF, threshold f=0.5/m=0.5) ---
+  female Pclass 1: n= 94  actual=0.968  pred=1.000  acc=0.968
+  female Pclass 2: n= 76  actual=0.921  pred=1.000  acc=0.921
+  female Pclass 3: n=144  actual=0.500  pred=0.479  acc=0.660
+  male   Pclass 1: n=122  actual=0.369  pred=0.115  acc=0.664
+  male   Pclass 2: n=108  actual=0.157  pred=0.083  acc=0.926
+  male   Pclass 3: n=347  actual=0.135  pred=0.029  acc=0.893
+
+--- Subgroup Accuracy Comparison (OOF) ---
+  Subgroup              12a (0.50)    12c best     Delta
+  --------------------  ----------  ----------  --------
+  female Pclass 1            0.968       0.968    +0.000
+  female Pclass 2            0.921       0.921    +0.000
+  female Pclass 3            0.660       0.660    +0.000
+  male Pclass 1              0.664       0.664    +0.000
+  male Pclass 2              0.926       0.926    +0.000
+  male Pclass 3              0.893       0.893    +0.000
+  OVERALL                   0.8384      0.8384   +0.0000
+
+--- Female Model Coefficients ---
+Positive = increases survival, Negative = decreases survival
+
+  -           Pclass_3  -1.1368  ###########
+  -      IsLargeFamily  -0.5223  #####
+  +               Fare  +0.4159  ####
+  -              Emb_S  -0.2520  ##
+  +              Emb_Q  +0.2330  ##
+  +            Deck_DE  +0.2272  ##
+  +            IsChild  +0.2145  ##
+  +            IsAlone  +0.2025  ##
+  +         Title_Rare  +0.1585  #
+  -         Title_Miss  -0.1278  #
+  +              Emb_C  +0.1083  #
+  -           Deck_ABC  -0.0972  
+  +          Title_Mrs  +0.0968  
+  +           HasCabin  +0.0877  
+  +           Pclass_2  +0.0629  
+  +            Deck_FG  +0.0469  
+  -       Title_Master  +0.0000  
+
+--- Male Model Coefficients ---
+Positive = increases survival, Negative = decreases survival
+
+  -      IsLargeFamily  -0.5797  #####
+  +       Title_Master  +0.3571  ###
+  +            IsChild  +0.2817  ##
+  +            Deck_DE  +0.2608  ##
+  -           Title_Mr  -0.2562  ##
+  +           HasCabin  +0.2077  ##
+  -           Pclass_2  -0.1365  #
+  -              Emb_Q  -0.1269  #
+  +               Fare  +0.1203  #
+  +              Emb_C  +0.1151  #
+  +           Deck_ABC  +0.1111  #
+  -           Pclass_3  -0.0898  
+  -         Title_Rare  -0.0683  
+  +            IsAlone  +0.0505  
+  -            Deck_FG  -0.0280  
+  -              Emb_S  -0.0238  
+
+--- Decision Boundaries ---
+  Female: intercept=+1.6195, threshold=0.5
+  Male:   intercept=-1.6718, threshold=0.5
+
+--- Overfitting Check ---
+  Training accuracy:  0.8485
+  CV accuracy:        0.8384
+  Gap:                0.0101
+  Gap < 5% — looks healthy
+
+--- Confusion Matrix: Female (training data) ---
+  Predicted:     Died  Survived
+  Actual Died:     52      29
+  Actual Surv:     24     209
+
+--- Confusion Matrix: Male (training data) ---
+  Predicted:     Died  Survived
+  Actual Died:    467       1
+  Actual Surv:     81      28
+
+--- Subgroup Behavior (Training Data, In-Sample) ---
+  female Pclass 1: n= 94  actual=0.968  pred=1.000  acc=0.968
+  female Pclass 2: n= 76  actual=0.921  pred=1.000  acc=0.921
+  female Pclass 3: n=144  actual=0.500  pred=0.472  acc=0.694
+  male   Pclass 1: n=122  actual=0.369  pred=0.082  acc=0.697
+  male   Pclass 2: n=108  actual=0.157  pred=0.083  acc=0.926
+  male   Pclass 3: n=347  actual=0.135  pred=0.029  acc=0.893
+
+--- Full Model Comparison ---
+  Model                                 CV    Kaggle
+  ------------------------------  --------  --------
+  v1 Ensemble (hard)              0.8563    0.7560
+  v1 XGBoost (tuned)              0.8552    0.7584
+  12a Segment (0.50/0.50)         0.8384       TBD
+  12c Segment+Thresh              0.8384       TBD <--
+  v1 LogReg (20 feat)             0.8339    0.7727
+  v2 LogReg (15 feat)             0.8305    0.7727
+  v3 LogReg (21 feat)             0.8305    0.7727
+  Gender-only                     0.7870    0.7655
+
+Submission saved: submissions/logreg_12c_threshold.csv
+Predicted survival rate in test: 0.335
+
+--- Test Prediction Profile ---
+  female Pclass 1: n= 50  predicted_survived= 50  rate=1.000
+  female Pclass 2: n= 30  predicted_survived= 30  rate=1.000
+  female Pclass 3: n= 72  predicted_survived= 39  rate=0.542
+  male   Pclass 1: n= 57  predicted_survived=  7  rate=0.123
+  male   Pclass 2: n= 63  predicted_survived=  2  rate=0.032
+  male   Pclass 3: n=146  predicted_survived= 12  rate=0.082
+
+  Total female predicted dead: 33
+
+--- Test Prediction Profile Comparison ---
+  Subgroup                  v3     12a     12c
+  --------------------  ------  ------  ------
+  female Pclass 1        1.000   1.000   1.000
+  female Pclass 2        1.000   1.000   1.000
+  female Pclass 3        0.931   0.542   0.542
+  male Pclass 1          0.228   0.123   0.123
+  male Pclass 2          0.032   0.032   0.032
+  male Pclass 3          0.075   0.082   0.082
+  TOTAL surv rate        0.414   0.335   0.335
+
+--- Passenger-Level Diff vs v3 ---
+  Passengers changed: 35 / 418
+  Flipped 0->1 (now survived): 1
+  Flipped 1->0 (now died):     34
+
+    PID 893: 1->0  female Pclass 3  Cabin=unknown   Wilkes, Mrs. James (Ellen Needs)
+    PID 896: 1->0  female Pclass 3  Cabin=unknown   Hirvonen, Mrs. Alexander (Helga E Lindqvist)
+    PID 910: 1->0  female Pclass 3  Cabin=unknown   Ilmakangas, Miss. Ida Livija
+    PID 924: 1->0  female Pclass 3  Cabin=unknown   Dean, Mrs. Bertram (Eva Georgetta Light)
+    PID 925: 1->0  female Pclass 3  Cabin=unknown   Johnston, Mrs. Andrew G (Elizabeth Lily" Watson)"
+    PID 928: 1->0  female Pclass 3  Cabin=unknown   Roth, Miss. Sarah A
+    PID 929: 1->0  female Pclass 3  Cabin=unknown   Cacic, Miss. Manda
+    PID 941: 1->0  female Pclass 3  Cabin=unknown   Coutts, Mrs. William (Winnie Minnie" Treanor)"
+    PID 956: 1->0  male   Pclass 1  Cabin=B57 B59 B63 B66  Ryerson, Master. John Borie
+    PID 964: 1->0  female Pclass 3  Cabin=unknown   Nieminen, Miss. Manta Josefina
+    PID 967: 1->0  male   Pclass 1  Cabin=C132      Keeping, Mr. Edwin
+    PID 979: 1->0  female Pclass 3  Cabin=unknown   Badman, Miss. Emily Louisa
+    PID 982: 1->0  female Pclass 3  Cabin=unknown   Dyker, Mrs. Adolf Fredrik (Anna Elisabeth Judith Andersson)
+    PID 990: 1->0  female Pclass 3  Cabin=unknown   Braf, Miss. Elin Ester Maria
+    PID 1017: 1->0  female Pclass 3  Cabin=unknown   Cribb, Miss. Laura Alice
+    PID 1023: 1->0  male   Pclass 1  Cabin=C51       Gracie, Col. Archibald IV
+    PID 1030: 1->0  female Pclass 3  Cabin=unknown   Drapkin, Miss. Jennie
+    PID 1045: 1->0  female Pclass 3  Cabin=unknown   Klasen, Mrs. (Hulda Kristina Eugenia Lofqvist)
+    PID 1049: 1->0  female Pclass 3  Cabin=unknown   Lundin, Miss. Olga Elida
+    PID 1051: 1->0  female Pclass 3  Cabin=unknown   Peacock, Mrs. Benjamin (Edith Nile)
+    PID 1057: 1->0  female Pclass 3  Cabin=unknown   Kink-Heilmann, Mrs. Anton (Luise Heilmann)
+    PID 1061: 1->0  female Pclass 3  Cabin=unknown   Hellstrom, Miss. Hilda Maria
+    PID 1089: 1->0  female Pclass 3  Cabin=unknown   Nilsson, Miss. Berta Olivia
+    PID 1144: 1->0  male   Pclass 1  Cabin=C89       Clark, Mr. Walter Miller
+    PID 1160: 1->0  female Pclass 3  Cabin=unknown   Howard, Miss. May Elizabeth
+    PID 1172: 1->0  female Pclass 3  Cabin=unknown   Oreskovic, Miss. Jelka
+    PID 1201: 1->0  female Pclass 3  Cabin=unknown   Hansen, Mrs. Claus Peter (Jennie L Howard)
+    PID 1208: 1->0  male   Pclass 1  Cabin=B78       Spencer, Mr. William Augustus
+    PID 1237: 1->0  female Pclass 3  Cabin=unknown   Abelseth, Miss. Karen Marie
+    PID 1251: 1->0  female Pclass 3  Cabin=unknown   Lindell, Mrs. Edvard Bengtsson (Elin Gerda Persson)
+    PID 1268: 1->0  female Pclass 3  Cabin=unknown   Kink, Miss. Maria
+    PID 1275: 1->0  female Pclass 3  Cabin=unknown   McNamee, Mrs. Neal (Eileen O'Leary)
+    PID 1284: 0->1  male   Pclass 3  Cabin=unknown   Abbott, Master. Eugene Joseph
+    PID 1299: 1->0  male   Pclass 1  Cabin=C80       Widener, Mr. George Dunton
+    PID 1304: 1->0  female Pclass 3  Cabin=unknown   Henriksson, Miss. Jenny Lovisa
+
+--- Passenger-Level Diff vs 12a ---
+  Passengers changed: 0 / 418
+
+Results saved to: results/models/12c_segment_threshold.txt
+Female coefficients: results/models/12c_female_coefficients.csv
+Male coefficients: results/models/12c_male_coefficients.csv
+Submission: submissions/logreg_12c_threshold.csv

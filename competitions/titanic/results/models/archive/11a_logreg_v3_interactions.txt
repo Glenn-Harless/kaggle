@@ -1,0 +1,110 @@
+============================================================
+MODEL 11a: LOGISTIC REGRESSION v3 — INTERACTIONS
+============================================================
+Features: 18
+Training samples: 891
+
+Feature list: ['Sex', 'Fare', 'IsAlone', 'IsLargeFamily', 'HasCabin', 'IsChild', 'Title_Master', 'Title_Miss', 'Title_Mr', 'Title_Mrs', 'Title_Rare', 'Emb_C', 'Emb_Q', 'Emb_S', 'Pclass_2', 'Pclass_3', 'Sex_x_Pclass_2', 'Sex_x_Pclass_3']
+
+--- Regularization Sweep ---
+       C   CV Mean    CV Std       Gap
+----------------------------------------
+    0.01    0.8294    0.0070   +0.0034 <-- best
+    0.05    0.8294    0.0107   +0.0034
+    0.10    0.8271    0.0093   +0.0056
+    0.50    0.8249    0.0138   +0.0124
+    1.00    0.8283    0.0113   +0.0090
+
+Selected C=0.01
+
+--- 5-Fold Cross-Validation ---
+  Fold 1: 0.8380
+  Fold 2: 0.8202
+  Fold 3: 0.8258
+  Fold 4: 0.8258
+  Fold 5: 0.8371
+
+  Mean:  0.8294
+  Std:   0.0070
+
+--- Feature Coefficients (sorted by importance) ---
+Positive = increases survival, Negative = decreases survival
+
+  -           Title_Mr  -0.3694  ###
+  -                Sex  -0.3418  ###
+  -      IsLargeFamily  -0.3142  ###
+  -           Pclass_3  -0.2675  ##
+  +           HasCabin  +0.2316  ##
+  +          Title_Mrs  +0.2220  ##
+  -     Sex_x_Pclass_2  -0.2197  ##
+  +       Title_Master  +0.1915  #
+  +         Title_Miss  +0.1865  #
+  +               Fare  +0.1360  #
+  -     Sex_x_Pclass_3  -0.1104  #
+  +           Pclass_2  +0.1051  #
+  +            IsChild  +0.1003  #
+  -              Emb_S  -0.0779  
+  +              Emb_C  +0.0778  
+  -         Title_Rare  -0.0653  
+  +              Emb_Q  +0.0154  
+  -            IsAlone  -0.0032  
+
+--- Interaction Interpretation ---
+Effective Sex penalty by class (scaled coefficients):
+  1st class (reference): Sex coef = -0.3418
+  2nd class:             Sex coef = -0.5615  (Sex + Sex_x_Pclass_2)
+  3rd class:             Sex coef = -0.4522  (Sex + Sex_x_Pclass_3)
+
+--- Confusion Matrix (on training data) ---
+  Predicted:     Died  Survived
+  Actual Died:    486      63
+  Actual Surv:     86     256
+
+--- Classification Report (on training data) ---
+              precision    recall  f1-score   support
+
+        Died       0.85      0.89      0.87       549
+    Survived       0.80      0.75      0.77       342
+
+    accuracy                           0.83       891
+   macro avg       0.83      0.82      0.82       891
+weighted avg       0.83      0.83      0.83       891
+
+--- Overfitting Check ---
+  Training accuracy:  0.8328
+  CV accuracy:        0.8294
+  Gap:                0.0034
+  Gap < 5% — looks healthy
+
+--- Subgroup Behavior (Training Data) ---
+  female Pclass 1: n= 94  actual=0.968  pred=1.000  acc=0.968
+  female Pclass 2: n= 76  actual=0.921  pred=0.974  acc=0.895
+  female Pclass 3: n=144  actual=0.500  pred=0.812  acc=0.646
+  male   Pclass 1: n=122  actual=0.369  pred=0.123  acc=0.656
+  male   Pclass 2: n=108  actual=0.157  pred=0.083  acc=0.926
+  male   Pclass 3: n=347  actual=0.135  pred=0.029  acc=0.893
+
+--- v2 vs v3a Comparison ---
+  v1 LogReg (20 feat)        0.8339
+  v2 LogReg (15 feat)        0.8305 (Kaggle: 0.7727)
+  v3a Interactions           0.8294 <-- current
+  Gender-only                0.7870
+
+Submission saved: submissions/logreg_v3a_interactions.csv
+Predicted survival rate in test: 0.404
+
+--- Test Prediction Profile ---
+  female Pclass 1: n= 50  predicted_survived= 50  rate=1.000
+  female Pclass 2: n= 30  predicted_survived= 30  rate=1.000
+  female Pclass 3: n= 72  predicted_survived= 67  rate=0.931
+  male   Pclass 1: n= 57  predicted_survived=  9  rate=0.158
+  male   Pclass 2: n= 63  predicted_survived=  2  rate=0.032
+  male   Pclass 3: n=146  predicted_survived= 11  rate=0.075
+
+  Total female predicted dead: 5
+
+--- Diff vs v2 ---
+  Passengers changed: 0 / 418
+
+Results saved to: results/models/11a_logreg_v3_interactions.txt
+Coefficients saved to: results/models/11a_logreg_v3_interactions_coefficients.csv

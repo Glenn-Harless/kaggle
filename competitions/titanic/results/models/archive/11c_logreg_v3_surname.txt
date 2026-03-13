@@ -1,0 +1,144 @@
+============================================================
+STAGE C: SURNAME FEATURES
+============================================================
+Base features (A+B): 21
+Feature list: ['Sex', 'Fare', 'IsAlone', 'IsLargeFamily', 'HasCabin', 'IsChild', 'Title_Master', 'Title_Miss', 'Title_Mr', 'Title_Mrs', 'Title_Rare', 'Emb_C', 'Emb_Q', 'Emb_S', 'Pclass_2', 'Pclass_3', 'Sex_x_Pclass_2', 'Sex_x_Pclass_3', 'Deck_ABC', 'Deck_DE', 'Deck_FG']
+
+--- Surname Group Size Distribution (train) ---
+  Size 1: 534 passengers (534 groups)  surv_rate=0.360
+  Size 2: 166 passengers ( 83 groups)  surv_rate=0.524
+  Size 3:  84 passengers ( 28 groups)  surv_rate=0.357
+  Size 4:  56 passengers ( 14 groups)  surv_rate=0.429
+  Size 5:   5 passengers (  1 groups)  surv_rate=0.000
+  Size 6:  30 passengers (  5 groups)  surv_rate=0.233
+  Size 7:   7 passengers (  1 groups)  surv_rate=0.000
+  Size 9:   9 passengers (  1 groups)  surv_rate=0.222
+
+
+--- C0: Baseline (A+B, no surname) ---
+Features: 21
+       C   CV Mean    CV Std
+------------------------------
+    0.01    0.8305    0.0066 <-- best
+    0.05    0.8283    0.0123
+    0.10    0.8294    0.0111
+    0.50    0.8294    0.0138
+    1.00    0.8294    0.0138
+  Best: C=0.01, CV=0.8305 ± 0.0066
+
+--- C1: + SurnameGroupSize ---
+Features: 22
+       C   CV Mean    CV Std
+------------------------------
+    0.01    0.8294    0.0094 <-- best
+    0.05    0.8294    0.0147
+    0.10    0.8271    0.0122
+    0.50    0.8271    0.0141
+    1.00    0.8283    0.0137
+  Best: C=0.01, CV=0.8294 ± 0.0094
+
+--- C2: + SurnameSurvHint (OOF) ---
+Features: 21
+       C   CV Mean    CV Std
+------------------------------
+    0.01    0.8092    0.0208 <-- best
+    0.05    0.7857    0.0210
+    0.10    0.7857    0.0225
+    0.50    0.7857    0.0189
+    1.00    0.7845    0.0205
+  Best: C=0.01, CV=0.8092 ± 0.0208
+
+--- C3: + SurnameGroupSize + SurnameSurvHint (OOF) ---
+Features: 22
+       C   CV Mean    CV Std
+------------------------------
+    0.01    0.8137    0.0238 <-- best
+    0.05    0.7857    0.0210
+    0.10    0.7879    0.0203
+    0.50    0.7812    0.0188
+    1.00    0.7767    0.0239
+  Best: C=0.01, CV=0.8137 ± 0.0238
+
+============================================================
+SHUFFLE ABLATION
+============================================================
+Randomize surname labels — if lift persists, it's leakage.
+
+
+--- Shuffled: GroupSize + SurvHint (should match baseline) ---
+Features: 22
+       C   CV Mean    CV Std
+------------------------------
+    0.01    0.7688    0.0200 <-- best
+    0.05    0.7452    0.0131
+    0.10    0.7441    0.0136
+    0.50    0.7430    0.0101
+    1.00    0.7418    0.0083
+  Best: C=0.01, CV=0.7688 ± 0.0200
+
+Shuffle ablation result:
+  Baseline (no surname):  0.8305
+  Real surnames (C3):     0.8137  delta=-0.0168
+  Shuffled surnames:      0.7688  delta=-0.0618
+  WARNING: Shuffled surnames still show lift — potential leakage!
+
+============================================================
+STAGE C SUMMARY
+============================================================
+  C0: Baseline (A+B)                   0.8305 ± 0.0066
+  C1: + GroupSize                      0.8294 ± 0.0094
+  C3: + Both                           0.8137 ± 0.0238
+  C2: + SurvHint (OOF)                 0.8092 ± 0.0208
+  Shuffled: Both                       0.7688 ± 0.0200
+
+Recommendation: None
+Features to add: []
+
+--- Generating Submission ---
+Submission saved: submissions/logreg_v3c_surname.csv
+Predicted survival rate in test: 0.414
+Training accuracy: 0.8384
+Best CV: 0.8305
+Gap: 0.0079
+
+--- Test Prediction Profile ---
+  female Pclass 1: n= 50  predicted_survived= 50  rate=1.000
+  female Pclass 2: n= 30  predicted_survived= 30  rate=1.000
+  female Pclass 3: n= 72  predicted_survived= 67  rate=0.931
+  male   Pclass 1: n= 57  predicted_survived= 13  rate=0.228
+  male   Pclass 2: n= 63  predicted_survived=  2  rate=0.032
+  male   Pclass 3: n=146  predicted_survived= 11  rate=0.075
+
+  Total female predicted dead: 5
+
+--- Diff vs v2 ---
+  Passengers changed: 4 / 418
+    PassengerId 965: 0 -> 1  (male, Pclass 1, Ovies y Rodriguez, Mr. Servando)
+    PassengerId 1073: 0 -> 1  (male, Pclass 1, Compton, Mr. Alexander Taylor Jr)
+    PassengerId 1128: 0 -> 1  (male, Pclass 1, Warren, Mr. Frank Manley)
+    PassengerId 1296: 0 -> 1  (male, Pclass 1, Frauenthal, Mr. Isaac Gerald)
+
+--- Coefficients ---
+  -             Title_Mr  -0.3751  ###
+  -                  Sex  -0.3451  ###
+  -        IsLargeFamily  -0.3102  ###
+  -             Pclass_3  -0.2411  ##
+  +            Title_Mrs  +0.2248  ##
+  -       Sex_x_Pclass_2  -0.2088  ##
+  +         Title_Master  +0.1911  #
+  +           Title_Miss  +0.1900  #
+  +              Deck_DE  +0.1738  #
+  +             HasCabin  +0.1609  #
+  +                 Fare  +0.1335  #
+  +             Pclass_2  +0.1209  #
+  +              IsChild  +0.1051  #
+  -       Sex_x_Pclass_3  -0.0972  
+  -                Emb_S  -0.0803  
+  +                Emb_C  +0.0785  
+  +             Deck_ABC  +0.0722  
+  -           Title_Rare  -0.0622  
+  +                Emb_Q  +0.0183  
+  +              Deck_FG  +0.0045  
+  +              IsAlone  +0.0016  
+
+Results saved to: results/models/11c_logreg_v3_surname.txt

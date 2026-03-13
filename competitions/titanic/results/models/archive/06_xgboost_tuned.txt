@@ -1,0 +1,129 @@
+============================================================
+MODEL 6: XGBOOST (HYPERPARAMETER TUNED)
+============================================================
+Features: 20
+Training samples: 891
+
+--- Search Space ---
+  n_estimators          [100.00, 699.00]
+  max_depth             [2.00, 9.00]
+  learning_rate         [0.00, 1.00]
+  subsample             [0.00, 1.00]
+  colsample_bytree      [0.00, 1.00]
+  min_child_weight      [1.00, 10.00]
+  reg_alpha             [0.00, 1.00]
+  reg_lambda            [0.00, 1.00]
+  gamma                 [0.00, 1.00]
+
+Searching 200 random hyperparameter combinations...
+(5-fold CV for each = 1,000 model fits total)
+
+--- Search Results ---
+  Best CV accuracy: 0.8552
+
+--- Best Hyperparameters ---
+  colsample_bytree      0.8257
+  gamma                 0.4149
+  learning_rate         0.0492
+  max_depth             3
+  min_child_weight      6
+  n_estimators          568
+  reg_alpha             0.2637
+  reg_lambda            1.0330
+  subsample             0.8929
+
+--- Original vs Tuned XGBoost ---
+
+  Parameter               Original       Tuned
+  --------------------  ----------  ----------
+  colsample_bytree          0.8000      0.8257
+  learning_rate             0.0500      0.0492
+  max_depth                      4           3
+  min_child_weight               3           6
+  n_estimators                 300         568
+  reg_alpha                 0.1000      0.2637
+  reg_lambda                1.0000      1.0330
+  subsample                 0.8000      0.8929
+  gamma                        N/A      0.4149
+
+--- Fresh 5-Fold CV (best model) ---
+  Fold 1: 0.8771
+  Fold 2: 0.8708
+  Fold 3: 0.8371
+  Fold 4: 0.8427
+  Fold 5: 0.8483
+
+  Mean:  0.8552
+  Std:   0.0158
+
+--- Full Model Comparison ---
+  XGBoost (tuned)            0.8552 <-- best
+  XGBoost (original)         0.8451
+  LightGBM                   0.8384
+  Logistic Regression        0.8316
+  Random Forest              0.8316
+  Neural Network             0.8204
+  Gender-only                0.7870
+
+--- Feature Importance (Tuned Model) ---
+
+  PT_adult_male         0.2258  ██████████████████████
+  Sex                   0.2226  ██████████████████████
+  Title_Master          0.1498  ██████████████
+  Title_Mr              0.1045  ██████████
+  Pclass                0.0710  ███████
+  TicketGroupSize       0.0348  ███
+  FamilySize            0.0301  ███
+  HasCabin              0.0287  ██
+  PT_child              0.0278  ██
+  Emb_S                 0.0157  █
+  FarePerPerson         0.0132  █
+  Fare                  0.0124  █
+  Emb_Q                 0.0110  █
+  Age                   0.0109  █
+  PT_adult_female       0.0099  
+  Emb_C                 0.0091  
+  IsAlone               0.0086  
+  Title_Mrs             0.0075  
+  Title_Miss            0.0065  
+  Title_Rare            0.0000  
+
+--- Confusion Matrix (on training data) ---
+  Predicted:     Died  Survived
+  Actual Died:    518      31
+  Actual Surv:     62     280
+
+--- Classification Report (on training data) ---
+              precision    recall  f1-score   support
+
+        Died       0.89      0.94      0.92       549
+    Survived       0.90      0.82      0.86       342
+
+    accuracy                           0.90       891
+   macro avg       0.90      0.88      0.89       891
+weighted avg       0.90      0.90      0.89       891
+
+--- Overfitting Check ---
+  Training accuracy:  0.8956
+  CV accuracy:        0.8552
+  Gap:                0.0404
+  Original XGB gap:   0.0640
+  Improvement: less overfitting than original
+
+--- Top 10 Hyperparameter Combinations ---
+  Rank  1: 0.8552 (+/- 0.0158)
+  Rank  2: 0.8530 (+/- 0.0116)
+  Rank  3: 0.8530 (+/- 0.0132)
+  Rank  4: 0.8530 (+/- 0.0132)
+  Rank  5: 0.8518 (+/- 0.0137)
+  Rank  5: 0.8518 (+/- 0.0155)
+  Rank  7: 0.8518 (+/- 0.0142)
+  Rank  7: 0.8518 (+/- 0.0155)
+  Rank  9: 0.8507 (+/- 0.0099)
+  Rank 10: 0.8507 (+/- 0.0106)
+
+Submission saved: submissions/xgboost_tuned.csv
+Predicted survival rate in test: 0.376
+
+Results saved to: results/models/06_xgboost_tuned.txt
+Importance saved to: results/models/06_xgboost_tuned_importance.csv

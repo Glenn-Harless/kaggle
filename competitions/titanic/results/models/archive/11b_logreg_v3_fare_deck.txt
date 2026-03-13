@@ -1,0 +1,150 @@
+============================================================
+STAGE B: FARE & DECK REFINEMENT
+============================================================
+
+--- B0: Stage A baseline (raw Fare) ---
+Features (18): ['Sex', 'Fare', 'IsAlone', 'IsLargeFamily', 'HasCabin', 'IsChild', 'Title_Master', 'Title_Miss', 'Title_Mr', 'Title_Mrs', 'Title_Rare', 'Emb_C', 'Emb_Q', 'Emb_S', 'Pclass_2', 'Pclass_3', 'Sex_x_Pclass_2', 'Sex_x_Pclass_3']
+       C   CV Mean    CV Std       Gap
+----------------------------------------
+    0.01    0.8294    0.0070   +0.0034 <-- best
+    0.05    0.8294    0.0107   +0.0034
+    0.10    0.8271    0.0093   +0.0056
+    0.50    0.8249    0.0138   +0.0124
+    1.00    0.8283    0.0113   +0.0090
+  Best: C=0.01, CV=0.8294 ± 0.0070
+
+--- B1: log1p(Fare) replacing raw Fare ---
+Features (18): ['Sex', 'Fare', 'IsAlone', 'IsLargeFamily', 'HasCabin', 'IsChild', 'Title_Master', 'Title_Miss', 'Title_Mr', 'Title_Mrs', 'Title_Rare', 'Emb_C', 'Emb_Q', 'Emb_S', 'Pclass_2', 'Pclass_3', 'Sex_x_Pclass_2', 'Sex_x_Pclass_3']
+       C   CV Mean    CV Std       Gap
+----------------------------------------
+    0.01    0.8271    0.0068   +0.0056 <-- best
+    0.05    0.8271    0.0118   +0.0011
+    0.10    0.8260    0.0140   +0.0079
+    0.50    0.8260    0.0149   +0.0079
+    1.00    0.8249    0.0167   +0.0113
+  Best: C=0.01, CV=0.8271 ± 0.0068
+
+--- B1-alt: log1p(Fare) + raw Fare (both) ---
+Features (19): ['Sex', 'Fare', 'IsAlone', 'IsLargeFamily', 'HasCabin', 'IsChild', 'Title_Master', 'Title_Miss', 'Title_Mr', 'Title_Mrs', 'Title_Rare', 'Emb_C', 'Emb_Q', 'Emb_S', 'Pclass_2', 'Pclass_3', 'Sex_x_Pclass_2', 'Sex_x_Pclass_3', 'LogFare']
+       C   CV Mean    CV Std       Gap
+----------------------------------------
+    0.01    0.8260    0.0090   +0.0045 <-- best
+    0.05    0.8283    0.0119   +0.0011 <-- best
+    0.10    0.8294    0.0139   +0.0045 <-- best
+    0.50    0.8249    0.0155   +0.0090
+    1.00    0.8249    0.0167   +0.0113
+  Best: C=0.1, CV=0.8294 ± 0.0139
+
+============================================================
+B1 FARE SUMMARY
+============================================================
+  Raw Fare (baseline)        0.8294 ± 0.0070
+  Both raw + log1p           0.8294 ± 0.0139
+  log1p(Fare) only           0.8271 ± 0.0068
+
+Fare winner: raw (CV=0.8294)
+
+============================================================
+B2: DECK FEATURES
+============================================================
+
+Deck distribution (train):
+  A: n= 15  surv_rate=0.467
+  B: n= 47  surv_rate=0.745
+  C: n= 59  surv_rate=0.593
+  D: n= 33  surv_rate=0.758
+  E: n= 32  surv_rate=0.750
+  F: n= 13  surv_rate=0.615
+  G: n=  4  surv_rate=0.500
+  U: n=688  surv_rate=0.299
+
+Grouped deck distribution (train):
+  ABC: n=121  surv_rate=0.636
+  DE: n= 65  surv_rate=0.754
+  FG: n= 17  surv_rate=0.588
+  U: n=688  surv_rate=0.299
+
+--- B2: Best fare (raw) + Deck groups ---
+Features (21): ['Sex', 'Fare', 'IsAlone', 'IsLargeFamily', 'HasCabin', 'IsChild', 'Title_Master', 'Title_Miss', 'Title_Mr', 'Title_Mrs', 'Title_Rare', 'Emb_C', 'Emb_Q', 'Emb_S', 'Pclass_2', 'Pclass_3', 'Sex_x_Pclass_2', 'Sex_x_Pclass_3', 'Deck_ABC', 'Deck_DE', 'Deck_FG']
+       C   CV Mean    CV Std       Gap
+----------------------------------------
+    0.01    0.8305    0.0066   +0.0079 <-- best
+    0.05    0.8283    0.0123   +0.0045
+    0.10    0.8294    0.0111   +0.0101
+    0.50    0.8294    0.0138   +0.0112
+    1.00    0.8294    0.0138   +0.0112
+  Best: C=0.01, CV=0.8305 ± 0.0066
+
+--- B2-alt: Raw Fare + Deck groups (no fare change) ---
+Features (21): ['Sex', 'Fare', 'IsAlone', 'IsLargeFamily', 'HasCabin', 'IsChild', 'Title_Master', 'Title_Miss', 'Title_Mr', 'Title_Mrs', 'Title_Rare', 'Emb_C', 'Emb_Q', 'Emb_S', 'Pclass_2', 'Pclass_3', 'Sex_x_Pclass_2', 'Sex_x_Pclass_3', 'Deck_ABC', 'Deck_DE', 'Deck_FG']
+       C   CV Mean    CV Std       Gap
+----------------------------------------
+    0.01    0.8305    0.0066   +0.0079 <-- best
+    0.05    0.8283    0.0123   +0.0045
+    0.10    0.8294    0.0111   +0.0101
+    0.50    0.8294    0.0138   +0.0112
+    1.00    0.8294    0.0138   +0.0112
+  Best: C=0.01, CV=0.8305 ± 0.0066
+
+============================================================
+B2 DECK SUMMARY
+============================================================
+  + Deck groups (raw fare)             0.8305
+  + Deck groups (raw fare)             0.8305
+  No deck (raw fare)                   0.8294
+
+============================================================
+STAGE B FINAL SUMMARY
+============================================================
+  B2: raw fare + Deck                     0.8305 ± 0.0066
+  B2-alt: raw fare + Deck                 0.8305 ± 0.0066
+  A: Interactions only (raw Fare)         0.8294 ± 0.0070
+  B1-alt: Both fares                      0.8294 ± 0.0139
+  B1: log1p(Fare)                         0.8271 ± 0.0068
+
+Best config: B2: raw fare + Deck (CV=0.8305)
+
+Submission saved: submissions/logreg_v3b_fare_deck.csv
+Predicted survival rate in test: 0.414
+
+--- Test Prediction Profile (best config) ---
+  female Pclass 1: n= 50  predicted_survived= 50  rate=1.000
+  female Pclass 2: n= 30  predicted_survived= 30  rate=1.000
+  female Pclass 3: n= 72  predicted_survived= 67  rate=0.931
+  male   Pclass 1: n= 57  predicted_survived= 13  rate=0.228
+  male   Pclass 2: n= 63  predicted_survived=  2  rate=0.032
+  male   Pclass 3: n=146  predicted_survived= 11  rate=0.075
+
+  Total female predicted dead: 5
+
+--- Diff vs v2 ---
+  Passengers changed: 4 / 418
+    PassengerId 965: 0 -> 1  (male, Pclass 1)
+    PassengerId 1073: 0 -> 1  (male, Pclass 1)
+    PassengerId 1128: 0 -> 1  (male, Pclass 1)
+    PassengerId 1296: 0 -> 1  (male, Pclass 1)
+
+--- Coefficients (best config) ---
+  -           Title_Mr  -0.3751  ###
+  -                Sex  -0.3451  ###
+  -      IsLargeFamily  -0.3102  ###
+  -           Pclass_3  -0.2411  ##
+  +          Title_Mrs  +0.2248  ##
+  -     Sex_x_Pclass_2  -0.2088  ##
+  +       Title_Master  +0.1911  #
+  +         Title_Miss  +0.1900  #
+  +            Deck_DE  +0.1738  #
+  +           HasCabin  +0.1609  #
+  +               Fare  +0.1335  #
+  +           Pclass_2  +0.1209  #
+  +            IsChild  +0.1051  #
+  -     Sex_x_Pclass_3  -0.0972  
+  -              Emb_S  -0.0803  
+  +              Emb_C  +0.0785  
+  +           Deck_ABC  +0.0722  
+  -         Title_Rare  -0.0622  
+  +              Emb_Q  +0.0183  
+  +            Deck_FG  +0.0045  
+  +            IsAlone  +0.0016  
+
+Results saved to: results/models/11b_logreg_v3_fare_deck.txt

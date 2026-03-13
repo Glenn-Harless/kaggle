@@ -1,0 +1,101 @@
+============================================================
+MODEL 8: LOGISTIC REGRESSION (HYPERPARAMETER TUNED)
+============================================================
+Features: 20
+Training samples: 891
+
+--- Search Space ---
+  C (regularization):    [0.001, 100] (log-uniform)
+  penalty:               [l1, l2, elasticnet]
+  l1_ratio:              [0, 1] (for elasticnet)
+  solver:                saga
+
+Searching 200 random hyperparameter combinations...
+
+--- Search Results ---
+  Best CV accuracy: 0.8406
+
+--- Best Hyperparameters ---
+  C                     0.1138
+  l1_ratio              0.7776
+  max_iter              2000
+  penalty               l2
+  solver                saga
+
+--- Original vs Tuned Logistic Regression ---
+
+  Parameter                 Original         Tuned
+  --------------------  ------------  ------------
+  C                     1.0 (default)        0.1138
+  penalty                         l2            l2
+
+--- Fresh 5-Fold CV (best model) ---
+  Fold 1: 0.8492
+  Fold 2: 0.8315
+  Fold 3: 0.8315
+  Fold 4: 0.8483
+  Fold 5: 0.8427
+
+  Mean:  0.8406
+  Std:   0.0078
+
+--- Model Comparison ---
+  XGBoost (tuned)            0.8552 <-- best
+  XGBoost (original)         0.8451
+  LogReg (tuned)             0.8406
+  LightGBM                   0.8384
+  LogReg (original)          0.8316
+  Random Forest (orig)       0.8316
+  Neural Network             0.8204
+  Gender-only                0.7870
+
+--- Feature Coefficients (sorted by importance) ---
+Positive = increases survival, Negative = decreases survival
+
+  - FamilySize            -0.6558  ██████
+  - Pclass                -0.6303  ██████
+  - PT_adult_male         -0.3992  ███
+  - Sex                   -0.3277  ███
+  - Age                   -0.2958  ██
+  + HasCabin              +0.2911  ██
+  + PT_adult_female       +0.2902  ██
+  - Title_Mr              -0.2898  ██
+  + Title_Mrs             +0.2881  ██
+  + PT_child              +0.2214  ██
+  + Fare                  +0.2084  ██
+  + Title_Master          +0.1873  █
+  - FarePerPerson         -0.0876  
+  + Emb_C                 +0.0874  
+  - Emb_S                 -0.0834  
+  - IsAlone               -0.0782  
+  - TicketGroupSize       -0.0721  
+  - Title_Rare            -0.0587  
+  + Title_Miss            +0.0325  
+  + Emb_Q                 +0.0108  
+
+--- Confusion Matrix (on training data) ---
+  Predicted:     Died  Survived
+  Actual Died:    488      61
+  Actual Surv:     82     260
+
+--- Classification Report (on training data) ---
+              precision    recall  f1-score   support
+
+        Died       0.86      0.89      0.87       549
+    Survived       0.81      0.76      0.78       342
+
+    accuracy                           0.84       891
+   macro avg       0.83      0.82      0.83       891
+weighted avg       0.84      0.84      0.84       891
+
+--- Overfitting Check ---
+  Training accuracy:  0.8395
+  CV accuracy:        0.8406
+  Gap:                -0.0011
+  Gap < 5% — looks healthy
+
+Submission saved: submissions/logistic_regression_tuned.csv
+Predicted survival rate in test: 0.402
+
+Results saved to: results/models/08_logistic_regression_tuned.txt
+Coefficients saved to: results/models/08_logistic_regression_tuned_coefficients.csv

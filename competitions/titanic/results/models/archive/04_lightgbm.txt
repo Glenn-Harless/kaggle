@@ -1,0 +1,77 @@
+============================================================
+MODEL 4: LIGHTGBM
+============================================================
+Features: 20
+Training samples: 891
+
+--- 5-Fold Cross-Validation ---
+  Fold 1: 0.8547
+  Fold 2: 0.8258
+  Fold 3: 0.8146
+  Fold 4: 0.8427
+  Fold 5: 0.8539
+
+  Mean:  0.8384
+  Std:   0.0158
+
+--- Model Comparison ---
+  Gender-only                0.7870
+  Logistic Regression        0.8316
+  Random Forest              0.8316
+  XGBoost                    0.8451 <-- best
+  LightGBM                   0.8384
+
+--- Feature Importance (Split count, normalized) ---
+
+  Age                   0.2587  █████████████████████████
+  FarePerPerson         0.2224  ██████████████████████
+  Fare                  0.2176  █████████████████████
+  FamilySize            0.0659  ██████
+  TicketGroupSize       0.0599  █████
+  Pclass                0.0236  ██
+  Title_Mrs             0.0207  ██
+  PT_adult_male         0.0191  █
+  HasCabin              0.0188  █
+  Emb_S                 0.0175  █
+  PT_adult_female       0.0159  █
+  Emb_C                 0.0156  █
+  Title_Mr              0.0121  █
+  Title_Master          0.0092  
+  Sex                   0.0089  
+  Title_Miss            0.0073  
+  IsAlone               0.0035  
+  Title_Rare            0.0025  
+  Emb_Q                 0.0006  
+  PT_child              0.0000  
+
+--- Confusion Matrix (on training data) ---
+  Predicted:     Died  Survived
+  Actual Died:    526      23
+  Actual Surv:     50     292
+
+--- Classification Report (on training data) ---
+              precision    recall  f1-score   support
+
+        Died       0.91      0.96      0.94       549
+    Survived       0.93      0.85      0.89       342
+
+    accuracy                           0.92       891
+   macro avg       0.92      0.91      0.91       891
+weighted avg       0.92      0.92      0.92       891
+
+--- Overfitting Check ---
+  Training accuracy:  0.9181
+  CV accuracy:        0.8384
+  Gap:                0.0797
+  Warning: Gap > 5% — potential overfitting
+
+--- Prediction Confidence ---
+  Predictions > 0.9 (very confident survive): 164
+  Predictions < 0.1 (very confident die):     328
+  Predictions 0.4-0.6 (uncertain):            49
+
+Submission saved: submissions/lightgbm.csv
+Predicted survival rate in test: 0.383
+
+Results saved to: results/models/04_lightgbm.txt
+Importance saved to: results/models/04_lightgbm_importance.csv

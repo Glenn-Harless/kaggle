@@ -1,0 +1,68 @@
+============================================================
+MODEL 5: NEURAL NETWORK (MLPClassifier)
+============================================================
+Features: 20
+Training samples: 891
+
+Architecture: 20 -> 64 -> 32 -> 1
+Activation: ReLU
+Optimizer: Adam
+Early stopping: enabled (patience=20)
+
+--- 5-Fold Cross-Validation ---
+  Fold 1: 0.8324
+  Fold 2: 0.8034
+  Fold 3: 0.8034
+  Fold 4: 0.8427
+  Fold 5: 0.8202
+
+  Mean:  0.8204
+  Std:   0.0156
+
+--- Model Comparison ---
+  XGBoost                    0.8451 <-- best
+  LightGBM                   0.8384
+  Logistic Regression        0.8316
+  Random Forest              0.8316
+  Neural Network             0.8204
+  Gender-only                0.7870
+
+--- Training Details ---
+  Epochs run: 24
+  Final loss: 0.3462
+
+--- Confusion Matrix (on training data) ---
+  Predicted:     Died  Survived
+  Actual Died:    486      63
+  Actual Surv:     84     258
+
+--- Classification Report (on training data) ---
+              precision    recall  f1-score   support
+
+        Died       0.85      0.89      0.87       549
+    Survived       0.80      0.75      0.78       342
+
+    accuracy                           0.84       891
+   macro avg       0.83      0.82      0.82       891
+weighted avg       0.83      0.84      0.83       891
+
+--- Overfitting Check ---
+  Training accuracy:  0.8350
+  CV accuracy:        0.8204
+  Gap:                0.0146
+  Gap < 5% — looks healthy
+
+--- Prediction Confidence ---
+  Predictions > 0.9 (very confident survive): 70
+  Predictions < 0.1 (very confident die):     1
+  Predictions 0.4-0.6 (uncertain):            68
+
+--- Layer Weights Summary ---
+  Layer 1: 20 -> 64  (weight range: -0.309 to 0.310, mean abs: 0.140)
+  Layer 2: 64 -> 32  (weight range: -0.285 to 0.301, mean abs: 0.123)
+  Layer 3: 32 -> 1  (weight range: -0.413 to 0.403, mean abs: 0.204)
+
+Submission saved: submissions/neural_network.csv
+Predicted survival rate in test: 0.404
+
+Results saved to: results/models/05_neural_network.txt

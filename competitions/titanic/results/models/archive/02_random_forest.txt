@@ -1,0 +1,72 @@
+============================================================
+MODEL 2: RANDOM FOREST
+============================================================
+Features: 20
+Training samples: 891
+
+--- 5-Fold Cross-Validation ---
+  Fold 1: 0.8436
+  Fold 2: 0.8146
+  Fold 3: 0.8258
+  Fold 4: 0.8371
+  Fold 5: 0.8371
+
+  Mean:  0.8316
+  Std:   0.0103
+
+--- Baseline Comparison ---
+  Gender-only model:    0.7870
+  Logistic Regression:  0.8316
+  Random Forest:        0.8316
+  vs Gender:            +0.0446
+  vs LogReg:            +0.0000
+
+--- Feature Importance (Mean Decrease in Impurity) ---
+
+  PT_adult_male         0.1681  ████████████████
+  Title_Mr              0.1442  ██████████████
+  Sex                   0.1132  ███████████
+  PT_adult_female       0.0948  █████████
+  FarePerPerson         0.0864  ████████
+  Fare                  0.0690  ██████
+  Pclass                0.0665  ██████
+  TicketGroupSize       0.0517  █████
+  FamilySize            0.0448  ████
+  Age                   0.0410  ████
+  HasCabin              0.0321  ███
+  Title_Mrs             0.0230  ██
+  Title_Miss            0.0224  ██
+  Emb_S                 0.0087  
+  PT_child              0.0082  
+  Emb_C                 0.0070  
+  IsAlone               0.0062  
+  Title_Master          0.0060  
+  Title_Rare            0.0036  
+  Emb_Q                 0.0032  
+
+--- Confusion Matrix (on training data) ---
+  Predicted:     Died  Survived
+  Actual Died:    503      46
+  Actual Surv:     85     257
+
+--- Classification Report (on training data) ---
+              precision    recall  f1-score   support
+
+        Died       0.86      0.92      0.88       549
+    Survived       0.85      0.75      0.80       342
+
+    accuracy                           0.85       891
+   macro avg       0.85      0.83      0.84       891
+weighted avg       0.85      0.85      0.85       891
+
+--- Overfitting Check ---
+  Training accuracy:  0.8530
+  CV accuracy:        0.8316
+  Gap:                0.0213
+  Gap < 5% — looks healthy
+
+Submission saved: submissions/random_forest.csv
+Predicted survival rate in test: 0.385
+
+Results saved to: results/models/02_random_forest.txt
+Importance saved to: results/models/02_random_forest_importance.csv

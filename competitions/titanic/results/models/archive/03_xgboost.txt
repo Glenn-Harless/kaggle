@@ -1,0 +1,79 @@
+============================================================
+MODEL 3: XGBOOST
+============================================================
+Features: 20
+Training samples: 891
+
+--- 5-Fold Cross-Validation ---
+  Fold 1: 0.8603
+  Fold 2: 0.8483
+  Fold 3: 0.8258
+  Fold 4: 0.8427
+  Fold 5: 0.8483
+
+  Mean:  0.8451
+  Std:   0.0112
+
+--- Model Comparison ---
+  Gender-only model:    0.7870
+  Logistic Regression:  0.8316
+  Random Forest:        0.8316
+  XGBoost:              0.8451
+  vs Gender:            +0.0581
+  vs LogReg:            +0.0135
+  vs Random Forest:     +0.0135
+
+--- Feature Importance (Gain) ---
+
+  PT_adult_male         0.2890  ████████████████████████████
+  Title_Mr              0.1104  ███████████
+  Sex                   0.1043  ██████████
+  Pclass                0.0892  ████████
+  Title_Rare            0.0752  ███████
+  Title_Master          0.0560  █████
+  HasCabin              0.0382  ███
+  FamilySize            0.0342  ███
+  PT_child              0.0336  ███
+  TicketGroupSize       0.0246  ██
+  FarePerPerson         0.0185  █
+  Emb_S                 0.0161  █
+  Fare                  0.0160  █
+  Age                   0.0157  █
+  Emb_C                 0.0144  █
+  Title_Mrs             0.0142  █
+  PT_adult_female       0.0142  █
+  IsAlone               0.0141  █
+  Emb_Q                 0.0111  █
+  Title_Miss            0.0110  █
+
+--- Confusion Matrix (on training data) ---
+  Predicted:     Died  Survived
+  Actual Died:    523      26
+  Actual Surv:     55     287
+
+--- Classification Report (on training data) ---
+              precision    recall  f1-score   support
+
+        Died       0.90      0.95      0.93       549
+    Survived       0.92      0.84      0.88       342
+
+    accuracy                           0.91       891
+   macro avg       0.91      0.90      0.90       891
+weighted avg       0.91      0.91      0.91       891
+
+--- Overfitting Check ---
+  Training accuracy:  0.9091
+  CV accuracy:        0.8451
+  Gap:                0.0640
+  Warning: Gap > 5% — potential overfitting
+
+--- Prediction Confidence ---
+  Predictions > 0.9 (very confident survive): 157
+  Predictions < 0.1 (very confident die):     323
+  Predictions 0.4-0.6 (uncertain):            59
+
+Submission saved: submissions/xgboost.csv
+Predicted survival rate in test: 0.383
+
+Results saved to: results/models/03_xgboost.txt
+Importance saved to: results/models/03_xgboost_importance.csv

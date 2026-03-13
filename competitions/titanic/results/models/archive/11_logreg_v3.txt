@@ -1,0 +1,133 @@
+============================================================
+MODEL 11: LOGISTIC REGRESSION v3 (FINAL)
+============================================================
+Features: 21
+Training samples: 891
+
+Feature list: ['Sex', 'Fare', 'IsAlone', 'IsLargeFamily', 'HasCabin', 'IsChild', 'Title_Master', 'Title_Miss', 'Title_Mr', 'Title_Mrs', 'Title_Rare', 'Emb_C', 'Emb_Q', 'Emb_S', 'Pclass_2', 'Pclass_3', 'Sex_x_Pclass_2', 'Sex_x_Pclass_3', 'Deck_ABC', 'Deck_DE', 'Deck_FG']
+
+--- v3 Changes from v2 ---
+  Added: Pclass_2, Pclass_3 (one-hot, replaces ordinal Pclass)
+  Added: Sex_x_Pclass_2, Sex_x_Pclass_3 (interaction terms)
+  Added: Deck_ABC, Deck_DE, Deck_FG (grouped cabin deck)
+  Dropped: Pclass (replaced by one-hot)
+  Rejected: log1p(Fare) — did not improve CV
+  Rejected: SurnameGroupSize, SurnameSurvHint — hurt CV
+
+--- Regularization Sweep ---
+       C   CV Mean    CV Std       Gap
+----------------------------------------
+    0.01    0.8305    0.0066   +0.0079 <-- best
+    0.05    0.8283    0.0123   +0.0045
+    0.10    0.8294    0.0111   +0.0101
+    0.50    0.8294    0.0138   +0.0112
+    1.00    0.8294    0.0138   +0.0112
+
+Selected C=0.01
+
+--- 5-Fold Cross-Validation ---
+  Fold 1: 0.8324
+  Fold 2: 0.8258
+  Fold 3: 0.8371
+  Fold 4: 0.8202
+  Fold 5: 0.8371
+
+  Mean:  0.8305
+  Std:   0.0066
+
+--- Feature Coefficients (sorted by importance) ---
+Positive = increases survival, Negative = decreases survival
+
+  -           Title_Mr  -0.3751  ###
+  -                Sex  -0.3451  ###
+  -      IsLargeFamily  -0.3102  ###
+  -           Pclass_3  -0.2411  ##
+  +          Title_Mrs  +0.2248  ##
+  -     Sex_x_Pclass_2  -0.2088  ##
+  +       Title_Master  +0.1911  #
+  +         Title_Miss  +0.1900  #
+  +            Deck_DE  +0.1738  #
+  +           HasCabin  +0.1609  #
+  +               Fare  +0.1335  #
+  +           Pclass_2  +0.1209  #
+  +            IsChild  +0.1051  #
+  -     Sex_x_Pclass_3  -0.0972  
+  -              Emb_S  -0.0803  
+  +              Emb_C  +0.0785  
+  +           Deck_ABC  +0.0722  
+  -         Title_Rare  -0.0622  
+  +              Emb_Q  +0.0183  
+  +            Deck_FG  +0.0045  
+  +            IsAlone  +0.0016  
+
+--- Interaction Interpretation ---
+Effective Sex penalty by Pclass (scaled coefficients):
+  1st class (reference): Sex = -0.3451
+  2nd class:             Sex = -0.5539  (base + interaction)
+  3rd class:             Sex = -0.4423  (base + interaction)
+
+--- Confusion Matrix (on training data) ---
+  Predicted:     Died  Survived
+  Actual Died:    488      61
+  Actual Surv:     83     259
+
+--- Classification Report (on training data) ---
+              precision    recall  f1-score   support
+
+        Died       0.85      0.89      0.87       549
+    Survived       0.81      0.76      0.78       342
+
+    accuracy                           0.84       891
+   macro avg       0.83      0.82      0.83       891
+weighted avg       0.84      0.84      0.84       891
+
+--- Overfitting Check ---
+  Training accuracy:  0.8384
+  CV accuracy:        0.8305
+  Gap:                0.0079
+  Gap < 5% — looks healthy
+
+--- Subgroup Behavior (Training Data) ---
+  female Pclass 1: n= 94  actual=0.968  pred=1.000  acc=0.968
+  female Pclass 2: n= 76  actual=0.921  pred=0.974  acc=0.895
+  female Pclass 3: n=144  actual=0.500  pred=0.812  acc=0.646
+  male   Pclass 1: n=122  actual=0.369  pred=0.131  acc=0.697
+  male   Pclass 2: n=108  actual=0.157  pred=0.083  acc=0.926
+  male   Pclass 3: n=347  actual=0.135  pred=0.029  acc=0.893
+
+--- Full Model Comparison ---
+  Model                                 CV    Kaggle
+  ------------------------------  --------  --------
+  v1 Ensemble (hard)              0.8563    0.7560
+  v1 XGBoost (tuned)              0.8552    0.7584
+  v1 LogReg (20 feat)             0.8339    0.7727
+  v3 LogReg (21 feat)             0.8305       TBD <--
+  v2 LogReg (15 feat)             0.8305    0.7727
+  Gender-only                     0.7870    0.7655
+
+Submission saved: submissions/logreg_v3.csv
+Predicted survival rate in test: 0.414
+
+--- Test Prediction Profile ---
+  female Pclass 1: n= 50  predicted_survived= 50  rate=1.000
+  female Pclass 2: n= 30  predicted_survived= 30  rate=1.000
+  female Pclass 3: n= 72  predicted_survived= 67  rate=0.931
+  male   Pclass 1: n= 57  predicted_survived= 13  rate=0.228
+  male   Pclass 2: n= 63  predicted_survived=  2  rate=0.032
+  male   Pclass 3: n=146  predicted_survived= 11  rate=0.075
+
+  Total female predicted dead: 5
+
+--- Passenger-Level Diff vs v2 ---
+  Passengers changed: 4 / 418
+  Flipped 0→1 (now survived): 4
+  Flipped 1→0 (now died):     0
+
+    PID 965: 0→1  male   Pclass 1  Cabin=D43       Ovies y Rodriguez, Mr. Servando
+    PID 1073: 0→1  male   Pclass 1  Cabin=E52       Compton, Mr. Alexander Taylor Jr
+    PID 1128: 0→1  male   Pclass 1  Cabin=D37       Warren, Mr. Frank Manley
+    PID 1296: 0→1  male   Pclass 1  Cabin=D40       Frauenthal, Mr. Isaac Gerald
+
+Results saved to: results/models/11_logreg_v3.txt
+Coefficients saved to: results/models/11_logreg_v3_coefficients.csv
+Submission saved to: submissions/logreg_v3.csv

@@ -1,0 +1,21 @@
+[project]
+name = "kaggle-dojo"
+version = "0.1.0"
+description = "A training ground for sharpening data science skills through Kaggle competitions"
+requires-python = ">=3.11"
+dependencies = [
+    "pandas>=2.2",
+    "numpy>=1.26",
+    "scikit-learn>=1.5",
+    "xgboost>=2.0",
+    "lightgbm>=4.3",
+    "matplotlib>=3.9",
+    "seaborn>=0.13",
+    "jupyter>=1.0",
+    "kaggle>=1.6",
+]
+
+[tool.uv]
+dev-dependencies = [
+    "ipykernel>=6.29",
+]

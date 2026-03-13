@@ -1,0 +1,65 @@
+============================================================
+MODEL 1: LOGISTIC REGRESSION
+============================================================
+Features: 20
+Training samples: 891
+
+--- 5-Fold Cross-Validation ---
+  Fold 1: 0.8436
+  Fold 2: 0.8202
+  Fold 3: 0.8202
+  Fold 4: 0.8371
+  Fold 5: 0.8315
+
+  Mean:  0.8305
+  Std:   0.0092
+
+--- Baseline Comparison ---
+  Gender-only model:    0.7870
+  Logistic Regression:  0.8305
+  Improvement:          +0.0435
+
+--- Feature Coefficients (sorted by importance) ---
+Positive = increases survival, Negative = decreases survival
+
+  - FamilySize            -0.9731  █████████
+  - Pclass                -0.6431  ██████
+  - PT_adult_male         -0.5312  █████
+  - Sex                   -0.4638  ████
+  + PT_adult_female       +0.3887  ███
+  - Age                   -0.3616  ███
+  + PT_child              +0.2905  ██
+  + HasCabin              +0.2573  ██
+  + Title_Mrs             +0.2098  ██
+  + FarePerPerson         +0.2037  ██
+  + TicketGroupSize       +0.1921  █
+  + Title_Master          +0.1854  █
+  - IsAlone               -0.1581  █
+  - Title_Mr              -0.1295  █
+  - Title_Miss            -0.1110  █
+  - Emb_S                 -0.0773  
+  + Emb_C                 +0.0698  
+  - Fare                  -0.0508  
+  + Emb_Q                 +0.0257  
+  - Title_Rare            -0.0163  
+
+--- Confusion Matrix (on training data) ---
+  Predicted:     Died  Survived
+  Actual Died:    484      65
+  Actual Surv:     82     260
+
+--- Classification Report (on training data) ---
+              precision    recall  f1-score   support
+
+        Died       0.86      0.88      0.87       549
+    Survived       0.80      0.76      0.78       342
+
+    accuracy                           0.84       891
+   macro avg       0.83      0.82      0.82       891
+weighted avg       0.83      0.84      0.83       891
+
+Submission saved: submissions/logistic_regression.csv
+Predicted survival rate in test: 0.411
+
+Results saved to: results/models/01_logistic_regression.txt
+Coefficients saved to: results/models/01_logistic_regression_coefficients.csv

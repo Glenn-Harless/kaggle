@@ -1,0 +1,250 @@
+============================================================
+EXPERIMENT 12b: SEGMENTED LOGREG + FareRankInClass
+============================================================
+
+Female: 314 train, 152 test
+Male:   577 train, 266 test
+
+Base female features (17): ['Fare', 'IsAlone', 'IsLargeFamily', 'HasCabin', 'Deck_ABC', 'Deck_DE', 'Deck_FG', 'IsChild', 'Title_Master', 'Title_Miss', 'Title_Mrs', 'Title_Rare', 'Emb_C', 'Emb_Q', 'Emb_S', 'Pclass_2', 'Pclass_3']
+Base male features (16): ['Fare', 'IsAlone', 'IsLargeFamily', 'HasCabin', 'Deck_ABC', 'Deck_DE', 'Deck_FG', 'IsChild', 'Title_Master', 'Title_Mr', 'Title_Rare', 'Emb_C', 'Emb_Q', 'Emb_S', 'Pclass_2', 'Pclass_3']
+
+============================================================
+VARIANT A: +FareRank, keep Fare
+============================================================
+
+--- Female Model: C Sweep ---
+       C   CV Mean    CV Std
+------------------------------
+    0.01    0.7999    0.0246 <-- best
+    0.05    0.8039    0.0233 <-- best
+    0.10    0.8143    0.0230 <-- best
+    0.50    0.8110    0.0279
+    1.00    0.8114    0.0258
+
+Selected C=0.1 (CV=0.8143)
+
+--- Male Model: C Sweep ---
+       C   CV Mean    CV Std
+------------------------------
+    0.01    0.8343    0.0196 <-- best
+    0.05    0.8508    0.0226 <-- best
+    0.10    0.8508    0.0226
+    0.50    0.8371    0.0185
+    1.00    0.8371    0.0185
+
+Selected C=0.05 (CV=0.8508)
+
+--- Combined Segmented CV (5-Fold) ---
+  Female C=0.1, Male C=0.05
+
+  Fold 1: 0.8547  (female=0.8308, male=0.8684)
+  Fold 2: 0.8483  (female=0.8276, male=0.8583)
+  Fold 3: 0.8258  (female=0.7778, male=0.8468)
+  Fold 4: 0.8202  (female=0.8382, male=0.8091)
+  Fold 5: 0.8427  (female=0.7971, male=0.8716)
+
+  Mean:  0.8384
+  Std:   0.0132
+
+============================================================
+VARIANT B: +FareRank, drop Fare
+============================================================
+
+--- Female Model: C Sweep ---
+       C   CV Mean    CV Std
+------------------------------
+    0.01    0.7999    0.0246 <-- best
+    0.05    0.8074    0.0214 <-- best
+    0.10    0.7976    0.0313
+    0.50    0.8204    0.0352 <-- best
+    1.00    0.8204    0.0352
+
+Selected C=0.5 (CV=0.8204)
+
+--- Male Model: C Sweep ---
+       C   CV Mean    CV Std
+------------------------------
+    0.01    0.8345    0.0205 <-- best
+    0.05    0.8474    0.0210 <-- best
+    0.10    0.8474    0.0210
+    0.50    0.8371    0.0161
+    1.00    0.8317    0.0121
+
+Selected C=0.05 (CV=0.8474)
+
+--- Combined Segmented CV (5-Fold) ---
+  Female C=0.5, Male C=0.05
+
+  Fold 1: 0.8547  (female=0.8462, male=0.8596)
+  Fold 2: 0.8427  (female=0.8276, male=0.8500)
+  Fold 3: 0.8258  (female=0.7778, male=0.8468)
+  Fold 4: 0.8315  (female=0.8676, male=0.8091)
+  Fold 5: 0.8371  (female=0.7826, male=0.8716)
+
+  Mean:  0.8384
+  Std:   0.0099
+
+============================================================
+VARIANT COMPARISON
+============================================================
+
+  Variant                                    CV       Std
+  -----------------------------------  --------  --------
+  A: +FareRank, keep Fare                0.8384    0.0132 <-- best
+  B: +FareRank, drop Fare                0.8384    0.0099 <-- best
+
+  Selected: B: +FareRank, drop Fare
+
+--- Final Model Features ---
+  Female (17): ['IsAlone', 'IsLargeFamily', 'HasCabin', 'Deck_ABC', 'Deck_DE', 'Deck_FG', 'IsChild', 'Title_Master', 'Title_Miss', 'Title_Mrs', 'Title_Rare', 'Emb_C', 'Emb_Q', 'Emb_S', 'Pclass_2', 'Pclass_3', 'FareRankInClass']
+  Male (16): ['IsAlone', 'IsLargeFamily', 'HasCabin', 'Deck_ABC', 'Deck_DE', 'Deck_FG', 'IsChild', 'Title_Master', 'Title_Mr', 'Title_Rare', 'Emb_C', 'Emb_Q', 'Emb_S', 'Pclass_2', 'Pclass_3', 'FareRankInClass']
+
+--- Female Model Coefficients ---
+Positive = increases survival, Negative = decreases survival
+
+  -           Pclass_3  -1.3179  #############
+  -      IsLargeFamily  -0.4379  ####
+  -              Emb_S  -0.2513  ##
+  +              Emb_Q  +0.2151  ##
+  +            IsChild  +0.2047  ##
+  +            Deck_DE  +0.1787  #
+  +           HasCabin  +0.1435  #
+  +         Title_Rare  +0.1328  #
+  +              Emb_C  +0.1210  #
+  -    FareRankInClass  -0.1147  #
+  -         Title_Miss  -0.1147  #
+  +            IsAlone  +0.1010  #
+  +          Title_Mrs  +0.0887  
+  -           Pclass_2  -0.0656  
+  +            Deck_FG  +0.0285  
+  +           Deck_ABC  +0.0178  
+  -       Title_Master  +0.0000  
+
+--- Male Model Coefficients ---
+Positive = increases survival, Negative = decreases survival
+
+  -      IsLargeFamily  -0.5777  #####
+  +       Title_Master  +0.3522  ###
+  +            IsChild  +0.2727  ##
+  +            Deck_DE  +0.2632  ##
+  -           Title_Mr  -0.2516  ##
+  +           HasCabin  +0.2234  ##
+  -           Pclass_2  -0.1520  #
+  +           Deck_ABC  +0.1291  #
+  -              Emb_Q  -0.1277  #
+  +              Emb_C  +0.1259  #
+  -           Pclass_3  -0.1213  #
+  +    FareRankInClass  +0.0808  
+  -         Title_Rare  -0.0692  
+  +            IsAlone  +0.0557  
+  -              Emb_S  -0.0327  
+  -            Deck_FG  -0.0298  
+
+--- Decision Boundaries (Intercepts) ---
+  Female intercept: +1.6055
+  Male intercept:   -1.6713
+
+--- Overfitting Check ---
+  Training accuracy:  0.8485
+  CV accuracy:        0.8384
+  Gap:                0.0101
+  Gap < 5% — looks healthy
+
+--- Subgroup Behavior (Training Data, In-Sample) ---
+  female Pclass 1: n= 94  actual=0.968  pred=1.000  acc=0.968
+  female Pclass 2: n= 76  actual=0.921  pred=1.000  acc=0.921
+  female Pclass 3: n=144  actual=0.500  pred=0.472  acc=0.694
+  male   Pclass 1: n=122  actual=0.369  pred=0.082  acc=0.697
+  male   Pclass 2: n=108  actual=0.157  pred=0.083  acc=0.926
+  male   Pclass 3: n=347  actual=0.135  pred=0.029  acc=0.893
+
+--- Subgroup Behavior (OOF Predictions) ---
+  female Pclass 1: n= 94  actual=0.968  pred=1.000  acc=0.968
+  female Pclass 2: n= 76  actual=0.921  pred=1.000  acc=0.921
+  female Pclass 3: n=144  actual=0.500  pred=0.465  acc=0.674
+  male   Pclass 1: n=122  actual=0.369  pred=0.098  acc=0.648
+  male   Pclass 2: n=108  actual=0.157  pred=0.083  acc=0.926
+  male   Pclass 3: n=347  actual=0.135  pred=0.029  acc=0.893
+
+--- FareRankInClass Distribution (Train, Full) ---
+  Pclass 1: n=216  min=0.012  median=0.500  max=0.993
+  Pclass 2: n=184  min=0.016  median=0.501  max=0.986
+  Pclass 3: n=491  min=0.004  median=0.512  max=0.993
+
+--- Full Model Comparison ---
+  Model                                 CV    Kaggle
+  ------------------------------  --------  --------
+  v1 Ensemble (hard)              0.8563    0.7560
+  v1 XGBoost (tuned)              0.8552    0.7584
+  12b Segment+FareRank            0.8384       TBD <--
+  v1 LogReg (20 feat)             0.8339    0.7727
+  v2 LogReg (15 feat)             0.8305    0.7727
+  v3 LogReg (21 feat)             0.8305    0.7727
+  Gender-only                     0.7870    0.7655
+
+Submission saved: submissions/logreg_12b_fare_rank.csv
+Predicted survival rate in test: 0.335
+
+--- Test Prediction Profile ---
+  female Pclass 1: n= 50  predicted_survived= 50  rate=1.000
+  female Pclass 2: n= 30  predicted_survived= 30  rate=1.000
+  female Pclass 3: n= 72  predicted_survived= 39  rate=0.542
+  male   Pclass 1: n= 57  predicted_survived=  7  rate=0.123
+  male   Pclass 2: n= 63  predicted_survived=  2  rate=0.032
+  male   Pclass 3: n=146  predicted_survived= 12  rate=0.082
+
+  Total female predicted dead: 33
+
+--- Passenger-Level Diff vs v3 ---
+  Passengers changed: 35 / 418
+  Flipped 0->1 (now survived): 1
+  Flipped 1->0 (now died):     34
+
+    PID 896: 1->0  female Pclass 3  Cabin=unknown   Hirvonen, Mrs. Alexander (Helga E Lindqvist)
+    PID 910: 1->0  female Pclass 3  Cabin=unknown   Ilmakangas, Miss. Ida Livija
+    PID 924: 1->0  female Pclass 3  Cabin=unknown   Dean, Mrs. Bertram (Eva Georgetta Light)
+    PID 925: 1->0  female Pclass 3  Cabin=unknown   Johnston, Mrs. Andrew G (Elizabeth Lily" Watson)"
+    PID 928: 1->0  female Pclass 3  Cabin=unknown   Roth, Miss. Sarah A
+    PID 929: 1->0  female Pclass 3  Cabin=unknown   Cacic, Miss. Manda
+    PID 941: 1->0  female Pclass 3  Cabin=unknown   Coutts, Mrs. William (Winnie Minnie" Treanor)"
+    PID 956: 1->0  male   Pclass 1  Cabin=B57 B59 B63 B66  Ryerson, Master. John Borie
+    PID 964: 1->0  female Pclass 3  Cabin=unknown   Nieminen, Miss. Manta Josefina
+    PID 967: 1->0  male   Pclass 1  Cabin=C132      Keeping, Mr. Edwin
+    PID 979: 1->0  female Pclass 3  Cabin=unknown   Badman, Miss. Emily Louisa
+    PID 982: 1->0  female Pclass 3  Cabin=unknown   Dyker, Mrs. Adolf Fredrik (Anna Elisabeth Judith Andersson)
+    PID 990: 1->0  female Pclass 3  Cabin=unknown   Braf, Miss. Elin Ester Maria
+    PID 1017: 1->0  female Pclass 3  Cabin=unknown   Cribb, Miss. Laura Alice
+    PID 1023: 1->0  male   Pclass 1  Cabin=C51       Gracie, Col. Archibald IV
+    PID 1030: 1->0  female Pclass 3  Cabin=unknown   Drapkin, Miss. Jennie
+    PID 1045: 1->0  female Pclass 3  Cabin=unknown   Klasen, Mrs. (Hulda Kristina Eugenia Lofqvist)
+    PID 1049: 1->0  female Pclass 3  Cabin=unknown   Lundin, Miss. Olga Elida
+    PID 1051: 1->0  female Pclass 3  Cabin=unknown   Peacock, Mrs. Benjamin (Edith Nile)
+    PID 1057: 1->0  female Pclass 3  Cabin=unknown   Kink-Heilmann, Mrs. Anton (Luise Heilmann)
+    PID 1061: 1->0  female Pclass 3  Cabin=unknown   Hellstrom, Miss. Hilda Maria
+    PID 1089: 1->0  female Pclass 3  Cabin=unknown   Nilsson, Miss. Berta Olivia
+    PID 1144: 1->0  male   Pclass 1  Cabin=C89       Clark, Mr. Walter Miller
+    PID 1160: 1->0  female Pclass 3  Cabin=unknown   Howard, Miss. May Elizabeth
+    PID 1172: 1->0  female Pclass 3  Cabin=unknown   Oreskovic, Miss. Jelka
+    PID 1201: 1->0  female Pclass 3  Cabin=unknown   Hansen, Mrs. Claus Peter (Jennie L Howard)
+    PID 1208: 1->0  male   Pclass 1  Cabin=B78       Spencer, Mr. William Augustus
+    PID 1237: 1->0  female Pclass 3  Cabin=unknown   Abelseth, Miss. Karen Marie
+    PID 1251: 1->0  female Pclass 3  Cabin=unknown   Lindell, Mrs. Edvard Bengtsson (Elin Gerda Persson)
+    PID 1259: 1->0  female Pclass 3  Cabin=unknown   Riihivouri, Miss. Susanna Juhantytar Sanni""
+    PID 1268: 1->0  female Pclass 3  Cabin=unknown   Kink, Miss. Maria
+    PID 1275: 1->0  female Pclass 3  Cabin=unknown   McNamee, Mrs. Neal (Eileen O'Leary)
+    PID 1284: 0->1  male   Pclass 3  Cabin=unknown   Abbott, Master. Eugene Joseph
+    PID 1299: 1->0  male   Pclass 1  Cabin=C80       Widener, Mr. George Dunton
+    PID 1304: 1->0  female Pclass 3  Cabin=unknown   Henriksson, Miss. Jenny Lovisa
+
+--- Passenger-Level Diff vs 12a ---
+  Passengers changed: 2 / 418
+  Flipped 0->1 (now survived): 1
+  Flipped 1->0 (now died):     1
+
+    PID 893: 0->1  female Pclass 3  Cabin=unknown   Wilkes, Mrs. James (Ellen Needs)
+    PID 1259: 1->0  female Pclass 3  Cabin=unknown   Riihivouri, Miss. Susanna Juhantytar Sanni""
+
+Results saved to: results/models/12b_segment_fare_rank.txt
+Female coefficients: results/models/12b_female_coefficients.csv
+Male coefficients: results/models/12b_male_coefficients.csv
+Submission: submissions/logreg_12b_fare_rank.csv

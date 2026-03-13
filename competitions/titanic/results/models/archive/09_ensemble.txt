@@ -1,0 +1,116 @@
+============================================================
+MODEL 9: ENSEMBLE (SOFT VOTING)
+============================================================
+Features: 20
+Training samples: 891
+
+--- Component Models ---
+  1. XGBoost (tuned):              CV=0.8552
+  2. Random Forest (tuned):        CV=0.8462
+  3. Logistic Regression (tuned):  CV=0.8406
+
+============================================================
+ENSEMBLE A: EQUAL WEIGHTS (1/3 each)
+============================================================
+
+--- 5-Fold Cross-Validation ---
+  Fold 1: 0.8492
+  Fold 2: 0.8652
+  Fold 3: 0.8258
+  Fold 4: 0.8427
+  Fold 5: 0.8652
+
+  Mean:  0.8496
+  Std:   0.0148
+
+============================================================
+ENSEMBLE B: PERFORMANCE-WEIGHTED (proportional to CV score)
+============================================================
+
+  XGBoost weight:  0.336
+  RF weight:       0.333
+  LogReg weight:   0.331
+
+--- 5-Fold Cross-Validation ---
+  Fold 1: 0.8492
+  Fold 2: 0.8652
+  Fold 3: 0.8258
+  Fold 4: 0.8427
+  Fold 5: 0.8652
+
+  Mean:  0.8496
+  Std:   0.0148
+
+============================================================
+ENSEMBLE C: XGBOOST-HEAVY (50/30/20)
+============================================================
+
+--- 5-Fold Cross-Validation ---
+  Fold 1: 0.8547
+  Fold 2: 0.8764
+  Fold 3: 0.8315
+  Fold 4: 0.8427
+  Fold 5: 0.8483
+
+  Mean:  0.8507
+  Std:   0.0149
+
+============================================================
+ENSEMBLE D: HARD VOTING (majority rules)
+============================================================
+
+--- 5-Fold Cross-Validation ---
+  Fold 1: 0.8547
+  Fold 2: 0.8596
+  Fold 3: 0.8315
+  Fold 4: 0.8483
+  Fold 5: 0.8708
+
+  Mean:  0.8530
+  Std:   0.0130
+
+============================================================
+FINAL MODEL COMPARISON
+============================================================
+
+  XGBoost (tuned)            0.8552 <-- BEST
+  Ensemble (hard vote)       0.8530
+  Ensemble (XGB-heavy)       0.8507
+  Ensemble (equal)           0.8496
+  Ensemble (weighted)        0.8496
+  Random Forest (tuned)      0.8462
+  XGBoost (original)         0.8451
+  LogReg (tuned)             0.8406
+  LightGBM                   0.8384
+  LogReg (original)          0.8316
+  Random Forest (orig)       0.8316
+  Neural Network             0.8204
+  Gender-only                0.7870
+
+Best ensemble variant: hard (0.8530)
+
+--- Confusion Matrix (best ensemble, on training data) ---
+  Predicted:     Died  Survived
+  Actual Died:    516      33
+  Actual Surv:     65     277
+
+--- Classification Report ---
+              precision    recall  f1-score   support
+
+        Died       0.89      0.94      0.91       549
+    Survived       0.89      0.81      0.85       342
+
+    accuracy                           0.89       891
+   macro avg       0.89      0.87      0.88       891
+weighted avg       0.89      0.89      0.89       891
+
+--- Overfitting Check ---
+  Training accuracy:  0.8900
+  CV accuracy:        0.8530
+  Gap:                0.0370
+  Gap < 5% — looks healthy
+
+Submission saved: submissions/ensemble.csv
+Predicted survival rate in test: 0.378
+
+Results saved to: results/models/09_ensemble.txt

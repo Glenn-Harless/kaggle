@@ -1,0 +1,110 @@
+============================================================
+MODEL 7: RANDOM FOREST (HYPERPARAMETER TUNED)
+============================================================
+Features: 20
+Training samples: 891
+
+--- Search Space ---
+  n_estimators          [100, 799)
+  max_depth             [3, 11)
+  min_samples_split     [2, 19)
+  min_samples_leaf      [1, 14)
+  max_features          ['sqrt', 'log2', None]
+  bootstrap             [True]
+  criterion             ['gini', 'entropy']
+
+Searching 200 random hyperparameter combinations...
+
+--- Search Results ---
+  Best CV accuracy: 0.8462
+
+--- Best Hyperparameters ---
+  bootstrap             True
+  criterion             entropy
+  max_depth             8
+  max_features          None
+  min_samples_leaf      6
+  min_samples_split     12
+  n_estimators          543
+
+--- Original vs Tuned Random Forest ---
+
+  Parameter               Original       Tuned
+  --------------------  ----------  ----------
+  criterion                   gini     entropy
+  max_depth                      6           8
+  max_features                sqrt        None
+  min_samples_leaf               5           6
+  n_estimators                 500         543
+  bootstrap                    N/A        True
+  min_samples_split            N/A          12
+
+--- Fresh 5-Fold CV (best model) ---
+  Fold 1: 0.8603
+  Fold 2: 0.8483
+  Fold 3: 0.8371
+  Fold 4: 0.8427
+  Fold 5: 0.8427
+
+  Mean:  0.8462
+  Std:   0.0079
+
+--- Model Comparison ---
+  XGBoost (tuned)            0.8552 <-- best
+  Random Forest (tuned)      0.8462
+  XGBoost (original)         0.8451
+  LightGBM                   0.8384
+  Logistic Regression        0.8316
+  Random Forest (orig)       0.8316
+  Neural Network             0.8204
+  Gender-only                0.7870
+
+--- Feature Importance (Tuned Model) ---
+
+  PT_adult_male         0.3618  ████████████████████████████████████
+  Pclass                0.1347  █████████████
+  FarePerPerson         0.1128  ███████████
+  Fare                  0.1110  ███████████
+  Age                   0.1075  ██████████
+  TicketGroupSize       0.0432  ████
+  FamilySize            0.0311  ███
+  Title_Mr              0.0244  ██
+  HasCabin              0.0209  ██
+  Sex                   0.0197  █
+  Emb_S                 0.0089  
+  Emb_C                 0.0068  
+  Title_Miss            0.0049  
+  Emb_Q                 0.0042  
+  IsAlone               0.0026  
+  PT_adult_female       0.0021  
+  Title_Mrs             0.0017  
+  Title_Master          0.0009  
+  PT_child              0.0005  
+  Title_Rare            0.0002  
+
+--- Confusion Matrix (on training data) ---
+  Predicted:     Died  Survived
+  Actual Died:    519      30
+  Actual Surv:     71     271
+
+--- Classification Report (on training data) ---
+              precision    recall  f1-score   support
+
+        Died       0.88      0.95      0.91       549
+    Survived       0.90      0.79      0.84       342
+
+    accuracy                           0.89       891
+   macro avg       0.89      0.87      0.88       891
+weighted avg       0.89      0.89      0.89       891
+
+--- Overfitting Check ---
+  Training accuracy:  0.8866
+  CV accuracy:        0.8462
+  Gap:                0.0404
+  Gap < 5% — looks healthy
+
+Submission saved: submissions/random_forest_tuned.csv
+Predicted survival rate in test: 0.380
+
+Results saved to: results/models/07_random_forest_tuned.txt
+Importance saved to: results/models/07_random_forest_tuned_importance.csv
