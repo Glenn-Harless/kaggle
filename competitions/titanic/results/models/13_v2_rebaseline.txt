@@ -1,0 +1,36 @@
+============================================================
+EVALUATION: v2_baseline
+============================================================
+Features: 15
+Feature list: ['Pclass', 'Sex', 'Fare', 'IsAlone', 'IsLargeFamily', 'HasCabin', 'IsChild', 'Title_Master', 'Title_Miss', 'Title_Mr', 'Title_Mrs', 'Title_Rare', 'Emb_C', 'Emb_Q', 'Emb_S']
+
+--- PRIMARY: Repeated Stratified CV (10x5-fold) ---
+  [v2_baseline] Mean:   0.8301
+  [v2_baseline] Std:    0.0239
+  [v2_baseline] Min:    0.7809
+  [v2_baseline] Max:    0.8820
+  [v2_baseline] Range:  0.1011
+
+--- PRIMARY: Test Prediction Flip Analysis ---
+  Total flips: 0 / 418 (0.0%)
+
+--- SUPPORTING: Prediction Instability ---
+  Mean instability:   0.0112
+  Unstable samples:   18 (any disagreement across folds)
+  Highly unstable:    11 (instability > 0.4)
+
+--- SUPPORTING: Bootstrap .632+ (200 resamples) ---
+  Train accuracy:     0.8346
+  OOB accuracy:       0.8287
+  .632 accuracy:      0.8309
+  .632+ accuracy:     0.8309
+  Overfitting rate R: 0.0195
+
+============================================================
+SUMMARY
+============================================================
+  Repeated CV:  0.8301 ± 0.0239
+  .632+ acc:    0.8309
+  Test flips:   0
+  Instability:  0.0112
+
