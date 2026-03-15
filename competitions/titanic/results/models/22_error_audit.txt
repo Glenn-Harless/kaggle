@@ -1,0 +1,293 @@
+=================================================================
+STEP 22: ERROR AUDIT ON FINAL MODEL
+=================================================================
+
+Model: v2 LogReg (C=0.01) + ticket-mate rules (2+ unanimous)
+Kaggle score: 0.7751 (~324/418 correct, ~94 errors)
+Gender-only Kaggle: 0.7655 (~320/418 correct)
+Difference: ~4 additional correct predictions
+
+=================================================================
+SECTION 1: OUT-OF-FOLD TRAINING ERROR ANALYSIS
+=================================================================
+
+OOF accuracy (consensus across 50 folds):
+  Gender-only:  0.7868 (701/891)
+  Base logistic: 0.8305 (740/891)
+  Hybrid (rules): 0.8204 (731/891)
+
+--- Confusion Matrix: Hybrid OOF ---
+  Predicted:     Died  Survived
+  Actual Died:    475        74
+  Actual Surv:     86       256
+  False positives (predicted survived, actually died): 74
+  False negatives (predicted died, actually survived): 86
+
+=================================================================
+SECTION 2: ERRORS BY SUBGROUP
+=================================================================
+
+Subgroup                  N  Surv%  Gender   Base  Hybrid  Δ G→H
+--------------------------------------------------------------
+male Pclass 1           122  36.9%   63.1%  63.9%   63.1%  +0.0%
+male Pclass 2           108  15.7%   84.3%  92.6%   87.0%  +2.8%
+male Pclass 3           347  13.5%   86.5%  89.3%   88.2%  +1.7%
+female Pclass 1          94  96.8%   96.8%  96.8%   96.8%  +0.0%
+female Pclass 2          76  92.1%   92.1%  89.5%   90.8%  -1.3%
+female Pclass 3         144  50.0%   50.0%  64.6%   65.3% +15.3%
+--------------------------------------------------------------
+TOTAL                   891  38.4%   78.7%  83.1%   82.0%  +3.4%
+
+=================================================================
+SECTION 3: THE HARD CASES
+=================================================================
+
+Passengers misclassified in >80% of folds: 140
+
+--- False Negatives (survived, model says died): 79 ---
+  These people survived but the model almost never predicts it
+
+  male Pclass 3: 35
+  male Pclass 1: 33
+  male Pclass 2: 8
+  female Pclass 3: 2
+  female Pclass 2: 1
+
+  Hardest false negatives (survived against all odds):
+    PID   18:   male Pc2 age ?   P(surv)=0.184 vote=0.00 Williams, Mr. Charles Eugene
+    PID  605:   male Pc1 age 35  P(surv)=0.300 vote=0.00 Homer, Mr. Harry ("Mr E Haven")
+    PID  580:   male Pc3 age 32  P(surv)=0.136 vote=0.00 Jussila, Mr. Eiriik
+    PID  573:   male Pc1 age 36  P(surv)=0.334 vote=0.00 Flynn, Mr. John Irwin ("Irving")
+    PID  571:   male Pc2 age 62  P(surv)=0.178 vote=0.00 Harris, Mr. George
+    PID  570:   male Pc3 age 32  P(surv)=0.137 vote=0.00 Jonsson, Mr. Carl
+    PID  554:   male Pc3 age 22  P(surv)=0.174 vote=0.00 Leeni, Mr. Fahim ("Philip Zenni")
+    PID  548:   male Pc2 age ?   P(surv)=0.232 vote=0.00 Padro y Manent, Mr. Julian
+    PID  544:   male Pc2 age 32  P(surv)=0.194 vote=0.00 Beane, Mr. Edward
+    PID  513:   male Pc1 age 36  P(surv)=0.349 vote=0.00 McGough, Mr. James Robert
+    PID  511:   male Pc3 age 29  P(surv)=0.152 vote=0.00 Daly, Mr. Eugene Patrick
+    PID  510:   male Pc3 age 26  P(surv)=0.150 vote=0.00 Lang, Mr. Fang
+    PID  508:   male Pc1 age ?   P(surv)=0.243 vote=0.00 Bradley, Mr. George ("George Arthur Bray
+    PID  485:   male Pc1 age 25  P(surv)=0.466 vote=0.00 Bishop, Mr. Dickinson H
+    PID  461:   male Pc1 age 48  P(surv)=0.344 vote=0.00 Anderson, Mr. Harry
+    PID  456:   male Pc3 age 29  P(surv)=0.173 vote=0.00 Jalsevac, Mr. Ivan
+    PID  608:   male Pc1 age 27  P(surv)=0.246 vote=0.00 Daniel, Mr. Robert Williams
+    PID  622:   male Pc1 age 42  P(surv)=0.360 vote=0.00 Kimball, Mr. Edwin Nelson Jr
+    PID  623:   male Pc3 age 20  P(surv)=0.185 vote=0.00 Nakid, Mr. Sahid
+    PID  631:   male Pc1 age 80  P(surv)=0.340 vote=0.00 Barkworth, Mr. Algernon Henry Wilson
+
+--- False Positives (died, model says survived): 61 ---
+  These people died but the model almost always predicts survived
+
+  female Pclass 3: 46
+  female Pclass 2: 6
+  male Pclass 1: 4
+  female Pclass 1: 3
+  male Pclass 2: 1
+  male Pclass 3: 1
+
+  Hardest false positives (died against model expectations):
+    PID   15: female Pc3 age 14  P(surv)=0.551 vote=1.00 Vestrom, Miss. Hulda Amanda Adolfina
+    PID  378:   male Pc1 age 27  P(surv)=0.558 vote=1.00 Widener, Mr. Harry Elkins
+    PID  403: female Pc3 age 21  P(surv)=0.562 vote=1.00 Jussila, Miss. Mari Aina
+    PID  405: female Pc3 age 20  P(surv)=0.545 vote=1.00 Oreskovic, Miss. Marija
+    PID  416: female Pc3 age ?   P(surv)=0.590 vote=1.00 Meek, Mrs. Thomas (Annie Louise Rowley)
+    PID  424: female Pc3 age 28  P(surv)=0.610 vote=1.00 Danbom, Mrs. Ernst Gilbert (Anna Sigrid 
+    PID  475: female Pc3 age 22  P(surv)=0.556 vote=1.00 Strandberg, Miss. Ida Sofia
+    PID  499: female Pc1 age 25  P(surv)=0.879 vote=1.00 Allison, Mrs. Hudson J C (Bessie Waldo D
+    PID  502: female Pc3 age 21  P(surv)=0.619 vote=1.00 Canavan, Miss. Mary
+    PID  503: female Pc3 age ?   P(surv)=0.593 vote=1.00 O'Sullivan, Miss. Bridget Mary
+    PID  504: female Pc3 age 37  P(surv)=0.548 vote=1.00 Laitinen, Miss. Kristina Sofia
+    PID  535: female Pc3 age 30  P(surv)=0.556 vote=1.00 Cacic, Miss. Marija
+    PID  565: female Pc3 age ?   P(surv)=0.545 vote=1.00 Meanwell, Miss. (Marion Ogden)
+    PID  579: female Pc3 age ?   P(surv)=0.698 vote=1.00 Caram, Mrs. Joseph (Maria Elias)
+    PID  594: female Pc3 age ?   P(surv)=0.616 vote=1.00 Bourke, Miss. Mary
+    PID  618: female Pc3 age 26  P(surv)=0.614 vote=1.00 Lobb, Mrs. William Arthur (Cordelia K St
+    PID  655: female Pc3 age 18  P(surv)=0.607 vote=1.00 Hegarty, Miss. Hanora "Nora"
+    PID  658: female Pc3 age 32  P(surv)=0.667 vote=1.00 Bourke, Mrs. John (Catherine)
+    PID  681: female Pc3 age ?   P(surv)=0.604 vote=1.00 Peters, Miss. Katie
+    PID  699:   male Pc1 age 49  P(surv)=0.503 vote=1.00 Thayer, Mr. John Borland
+
+=================================================================
+SECTION 4: WHERE THE MODEL BEATS GENDER-ONLY
+=================================================================
+
+Model correct, gender wrong: 54 passengers
+Gender correct, model wrong: 24 passengers
+Net advantage: 30 passengers on training set
+
+--- Model wins (hybrid correct, gender wrong) ---
+  female Pclass 3: 26
+  male Pclass 3: 10
+  male Pclass 1: 9
+  male Pclass 2: 9
+
+--- Gender wins (gender correct, hybrid wrong) ---
+  male Pclass 1: 9
+  male Pclass 2: 6
+  female Pclass 3: 4
+  male Pclass 3: 4
+  female Pclass 2: 1
+
+=================================================================
+SECTION 5: THE BUBBLE ZONE (P(surv) 0.3-0.7)
+=================================================================
+
+Training passengers in bubble zone: 306 / 891 (34.3%)
+Hybrid accuracy in bubble: 69.9% (vs 82.0% overall)
+
+Subgroup                  N  Surv% Hybrid Acc
+---------------------------------------------
+male Pclass 1           101  35.6%      59.4%
+male Pclass 2             7  85.7%     100.0%
+male Pclass 3            14  71.4%     100.0%
+female Pclass 1           3 100.0%     100.0%
+female Pclass 2          53  90.6%      88.7%
+female Pclass 3         128  48.4%      64.8%
+
+=================================================================
+SECTION 6: TEST PREDICTION CHARACTERIZATION
+=================================================================
+
+--- Test Prediction Summary ---
+  Total test passengers: 418
+  Predicted survived (hybrid): 170 (40.7%)
+  Predicted survived (gender): 152 (36.4%)
+  Hybrid ≠ gender: 34
+  Rule overrides that changed prediction: 13
+  In bubble zone: 142
+
+Subgroup                  N  Surv%  Gender%  Bubble
+--------------------------------------------------
+male Pclass 1            57  22.8%     0.0%      44
+male Pclass 2            63   7.9%     0.0%       4
+male Pclass 3           146   5.5%     0.0%      12
+female Pclass 1          50 100.0%   100.0%       0
+female Pclass 2          30 100.0%   100.0%      14
+female Pclass 3          72  88.9%   100.0%      68
+
+--- Where hybrid disagrees with gender-only (34 passengers) ---
+
+Males predicted to SURVIVE (gender says die): 26
+  PID 1088: Pc1 age 6   P(surv)=0.886 Spedden, Master. Robert Douglas
+  PID  956: Pc1 age 13  P(surv)=0.677 Ryerson, Master. John Borie
+  PID 1094: Pc1 age 47  P(surv)=0.646 Astor, Col. John Jacob
+  PID 1086: Pc2 age 8   P(surv)=0.637 Drew, Master. Marshall Brines
+  PID  981: Pc2 age 2   P(surv)=0.631 Wells, Master. Ralph Lester
+  PID 1309: Pc3 age ?   P(surv)=0.629 Peter, Master. Michael J
+  PID 1053: Pc3 age 7   P(surv)=0.625 Touma, Master. Georges Youssef
+  PID 1231: Pc3 age ?   P(surv)=0.615 Betros, Master. Seman
+  PID 1299: Pc1 age 50  P(surv)=0.551 Widener, Mr. George Dunton
+  PID  967: Pc1 age 32  P(surv)=0.546 Keeping, Mr. Edwin
+  PID 1236: Pc3 age ?   P(surv)=0.541 van Billiard, Master. James William
+  PID 1084: Pc3 age 11  P(surv)=0.541 van Billiard, Master. Walter John
+  PID 1173: Pc3 age 0   P(surv)=0.540 Peacock, Master. Alfred Edward
+  PID 1199: Pc3 age 0   P(surv)=0.537 Aks, Master. Philip Frank
+  PID  913: Pc3 age 9   P(surv)=0.533 Olsen, Master. Artur Karl
+  PID 1023: Pc1 age 53  P(surv)=0.520 Gracie, Col. Archibald IV
+  PID 1208: Pc1 age 57  P(surv)=0.510 Spencer, Mr. William Augustus
+  PID 1144: Pc1 age 27  P(surv)=0.504 Clark, Mr. Walter Miller
+  PID 1134: Pc1 age 45  P(surv)=0.502 Spedden, Mr. Frederic Oakley
+  PID 1200: Pc1 age 55  P(surv)=0.392 [RULE] Hays, Mr. Charles Melville
+  PID 1282: Pc1 age 23  P(surv)=0.388 [RULE] Payne, Mr. Vivian Ponsonby
+  PID 1109: Pc1 age 57  P(surv)=0.313 [RULE] Wick, Mr. George Dennick
+  PID 1034: Pc1 age 61  P(surv)=0.284 [RULE] Ryerson, Mr. Arthur Larned
+  PID 1245: Pc2 age 49  P(surv)=0.199 [RULE] Herman, Mr. Samuel
+  PID 1122: Pc2 age 14  P(surv)=0.196 [RULE] Sweet, Mr. George Frederick
+  PID  899: Pc2 age 26  P(surv)=0.185 [RULE] Caldwell, Mr. Albert Francis
+
+Females predicted to DIE (gender says survive): 8
+  PID 1106: Pc3 age 38  P(surv)=0.266 Andersson, Miss. Ida Augusta Margareta
+  PID 1080: Pc3 age ?   P(surv)=0.298 Sage, Miss. Ada
+  PID 1024: Pc3 age ?   P(surv)=0.319 Lefebre, Mrs. Frank (Frances)
+  PID 1257: Pc3 age ?   P(surv)=0.343 Sage, Mrs. John (Annie Bullen)
+  PID 1032: Pc3 age 10  P(surv)=0.367 Goodwin, Miss. Jessie Allis
+  PID 1259: Pc3 age 22  P(surv)=0.577 [RULE] Riihivouri, Miss. Susanna Juhantytar Sanni""
+  PID  925: Pc3 age ?   P(surv)=0.622 [RULE] Johnston, Mrs. Andrew G (Elizabeth Lily" Wats
+  PID 1176: Pc3 age 2   P(surv)=0.656 [RULE] Rosblom, Miss. Salli Helena
+
+=================================================================
+SECTION 7: ESTIMATED ERROR BUDGET
+=================================================================
+
+Estimated test errors:
+  Gender-only: ~98 errors
+  Hybrid model: ~94 errors
+  Net improvement: ~4 fewer errors
+
+--- Projected error composition (from training patterns) ---
+
+Subgroup               Train Err% Test N  Est Errors
+-------------------------------------------------------
+male Pclass 1               36.9%     57        21.0
+male Pclass 2               13.0%     63         8.2
+male Pclass 3               11.8%    146        17.3
+female Pclass 1              3.2%     50         1.6
+female Pclass 2              9.2%     30         2.8
+female Pclass 3             34.7%     72        25.0
+-------------------------------------------------------
+TOTAL (projected)                    418        75.8
+TOTAL (actual Kaggle)                418          94
+
+--- Error concentration ---
+
+  female Pc3    25.0 est errors (33.0%) ████████████████
+  male Pc1      21.0 est errors (27.7%) █████████████
+  male Pc3      17.3 est errors (22.8%) ███████████
+  male Pc2       8.2 est errors (10.8%) █████
+  female Pc2     2.8 est errors ( 3.6%) █
+  female Pc1     1.6 est errors ( 2.1%) █
+
+=================================================================
+SECTION 8: WHAT'S LEFT — THE IRREDUCIBLE RESIDUAL
+=================================================================
+
+The ~94 test errors likely come from:
+
+1. MALE PCLASS 3 — men in steerage who died (model already predicts this)
+   But some survived. These are exceptions to the dominant pattern.
+   The model has almost no features to identify which Pc3 men survived.
+
+2. FEMALE PCLASS 3 — the most contested subgroup
+   ~50% survival rate means any prediction is close to a coin flip.
+   Aggressive correction hurts Kaggle (confirmed 3 times).
+   The safe move is to predict 'survived' and accept ~50% errors here.
+
+3. MALE PCLASS 1 — wealthy men, ~37% survival
+   The model correctly saves some via ticket rules and high-status features.
+   But many Pc1 men died despite privilege. These are hard to predict.
+
+Structurally hard passengers in training: 181 / 891 (20.3%)
+  Male survivors: 109
+  Female Pc3 deaths: 72
+
+Accuracy on structural exceptions:
+  Gender-only: 0.0% (always wrong by definition for male survivors)
+  Hybrid: 29.8%
+
+=================================================================
+AUDIT SUMMARY
+=================================================================
+
+1. The model's ~94 test errors are concentrated in three groups:
+   - male Pclass 3 survivors (unpredictable from available features)
+   - female Pclass 3 deaths (coin-flip subgroup, correction hurts)
+   - male Pclass 1 deaths (wealthy men who chose not to board lifeboats)
+
+2. The model adds value over gender-only primarily by:
+   - correctly identifying some male survivors via class/family features
+   - correctly identifying some female Pclass 3 deaths via fare/family features
+   - ticket-rule overrides for passengers with strong group signal
+
+3. The remaining errors are largely irreducible with available features:
+   - individual survival decisions (heroism, panic, luck) aren't in the data
+   - the ~50% female Pclass 3 survival rate creates a structural error floor
+   - most male Pclass 3 deaths are correctly predicted, but the rare survivors
+     have no distinguishing features
+
+4. The honest ceiling estimate:
+   - gender-only: ~0.7655 (320/418)
+   - current best: ~0.7751 (324/418)
+   - theoretical with perfect group rules: ~0.79-0.80 (330-335/418)
+   - beyond that requires features not in this dataset
+
+Results presented for human review.

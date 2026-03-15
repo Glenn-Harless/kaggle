@@ -61,6 +61,226 @@ def report_cv(scores, label=""):
 
 
 # ============================================================
+# PRIMARY: Repeated Grouped CV
+# ============================================================
+#
+# Scope: Use grouped CV to evaluate BASE MODELS and FEATURE VARIANTS
+# for group-structure leakage. It answers: "does the model benefit from
+# ticket-mates leaking across folds?"
+#
+# NOT suitable for evaluating propagation rules (ticket-mate survival
+# overrides), because grouping by ticket prevents the rule from ever
+# firing. For rule evaluation, use leave_one_out_grouped_cv() below.
+# ============================================================
+
+def grouped_cv_splits(groups, n_splits=5, n_repeats=10, random_state=42):
+    """
+    Generate (train_idx, val_idx) splits for repeated grouped K-fold.
+
+    Keeps all members of a group in the same fold. Groups are shuffled
+    between repeats to produce different fold assignments.
+
+    Use this directly when experiment scripts need custom per-fold logic
+    (e.g., OOF encoding). NOT suitable for propagation rules — use
+    leave_one_out_grouped_cv() instead.
+
+    Args:
+        groups: array-like of group labels (e.g., ticket strings), one per sample.
+        n_splits: number of folds per repeat.
+        n_repeats: number of times to repeat with different group shuffles.
+        random_state: base random seed (incremented per repeat).
+
+    Yields:
+        (train_idx, val_idx) index arrays, n_splits * n_repeats total.
+    """
+    unique_groups = np.unique(groups)
+
+    for repeat in range(n_repeats):
+        rng = np.random.RandomState(random_state + repeat)
+        shuffled = rng.permutation(unique_groups)
+        group_folds = np.array_split(shuffled, n_splits)
+
+        for fold_i in range(n_splits):
+            val_groups = set(group_folds[fold_i])
+            val_mask = np.array([g in val_groups for g in groups])
+            train_idx = np.where(~val_mask)[0]
+            val_idx = np.where(val_mask)[0]
+            yield train_idx, val_idx
+
+
+def repeated_grouped_cv(pipeline, X, y, groups, n_splits=5, n_repeats=10,
+                        random_state=42):
+    """
+    Repeated grouped K-fold CV. Keeps all members of a group in the same fold.
+
+    Unlike RepeatedStratifiedKFold, this does NOT stratify by class — fold
+    class balance depends on random group assignment. For 891 samples with
+    ~680 unique ticket groups, fold sizes and class balance are adequate.
+
+    Returns array of fold scores (n_splits * n_repeats total), compatible
+    with paired_comparison() against baseline_cv scores of the same length.
+    """
+    from sklearn.metrics import accuracy_score
+
+    scores = []
+    for train_idx, val_idx in grouped_cv_splits(groups, n_splits, n_repeats,
+                                                random_state):
+        model = clone(pipeline)
+        model.fit(X.iloc[train_idx], y.iloc[train_idx])
+        score = accuracy_score(y.iloc[val_idx], model.predict(X.iloc[val_idx]))
+        scores.append(score)
+
+    return np.array(scores)
+
+
+# ============================================================
+# PRIMARY: Leave-One-Out Grouped CV (for propagation rules)
+# ============================================================
+#
+# Holds out one member per multi-member group while keeping remaining
+# members in training. Structurally closer to deployment than GroupKFold.
+#
+# KNOWN LIMITATION (2026-03-14): For unanimous-outcome rules like 18b,
+# LOO has a structural bias. Truly unanimous groups → rule fires and
+# is trivially correct (100%). Mixed groups → holding out the dissenter
+# creates spurious unanimity, rule fires and is always wrong. Neither
+# case informs the real question: "will a test passenger from a
+# training-unanimous group follow the group pattern?" Only the Kaggle
+# leaderboard answers that. This validator is still useful for:
+# - measuring fire rate and coverage
+# - comparing rule variants (e.g., 2-mate vs 3-mate thresholds)
+# - detecting structural problems (low coverage, high false-fire rate)
+#
+# NOT suitable for base model evaluation (use repeated_cv or
+# repeated_grouped_cv for that).
+# ============================================================
+
+def leave_one_out_grouped_cv(y, groups, rule_fn, n_repeats=10, random_state=42):
+    """
+    Evaluate a propagation rule by holding out one member per eligible group.
+
+    For each repeat: shuffle eligible groups, hold out one random member
+    from each multi-member group, keep remaining members in training.
+    The rule_fn is called to produce predictions for held-out passengers.
+    Solo passengers (group size 1) are excluded — the rule can never
+    apply to them.
+
+    Args:
+        y: Series of survival labels (indexed 0..N-1).
+        groups: array of group labels (e.g., ticket strings), one per sample.
+        rule_fn: callable(train_idx, val_idx, groups) -> predictions array.
+            Must return an array of 0/1 predictions for val_idx passengers,
+            or np.nan for passengers where the rule did not fire.
+        n_repeats: number of random holdout rounds.
+        random_state: base seed.
+
+    Returns:
+        dict with accuracy, coverage, and per-repeat diagnostics.
+    """
+    from collections import defaultdict
+
+    # Identify multi-member groups
+    group_to_idxs = defaultdict(list)
+    for i, g in enumerate(groups):
+        group_to_idxs[g].append(i)
+
+    eligible_groups = {g: idxs for g, idxs in group_to_idxs.items()
+                       if len(idxs) >= 2}
+
+    all_idx = np.arange(len(y))
+    solo_idx = [i for i, g in enumerate(groups) if len(group_to_idxs[g]) == 1]
+
+    repeat_results = []
+
+    for repeat in range(n_repeats):
+        rng = np.random.RandomState(random_state + repeat)
+
+        val_idx = []
+        train_idx_from_groups = []
+
+        for g, idxs in eligible_groups.items():
+            # Hold out one random member
+            holdout_pos = rng.randint(len(idxs))
+            for j, idx in enumerate(idxs):
+                if j == holdout_pos:
+                    val_idx.append(idx)
+                else:
+                    train_idx_from_groups.append(idx)
+
+        # Training set = solo passengers + non-held-out group members
+        train_idx = np.array(sorted(solo_idx + train_idx_from_groups))
+        val_idx = np.array(sorted(val_idx))
+
+        # Get rule predictions
+        preds = rule_fn(train_idx, val_idx, groups)
+
+        # Separate fired vs not-fired
+        y_val = y.iloc[val_idx].values
+        fired_mask = ~np.isnan(preds)
+        n_fired = fired_mask.sum()
+        n_val = len(val_idx)
+
+        if n_fired > 0:
+            fired_correct = (preds[fired_mask] == y_val[fired_mask]).sum()
+            fired_acc = fired_correct / n_fired
+        else:
+            fired_correct = 0
+            fired_acc = np.nan
+
+        repeat_results.append({
+            "n_val": n_val,
+            "n_fired": n_fired,
+            "n_correct": fired_correct,
+            "fired_acc": fired_acc,
+        })
+
+    # Aggregate
+    total_fired = sum(r["n_fired"] for r in repeat_results)
+    total_correct = sum(r["n_correct"] for r in repeat_results)
+    total_val = sum(r["n_val"] for r in repeat_results)
+
+    result = {
+        "n_eligible_groups": len(eligible_groups),
+        "n_eligible_passengers": sum(len(v) for v in eligible_groups.values()),
+        "n_repeats": n_repeats,
+        "total_val": total_val,
+        "total_fired": total_fired,
+        "total_correct": total_correct,
+        "fire_rate": total_fired / total_val if total_val > 0 else 0,
+        "fired_accuracy": total_correct / total_fired if total_fired > 0 else np.nan,
+        "per_repeat": repeat_results,
+    }
+    return result
+
+
+def report_loo_grouped(result, label=""):
+    """Print leave-one-out grouped CV summary."""
+    prefix = f"[{label}] " if label else ""
+    r = result
+    print(f"  {prefix}Eligible groups: {r['n_eligible_groups']} "
+          f"({r['n_eligible_passengers']} passengers)")
+    print(f"  {prefix}Repeats: {r['n_repeats']}")
+    print(f"  {prefix}Total held-out: {r['total_val']} "
+          f"(~{r['total_val'] // r['n_repeats']} per repeat)")
+    print(f"  {prefix}Rule fired: {r['total_fired']} / {r['total_val']} "
+          f"({r['fire_rate']:.1%})")
+    if r['total_fired'] > 0:
+        print(f"  {prefix}Accuracy on fired: {r['fired_accuracy']:.4f} "
+              f"({r['total_correct']}/{r['total_fired']})")
+    else:
+        print(f"  {prefix}Rule never fired")
+
+    # Per-repeat breakdown
+    per = r["per_repeat"]
+    fired_accs = [p["fired_acc"] for p in per if not np.isnan(p["fired_acc"])]
+    if fired_accs:
+        print(f"  {prefix}Fired acc per repeat: "
+              f"mean={np.mean(fired_accs):.4f}, "
+              f"min={np.min(fired_accs):.4f}, "
+              f"max={np.max(fired_accs):.4f}")
+
+
+# ============================================================
 # PRIMARY: Paired Comparison
 # ============================================================
 

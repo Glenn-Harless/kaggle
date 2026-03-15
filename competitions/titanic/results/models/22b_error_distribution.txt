@@ -1,0 +1,374 @@
+======================================================================
+PART 1: TRAINING OOF ERRORS (KNOWN GROUND TRUTH)
+======================================================================
+
+Total: 160 errors / 891 (18.0%)
+  False Negatives (survived, predicted died): 86
+  False Positives (died, predicted survived):  74
+
+--- Error count and rate by subgroup ---
+
+Subgroup        Total Errors   Err%   FN   FP  Surv%
+----------------------------------------------------
+male Pc1          122     45  36.9%   36    9  36.9%
+male Pc2          108     14  13.0%    8    6  15.7%
+male Pc3          347     41  11.8%   37    4  13.5%
+female Pc1         94      3   3.2%    0    3  96.8%
+female Pc2         76      7   9.2%    1    6  92.1%
+female Pc3        144     50  34.7%    4   46  50.0%
+
+--- Error rate by age group ---
+
+Age Group        Total Errors   Err%   FN   FP
+---------------------------------------------
+0-5 (infant)        44      4   9.1%    2    2
+6-12 (child)        25      2   8.0%    0    2
+13-17 (teen)        70     12  17.1%    4    8
+18-29              270     52  19.3%   27   25
+30-49              241     53  22.0%   32   21
+50+                 64      9  14.1%    6    3
+age unknown        177     28  15.8%   15   13
+
+--- Error rate by fare quartile ---
+
+Fare Range           Total Errors   Err%
+----------------------------------------
+£   0.0-   7.9       223     27  12.1%
+£   7.9-  14.5       217     42  19.4%
+£  14.5-  31.0       226     50  22.1%
+£  31.0- 512.3       225     41  18.2%
+
+======================================================================
+PART 2: EVERY TRAINING ERROR (SORTED BY SUBGROUP)
+======================================================================
+
+--- female Pc1: 3 errors ---
+  FALSE POSITIVES (died, model said survived):
+    PID  298 age=  2 fare=£  151.6 cabin=C22 C P=0.896 vote=1.00 Allison, Miss. Helen Loraine
+    PID  499 age= 25 fare=£  151.6 cabin=C22 C P=0.879 vote=1.00 Allison, Mrs. Hudson J C (Bessie Wa
+    PID  178 age= 50 fare=£   28.7 cabin=C49 P=0.854 vote=1.00 Isham, Miss. Ann Elizabeth
+
+--- female Pc2: 7 errors ---
+  FALSE POSITIVES (died, model said survived):
+    PID  773 age= 57 fare=£   10.5 cabin=E77 P=0.778 vote=1.00 Mack, Mrs. (Mary)
+    PID  855 age= 44 fare=£   26.0 cabin=  -   P=0.691 vote=1.00 Carter, Mrs. Ernest Courtenay (Lili
+    PID  313 age= 26 fare=£   26.0 cabin=  -   P=0.685 vote=1.00 Lahtinen, Mrs. William (Anna Sylfve
+    PID   42 age= 27 fare=£   21.0 cabin=  -   P=0.684 vote=1.00 Turpin, Mrs. William John Robert (D
+    PID  358 age= 38 fare=£   13.0 cabin=  -   P=0.634 vote=1.00 Funk, Miss. Annie Clemmer
+    PID  200 age= 24 fare=£   13.0 cabin=  -   P=0.632 vote=1.00 Yrois, Miss. Henriette ("Mrs Harbec
+  FALSE NEGATIVES (survived, model said died):
+    PID  775 age= 54 fare=£   23.0 cabin=  -   P=0.400 vote=0.00 Hocking, Mrs. Elizabeth (Eliza Need
+
+--- female Pc3: 50 errors ---
+  FALSE POSITIVES (died, model said survived):
+    PID  206 age=  2 fare=£   10.5 cabin=G6 P=0.762 vote=1.00 Strom, Miss. Telma Matilda
+    PID  252 age= 29 fare=£   10.5 cabin=G6 P=0.728 vote=1.00 Strom, Mrs. Wilhelm (Elna Matilda P
+    PID  853 age=  9 fare=£   15.2 cabin=  -   P=0.724 vote=1.00 Boulos, Miss. Nourelain
+    PID  141 age=  ? fare=£   15.2 cabin=  -   P=0.703 vote=1.00 Boulos, Mrs. Joseph (Sultana)
+    PID  579 age=  ? fare=£   14.5 cabin=  -   P=0.698 vote=1.00 Caram, Mrs. Joseph (Maria Elias)
+    PID  363 age= 45 fare=£   14.5 cabin=  -   P=0.682 vote=1.00 Barbara, Mrs. (Catherine David)
+    PID  658 age= 32 fare=£   15.5 cabin=  -   P=0.667 vote=1.00 Bourke, Mrs. John (Catherine)
+    PID  703 age= 18 fare=£   14.5 cabin=  -   P=0.657 vote=1.00 Barbara, Miss. Saiide
+    PID  241 age=  ? fare=£   14.5 cabin=  -   P=0.655 vote=1.00 Zabour, Miss. Thamine
+    PID  112 age= 14 fare=£   14.5 cabin=  -   P=0.651 vote=1.00 Zabour, Miss. Hileni
+    PID  115 age= 17 fare=£   14.5 cabin=  -   P=0.636 vote=1.00 Attalah, Miss. Malake
+    PID  133 age= 47 fare=£   14.5 cabin=  -   P=0.620 vote=1.00 Robins, Mrs. Alexander A (Grace Cha
+    PID   19 age= 31 fare=£   18.0 cabin=  -   P=0.619 vote=1.00 Vander Planke, Mrs. Julius (Emelia 
+    PID  502 age= 21 fare=£    7.8 cabin=  -   P=0.619 vote=1.00 Canavan, Miss. Mary
+    PID  594 age=  ? fare=£    7.8 cabin=  -   P=0.616 vote=1.00 Bourke, Miss. Mary
+    PID  618 age= 26 fare=£   16.1 cabin=  -   P=0.614 vote=1.00 Lobb, Mrs. William Arthur (Cordelia
+    PID   41 age= 40 fare=£    9.5 cabin=  -   P=0.612 vote=1.00 Ahlin, Mrs. Johan (Johanna Persdott
+    PID  424 age= 28 fare=£   14.4 cabin=  -   P=0.610 vote=1.00 Danbom, Mrs. Ernst Gilbert (Anna Si
+    PID  255 age= 41 fare=£   20.2 cabin=  -   P=0.609 vote=1.00 Rosblom, Mrs. Viktor (Helena Wilhel
+    PID   50 age= 18 fare=£   17.8 cabin=  -   P=0.608 vote=1.00 Arnold-Franchi, Mrs. Josef (Josefin
+    PID  265 age=  ? fare=£    7.8 cabin=  -   P=0.608 vote=1.00 Henry, Miss. Delia
+    PID  655 age= 18 fare=£    6.8 cabin=  -   P=0.607 vote=1.00 Hegarty, Miss. Hanora "Nora"
+    PID  681 age=  ? fare=£    8.1 cabin=  -   P=0.604 vote=1.00 Peters, Miss. Katie
+    PID  768 age= 30 fare=£    7.8 cabin=  -   P=0.600 vote=1.00 Mangan, Miss. Mary
+    PID  503 age=  ? fare=£    7.6 cabin=  -   P=0.593 vote=1.00 O'Sullivan, Miss. Bridget Mary
+    PID  416 age=  ? fare=£    8.1 cabin=  -   P=0.590 vote=1.00 Meek, Mrs. Thomas (Annie Louise Row
+    PID  889 age=  ? fare=£   23.4 cabin=  -   P=0.573 vote=1.00 Johnston, Miss. Catherine Helen "Ca
+    PID  730 age= 25 fare=£    7.9 cabin=  -   P=0.568 vote=1.00 Ilmakangas, Miss. Pieta Sofia
+    PID  114 age= 20 fare=£    9.8 cabin=  -   P=0.566 vote=1.00 Jussila, Miss. Katriina
+    PID   39 age= 18 fare=£   18.0 cabin=  -   P=0.566 vote=1.00 Vander Planke, Miss. Augusta Maria
+    PID  403 age= 21 fare=£    9.8 cabin=  -   P=0.562 vote=1.00 Jussila, Miss. Mari Aina
+    PID  883 age= 22 fare=£   10.5 cabin=  -   P=0.562 vote=1.00 Dahlberg, Miss. Gerda Ulrika
+    PID  277 age= 45 fare=£    7.8 cabin=  -   P=0.561 vote=1.00 Lindblom, Miss. Augusta Charlotta
+    PID  475 age= 22 fare=£    9.8 cabin=  -   P=0.556 vote=1.00 Strandberg, Miss. Ida Sofia
+    PID  535 age= 30 fare=£    8.7 cabin=  -   P=0.556 vote=1.00 Cacic, Miss. Marija
+    PID  808 age= 18 fare=£    7.8 cabin=  -   P=0.555 vote=1.00 Pettersson, Miss. Ellen Natalia
+    PID  101 age= 28 fare=£    7.9 cabin=  -   P=0.554 vote=1.00 Petranec, Miss. Matilda
+    PID  294 age= 24 fare=£    8.8 cabin=  -   P=0.554 vote=1.00 Haas, Miss. Aloisia
+    PID  397 age= 31 fare=£    7.9 cabin=  -   P=0.552 vote=1.00 Olsson, Miss. Elina
+    PID  236 age=  ? fare=£    7.5 cabin=  -   P=0.552 vote=1.00 Harknett, Miss. Alice Phoebe
+    PID  247 age= 25 fare=£    7.8 cabin=  -   P=0.551 vote=1.00 Lindahl, Miss. Agda Thorilda Viktor
+    PID   15 age= 14 fare=£    7.9 cabin=  -   P=0.551 vote=1.00 Vestrom, Miss. Hulda Amanda Adolfin
+    PID  817 age= 23 fare=£    7.9 cabin=  -   P=0.548 vote=1.00 Heininen, Miss. Wendla Maria
+    PID  504 age= 37 fare=£    9.6 cabin=  -   P=0.548 vote=1.00 Laitinen, Miss. Kristina Sofia
+    PID  565 age=  ? fare=£    8.1 cabin=  -   P=0.545 vote=1.00 Meanwell, Miss. (Marion Ogden)
+    PID  405 age= 20 fare=£    8.7 cabin=  -   P=0.545 vote=1.00 Oreskovic, Miss. Marija
+  FALSE NEGATIVES (survived, model said died):
+    PID   69 age= 17 fare=£    7.9 cabin=  -   P=0.282 vote=0.00 Andersson, Miss. Erna Alexandra
+    PID   26 age= 38 fare=£   31.4 cabin=  -   P=0.322 vote=0.00 Asplund, Mrs. Carl Oscar (Selma Aug
+    PID  234 age=  5 fare=£   31.4 cabin=  -   P=0.372 vote=0.20 Asplund, Miss. Lillian Gertrud
+    PID  110 age=  ? fare=£   24.1 cabin=  -   P=0.594 vote=0.40 Moran, Miss. Bertha
+
+--- male Pc1: 45 errors ---
+  FALSE POSITIVES (died, model said survived):
+    PID  119 age= 24 fare=£  247.5 cabin=B58 B P=0.571 vote=1.00 Baxter, Mr. Quigg Edmond
+    PID  378 age= 27 fare=£  211.5 cabin=C82 P=0.558 vote=1.00 Widener, Mr. Harry Elkins
+    PID  246 age= 44 fare=£   90.0 cabin=C78 P=0.553 vote=0.90 Minahan, Dr. William Edward
+    PID  699 age= 49 fare=£  110.9 cabin=C68 P=0.503 vote=1.00 Thayer, Mr. John Borland
+    PID  660 age= 58 fare=£  113.3 cabin=D48 P=0.493 vote=0.70 Newell, Mr. Arthur Webster
+    PID  746 age= 70 fare=£   71.0 cabin=B22 P=0.491 vote=0.60 Crosby, Capt. Edward Gifford
+    PID  333 age= 38 fare=£  153.5 cabin=C91 P=0.432 vote=0.80 Graham, Mr. George Edward
+    PID  558 age=  ? fare=£  227.5 cabin=  -   P=0.428 vote=0.70 Robbins, Mr. Victor
+    PID  374 age= 22 fare=£  135.6 cabin=  -   P=0.374 vote=0.60 Ringhini, Mr. Sante
+  FALSE NEGATIVES (survived, model said died):
+    PID  188 age= 45 fare=£   26.6 cabin=  -   P=0.239 vote=0.00 Romaine, Mr. Charles Hallace ("Mr C
+    PID  448 age= 34 fare=£   26.6 cabin=  -   P=0.240 vote=0.00 Seward, Mr. Frederic Kimber
+    PID  508 age=  ? fare=£   26.6 cabin=  -   P=0.243 vote=0.00 Bradley, Mr. George ("George Arthur
+    PID  608 age= 27 fare=£   30.5 cabin=  -   P=0.246 vote=0.00 Daniel, Mr. Robert Williams
+    PID  605 age= 35 fare=£   26.6 cabin=  -   P=0.300 vote=0.00 Homer, Mr. Harry ("Mr E Haven")
+    PID  431 age= 28 fare=£   26.6 cabin=C52 P=0.332 vote=0.00 Bjornstrom-Steffansson, Mr. Mauritz
+    PID  858 age= 51 fare=£   26.6 cabin=E17 P=0.333 vote=0.00 Daly, Mr. Peter Denis 
+    PID  573 age= 36 fare=£   26.4 cabin=E25 P=0.334 vote=0.00 Flynn, Mr. John Irwin ("Irving")
+    PID  708 age= 42 fare=£   26.3 cabin=E24 P=0.336 vote=0.00 Calderhead, Mr. Edward Pennington
+    PID   56 age=  ? fare=£   35.5 cabin=C52 P=0.338 vote=0.00 Woolner, Mr. Hugh
+    PID  702 age= 35 fare=£   26.3 cabin=E24 P=0.338 vote=0.00 Silverthorne, Mr. Spencer Victor
+    PID  631 age= 80 fare=£   30.0 cabin=A23 P=0.340 vote=0.00 Barkworth, Mr. Algernon Henry Wilso
+    PID  741 age=  ? fare=£   30.0 cabin=D45 P=0.340 vote=0.00 Hawksford, Mr. Walter James
+    PID  299 age=  ? fare=£   30.5 cabin=C106 P=0.342 vote=0.00 Saalfeld, Mr. Adolphe
+    PID   24 age= 28 fare=£   35.5 cabin=A6 P=0.343 vote=0.00 Sloper, Mr. William Thompson
+    PID  461 age= 48 fare=£   26.6 cabin=E12 P=0.344 vote=0.00 Anderson, Mr. Harry
+    PID  513 age= 36 fare=£   26.3 cabin=E25 P=0.349 vote=0.00 McGough, Mr. James Robert
+    PID  249 age= 37 fare=£   52.6 cabin=D35 P=0.357 vote=0.00 Beckwith, Mr. Richard Leonard
+    PID  725 age= 27 fare=£   53.1 cabin=E8 P=0.357 vote=0.00 Chambers, Mr. Norman Campbell
+    PID  622 age= 42 fare=£   52.6 cabin=D19 P=0.360 vote=0.00 Kimball, Mr. Edwin Nelson Jr
+    PID  661 age= 50 fare=£  133.7 cabin=  -   P=0.368 vote=0.00 Frauenthal, Dr. Henry William
+    PID  713 age= 48 fare=£   52.0 cabin=C126 P=0.375 vote=0.00 Taylor, Mr. Elmer Zebley
+    PID  691 age= 31 fare=£   57.0 cabin=B20 P=0.376 vote=0.00 Dick, Mr. Albert Adrian
+    PID  225 age= 38 fare=£   90.0 cabin=C93 P=0.381 vote=0.00 Hoyt, Mr. Frederick Maxfield
+    PID  450 age= 52 fare=£   30.5 cabin=C104 P=0.399 vote=0.00 Peuchen, Major. Arthur Godfrey
+    PID  210 age= 40 fare=£   31.0 cabin=A31 P=0.416 vote=0.00 Blank, Mr. Henry
+    PID  840 age=  ? fare=£   29.7 cabin=C47 P=0.422 vote=0.00 Marechal, Mr. Pierre
+    PID  890 age= 26 fare=£   30.0 cabin=C148 P=0.426 vote=0.00 Behr, Mr. Karl Howell
+    PID  371 age= 25 fare=£   55.4 cabin=E50 P=0.438 vote=0.00 Harder, Mr. George Achilles
+    PID   98 age= 23 fare=£   63.4 cabin=D10 D P=0.454 vote=0.00 Greenfield, Mr. William Bertram
+    PID  588 age= 60 fare=£   79.2 cabin=B41 P=0.457 vote=0.10 Frolicher-Stehli, Mr. Maxmillian
+    PID  485 age= 25 fare=£   91.1 cabin=B49 P=0.466 vote=0.00 Bishop, Mr. Dickinson H
+    PID  454 age= 49 fare=£   89.1 cabin=C92 P=0.468 vote=0.00 Goldenberg, Mr. Samuel L
+    PID  551 age= 17 fare=£  110.9 cabin=C70 P=0.486 vote=0.30 Thayer, Mr. John Borland Jr
+    PID  600 age= 49 fare=£   56.9 cabin=A20 P=0.488 vote=0.40 Duff Gordon, Sir. Cosmo Edmund ("Mr
+    PID  633 age= 32 fare=£   30.5 cabin=B50 P=0.496 vote=0.40 Stahelin-Maeglin, Dr. Max
+
+--- male Pc2: 14 errors ---
+  FALSE POSITIVES (died, model said survived):
+    PID  149 age= 36 fare=£   26.0 cabin=F2 P=0.288 vote=1.00 Navratil, Mr. Michel ("Louis M Hoff
+    PID  849 age= 28 fare=£   33.0 cabin=  -   P=0.265 vote=0.70 Harper, Rev. John
+    PID  686 age= 25 fare=£   41.6 cabin=  -   P=0.254 vote=0.50 Laroche, Mr. Joseph Philippe Lemerc
+    PID  315 age= 43 fare=£   26.2 cabin=  -   P=0.197 vote=0.80 Hart, Mr. Benjamin
+    PID  451 age= 36 fare=£   27.8 cabin=  -   P=0.193 vote=0.60 West, Mr. Edwy Arthur
+    PID  638 age= 31 fare=£   26.2 cabin=  -   P=0.193 vote=0.50 Collyer, Mr. Harvey
+  FALSE NEGATIVES (survived, model said died):
+    PID  571 age= 62 fare=£   10.5 cabin=  -   P=0.178 vote=0.00 Harris, Mr. George
+    PID  289 age= 42 fare=£   13.0 cabin=  -   P=0.178 vote=0.00 Hosono, Mr. Masabumi
+    PID  227 age= 19 fare=£   10.5 cabin=  -   P=0.179 vote=0.00 Mellors, Mr. William John
+    PID  674 age= 31 fare=£   13.0 cabin=  -   P=0.181 vote=0.00 Wilhelms, Mr. Charles
+    PID   18 age=  ? fare=£   13.0 cabin=  -   P=0.184 vote=0.00 Williams, Mr. Charles Eugene
+    PID  544 age= 32 fare=£   26.0 cabin=  -   P=0.194 vote=0.00 Beane, Mr. Edward
+    PID  548 age=  ? fare=£   13.9 cabin=  -   P=0.232 vote=0.00 Padro y Manent, Mr. Julian
+    PID   22 age= 34 fare=£   13.0 cabin=D56 P=0.267 vote=0.00 Beesley, Mr. Lawrence
+
+--- male Pc3: 41 errors ---
+  FALSE POSITIVES (died, model said survived):
+    PID  183 age=  9 fare=£   31.4 cabin=  -   P=0.272 vote=1.00 Asplund, Master. Clarence Gustaf Hu
+    PID  170 age= 28 fare=£   56.5 cabin=  -   P=0.153 vote=0.60 Ling, Mr. Lee
+    PID  827 age=  ? fare=£   56.5 cabin=  -   P=0.151 vote=0.60 Lam, Mr. Len
+    PID  549 age= 33 fare=£   20.5 cabin=  -   P=0.146 vote=0.60 Goldsmith, Mr. Frank John
+  FALSE NEGATIVES (survived, model said died):
+    PID  205 age= 18 fare=£    8.1 cabin=  -   P=0.133 vote=0.00 Cohen, Mr. Gurshon "Gus"
+    PID  805 age= 27 fare=£    7.0 cabin=  -   P=0.135 vote=0.00 Hedman, Mr. Oskar Arvid
+    PID  284 age= 19 fare=£    8.1 cabin=  -   P=0.135 vote=0.00 Dorking, Mr. Edward Arthur
+    PID  128 age= 24 fare=£    7.1 cabin=  -   P=0.135 vote=0.00 Madsen, Mr. Fridtjof Arne
+    PID  147 age= 27 fare=£    7.8 cabin=  -   P=0.135 vote=0.00 Andersson, Mr. August Edvard ("Wenn
+    PID  392 age= 21 fare=£    7.8 cabin=  -   P=0.135 vote=0.00 Jansson, Mr. Carl Olof
+    PID  272 age= 25 fare=£    0.0 cabin=  -   P=0.135 vote=0.00 Tornquist, Mr. William Henry
+    PID  401 age= 39 fare=£    7.9 cabin=  -   P=0.136 vote=0.00 Niskanen, Mr. Juha
+    PID  745 age= 31 fare=£    7.9 cabin=  -   P=0.136 vote=0.00 Stranden, Mr. Juho
+    PID  580 age= 32 fare=£    7.9 cabin=  -   P=0.136 vote=0.00 Jussila, Mr. Eiriik
+    PID  415 age= 44 fare=£    7.9 cabin=  -   P=0.136 vote=0.00 Sundman, Mr. Johan Julian
+    PID   82 age= 29 fare=£    9.5 cabin=  -   P=0.136 vote=0.00 Sheerlinck, Mr. Jan Baptist
+    PID  570 age= 32 fare=£    7.9 cabin=  -   P=0.137 vote=0.00 Jonsson, Mr. Carl
+    PID  445 age=  ? fare=£    8.1 cabin=  -   P=0.137 vote=0.00 Johannesen-Bratthammer, Mr. Bernt
+    PID  822 age= 27 fare=£    8.7 cabin=  -   P=0.137 vote=0.00 Lulic, Mr. Nikola
+    PID  221 age= 16 fare=£    8.1 cabin=  -   P=0.138 vote=0.00 Sunderland, Mr. Victor Francis
+    PID  108 age=  ? fare=£    7.8 cabin=  -   P=0.138 vote=0.00 Moss, Mr. Albert Johan
+    PID  287 age= 30 fare=£    9.5 cabin=  -   P=0.138 vote=0.00 de Mulder, Mr. Theodore
+    PID  339 age= 45 fare=£    8.1 cabin=  -   P=0.139 vote=0.00 Dahl, Mr. Karl Edwart
+    PID  665 age= 20 fare=£    7.9 cabin=  -   P=0.140 vote=0.00 Lindqvist, Mr. Eino William
+    PID  268 age= 25 fare=£    7.8 cabin=  -   P=0.141 vote=0.00 Persson, Mr. Ernst Ulrik
+    PID  644 age=  ? fare=£   56.5 cabin=  -   P=0.149 vote=0.10 Foo, Mr. Choong
+    PID  510 age= 26 fare=£   56.5 cabin=  -   P=0.150 vote=0.00 Lang, Mr. Fang
+    PID   75 age= 32 fare=£   56.5 cabin=  -   P=0.151 vote=0.00 Bing, Mr. Lee
+    PID  839 age= 32 fare=£   56.5 cabin=  -   P=0.151 vote=0.20 Chip, Mr. Chang
+    PID  511 age= 29 fare=£    7.8 cabin=  -   P=0.152 vote=0.00 Daly, Mr. Eugene Patrick
+    PID  693 age=  ? fare=£   56.5 cabin=  -   P=0.152 vote=0.30 Lam, Mr. Ali
+    PID  829 age=  ? fare=£    7.8 cabin=  -   P=0.154 vote=0.00 McCormack, Mr. Thomas Joseph
+    PID  302 age=  ? fare=£   23.2 cabin=  -   P=0.163 vote=0.00 McCoy, Mr. Bernard
+    PID  456 age= 29 fare=£    7.9 cabin=  -   P=0.173 vote=0.00 Jalsevac, Mr. Ivan
+    PID  554 age= 22 fare=£    7.2 cabin=  -   P=0.174 vote=0.00 Leeni, Mr. Fahim ("Philip Zenni")
+    PID   37 age=  ? fare=£    7.2 cabin=  -   P=0.177 vote=0.00 Mamee, Mr. Hanna
+    PID  763 age= 20 fare=£    7.2 cabin=  -   P=0.178 vote=0.00 Barah, Mr. Hanna Assi
+    PID  208 age= 26 fare=£   18.8 cabin=  -   P=0.181 vote=0.00 Albimona, Mr. Nassef Cassem
+    PID  623 age= 20 fare=£   15.7 cabin=  -   P=0.185 vote=0.00 Nakid, Mr. Sahid
+    PID  430 age= 32 fare=£    8.1 cabin=E10 P=0.206 vote=0.00 Pickard, Mr. Berk (Berk Trembisky)
+    PID  262 age=  3 fare=£   31.4 cabin=  -   P=0.253 vote=0.10 Asplund, Master. Edvin Rojj Felix
+
+======================================================================
+PART 3: TEST CONFIDENCE MAP
+======================================================================
+
+We don't have test ground truth. But we can rank test predictions
+by confidence — the least confident are most likely to be wrong.
+
+--- Confidence distribution (base model probability) ---
+
+Confidence                             N Pred Surv
+----------------------------------------------------
+very high (>0.95 or <0.05)            22        10
+high (0.90-0.95)                      25        17
+moderate (0.80-0.90)                  95        70
+low (0.70-0.80)                       55        22
+very low / bubble (0.50-0.70)        221        51
+
+--- Most likely test errors (lowest confidence, no rule override) ---
+
+These are test passengers where the model is least sure.
+Statistically, about half of these are wrong.
+
+  PID Subgroup      Age    Fare  P(surv)  Pred Name
+------------------------------------------------------------------------------------------
+ 1134 male Pc1       45 £ 134.5    0.502     1 Spedden, Mr. Frederic Oakley
+ 1144 male Pc1       27 £ 136.8    0.504     1 Clark, Mr. Walter Miller
+ 1208 male Pc1       57 £ 146.5    0.510     1 Spencer, Mr. William Augustus
+ 1023 male Pc1       53 £  28.5    0.520     1 Gracie, Col. Archibald IV
+ 1185 male Pc1       53 £  81.9    0.472     0 Dodge, Dr. Washington
+  973 male Pc1       67 £ 221.8    0.472     0 Straus, Mr. Isidor
+ 1073 male Pc1       37 £  83.2    0.470     0 Compton, Mr. Alexander Taylor Jr
+  913 male Pc3        9 £   3.2    0.533     1 Olsen, Master. Artur Karl
+ 1128 male Pc1       64 £  75.2    0.465     0 Warren, Mr. Frank Manley
+ 1199 male Pc3        0 £   9.3    0.537     1 Aks, Master. Philip Frank
+ 1126 male Pc1       39 £  71.3    0.462     0 Cumings, Mr. John Bradley
+ 1162 male Pc1       46 £  75.2    0.460     0 McCaffry, Mr. Thomas Francis
+ 1010 male Pc1       36 £  75.2    0.460     0 Beattie, Mr. Thomson
+ 1173 male Pc3        0 £  13.8    0.540     1 Peacock, Master. Alfred Edward
+ 1236 male Pc3        ? £  14.5    0.541     1 van Billiard, Master. James William
+ 1084 male Pc3       11 £  14.5    0.541     1 van Billiard, Master. Walter John
+  926 male Pc1       30 £  57.8    0.454     0 Mock, Mr. Philipp Edmund
+  967 male Pc1       32 £ 211.5    0.546     1 Keeping, Mr. Edwin
+ 1284 male Pc3       13 £  20.2    0.452     0 Abbott, Master. Eugene Joseph
+ 1069 male Pc1       54 £  55.4    0.452     0 Stengel, Mr. Charles Emil Henry
+ 1299 male Pc1       50 £ 211.5    0.551     1 Widener, Mr. George Dunton
+ 1058 male Pc1       48 £  50.5    0.445     0 Brandeis, Mr. Emil
+ 1237 female Pc3     16 £   7.7    0.557     1 Abelseth, Miss. Karen Marie
+ 1089 female Pc3     18 £   7.8    0.557     1 Nilsson, Miss. Berta Olivia
+ 1304 female Pc3     28 £   7.8    0.557     1 Henriksson, Miss. Jenny Lovisa
+ 1049 female Pc3     23 £   7.9    0.557     1 Lundin, Miss. Olga Elida
+  990 female Pc3     20 £   7.9    0.557     1 Braf, Miss. Elin Ester Maria
+  964 female Pc3     29 £   7.9    0.557     1 Nieminen, Miss. Manta Josefina
+  979 female Pc3     18 £   8.1    0.557     1 Badman, Miss. Emily Louisa
+ 1160 female Pc3      ? £   8.1    0.557     1 Howard, Miss. May Elizabeth
+  928 female Pc3      ? £   8.1    0.557     1 Roth, Miss. Sarah A
+ 1030 female Pc3     23 £   8.1    0.557     1 Drapkin, Miss. Jennie
+  929 female Pc3     21 £   8.7    0.557     1 Cacic, Miss. Manda
+ 1172 female Pc3     23 £   8.7    0.557     1 Oreskovic, Miss. Jelka
+ 1061 female Pc3     22 £   9.0    0.558     1 Hellstrom, Miss. Hilda Maria
+  910 female Pc3     27 £   7.9    0.562     1 Ilmakangas, Miss. Ida Livija
+ 1268 female Pc3     22 £   8.7    0.562     1 Kink, Miss. Maria
+ 1296 male Pc1       43 £  27.7    0.435     0 Frauenthal, Mr. Isaac Gerald
+ 1017 female Pc3     17 £  16.1    0.567     1 Cribb, Miss. Laura Alice
+ 1223 male Pc1       39 £  29.7    0.432     0 Dulles, Mr. William Crothers
+  938 male Pc1       45 £  29.7    0.432     0 Chevre, Mr. Paul Romaine
+  960 male Pc1       31 £  28.5    0.431     0 Tucker, Mr. Gilbert Milligan Jr
+  965 male Pc1       28 £  27.7    0.430     0 Ovies y Rodriguez, Mr. Servando
+ 1198 male Pc1       30 £ 151.6    0.428     0 Allison, Mr. Hudson Joshua Creighton
+ 1183 female Pc3     30 £   7.0    0.604     1 Daly, Miss. Margaret Marcella Maggie""
+ 1005 female Pc3     18 £   7.3    0.605     1 Buckley, Miss. Katherine
+  898 female Pc3     30 £   7.6    0.605     1 Connolly, Miss. Kate
+ 1300 female Pc3      ? £   7.7    0.605     1 Riordan, Miss. Johanna Hannah""
+  955 female Pc3     22 £   7.7    0.605     1 Bradley, Miss. Bridget Delia
+ 1207 female Pc3     17 £   7.7    0.605     1 Hagardon, Miss. Kate
+
+--- Estimated error distribution by confidence band ---
+
+Using training error rates at similar confidence levels as a proxy.
+
+Confidence Band           Train Err% Test N  Est Wrong
+-------------------------------------------------------
+very high                      35.0%     20        7.0
+high                           41.2%     24        9.9
+moderate                       25.3%     89       22.5
+low                            16.1%     54        8.7
+very low / bubble              10.6%    231       24.4
+-------------------------------------------------------
+TOTAL                                   418       72.5
+
+Note: actual Kaggle errors ≈ 94. Projected ≈ 72.
+The gap reflects that test may be harder than training (different
+composition, or the model slightly overfits training patterns).
+
+--- Rule override analysis ---
+
+Rule overrides that CHANGED prediction: 13
+  Flipped to survived: 7
+  Flipped to died: 6
+
+Kaggle evidence: rules added ~1 net correct predictions
+  (0.7751 - 0.7727 = 0.0024 × 418 ≈ 1.0)
+  Of 13 flipped predictions, the net is only +1
+  → some rule overrides are right, some are wrong
+
+  PID  899:   male Pc2 age 26  P=0.185 surv→surv (2 mates, 100% surv) Caldwell, Mr. Albert Francis
+  PID  925: female Pc3 age ?   P=0.622 died→died (2 mates, 0% surv) Johnston, Mrs. Andrew G (Elizabeth 
+  PID  972:   male Pc3 age 6   P=0.625 died→died (2 mates, 0% surv) Boulos, Master. Akar
+  PID 1034:   male Pc1 age 61  P=0.284 surv→surv (2 mates, 100% surv) Ryerson, Mr. Arthur Larned
+  PID 1093:   male Pc3 age 0   P=0.540 died→died (2 mates, 0% surv) Danbom, Master. Gilbert Sigvard Ema
+  PID 1109:   male Pc1 age 57  P=0.313 surv→surv (2 mates, 100% surv) Wick, Mr. George Dennick
+  PID 1122:   male Pc2 age 14  P=0.196 surv→surv (2 mates, 100% surv) Sweet, Mr. George Frederick
+  PID 1136:   male Pc3 age ?   P=0.546 died→died (2 mates, 0% surv) Johnston, Master. William Arthur Wi
+  PID 1176: female Pc3 age 2   P=0.656 died→died (2 mates, 0% surv) Rosblom, Miss. Salli Helena
+  PID 1200:   male Pc1 age 55  P=0.392 surv→surv (2 mates, 100% surv) Hays, Mr. Charles Melville
+  PID 1245:   male Pc2 age 49  P=0.199 surv→surv (2 mates, 100% surv) Herman, Mr. Samuel
+  PID 1259: female Pc3 age 22  P=0.577 died→died (6 mates, 0% surv) Riihivouri, Miss. Susanna Juhantyta
+  PID 1282:   male Pc1 age 23  P=0.388 surv→surv (2 mates, 100% surv) Payne, Mr. Vivian Ponsonby
+
+======================================================================
+SUMMARY
+======================================================================
+
+What we know about our test errors:
+
+1. ~94 of 418 test predictions are wrong (Kaggle 0.7751)
+
+2. Most errors are concentrated in LOW CONFIDENCE predictions:
+   - The 142 test passengers in the bubble zone (P 0.3-0.7)
+     probably account for ~60 of our ~94 errors
+   - The 276 high-confidence predictions probably account for ~34 errors
+
+3. By subgroup, the error-heavy zones are:
+   - female Pc3: 72 test passengers, ~50% survival → ~25 errors
+   - male Pc1:   57 test passengers, ~37% survival → ~21 errors
+   - male Pc3:  146 test passengers, ~14% survival → ~17 errors
+
+4. The 13 rule overrides are a mixed bag:
+   - net +1 correct prediction (Kaggle evidence)
+   - some overrides are clearly right (children with surviving families)
+   - some are likely wrong (adult men overridden to survive based on
+     family signal, but they may have stayed behind)
+
+5. We CANNOT know which specific test passengers are wrong without
+   the ground truth labels. The confidence ranking above is our best
+   proxy — passengers near P=0.5 are essentially coin flips.
+
+Results presented for human review.
