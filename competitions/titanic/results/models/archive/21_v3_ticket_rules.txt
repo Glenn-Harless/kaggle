@@ -1,0 +1,192 @@
+============================================================
+STEP 21: v3 BASE + TICKET RULES
+============================================================
+v3 features (21): ['Sex', 'Fare', 'IsAlone', 'IsLargeFamily', 'HasCabin', 'Deck_ABC', 'Deck_DE', 'Deck_FG', 'IsChild', 'Title_Master', 'Title_Miss', 'Title_Mr', 'Title_Mrs', 'Title_Rare', 'Emb_C', 'Emb_Q', 'Emb_S', 'Pclass_2', 'Pclass_3', 'Sex_x_Pclass_2', 'Sex_x_Pclass_3']
+v2 features (15): ['Pclass', 'Sex', 'Fare', 'IsAlone', 'IsLargeFamily', 'HasCabin', 'IsChild', 'Title_Master', 'Title_Miss', 'Title_Mr', 'Title_Mrs', 'Title_Rare', 'Emb_C', 'Emb_Q', 'Emb_S']
+v2 baseline repeated CV: 0.8301 ± 0.0239
+
+============================================================
+PHASE 1: v3 BASELINE REPEATED CV (C=0.01)
+============================================================
+
+--- v3 Baseline (C=0.01) ---
+  [v3_base] Mean:   0.8275
+  [v3_base] Std:    0.0246
+  [v3_base] Min:    0.7753
+  [v3_base] Max:    0.8764
+  [v3_base] Range:  0.1011
+
+--- Paired: v3 baseline vs v2 baseline ---
+  Delta (v3_base - v2_base):
+    Mean:  -0.0026
+    Std:   0.0095
+    Range: [-0.0281, +0.0112]
+    Wins:  candidate 16, baseline 21, ties 13
+
+Saved: results/models/21_v3_baseline_cv_scores.npy
+
+============================================================
+PHASE 2: C SWEEP ON v3
+============================================================
+
+       C   CV Mean   CV Std   vs v2 BL
+  --------------------------------------
+    0.01    0.8275   0.0246    -0.0026 <-- best
+    0.05    0.8260   0.0238    -0.0040
+    0.10    0.8259   0.0239    -0.0042
+    0.50    0.8241   0.0238    -0.0060
+    1.00    0.8243   0.0240    -0.0057
+    5.00    0.8246   0.0240    -0.0055
+   10.00    0.8245   0.0243    -0.0056
+
+  Best C for v3: 0.01, CV=0.8275
+
+============================================================
+PHASE 3: v3 + TICKET RULES (HYBRID CV)
+============================================================
+
+--- v3 + ticket rules (2+ mates) ---
+       C   CV Mean   CV Std   vs v2 BL
+  --------------------------------------
+    0.01    0.8203   0.0239    -0.0098 <-- best
+
+  Best v3+rules: C=0.01, CV=0.8203
+
+--- v2 + ticket rules (18b inline, same splits) ---
+  CV Mean: 0.8228 ± 0.0223  (delta vs BL: -0.0073)
+
+--- KEY COMPARISON: v3+rules vs v2+rules ---
+  Delta (v3+rules - v2+rules):
+    Mean:  -0.0025
+    Std:   0.0076
+    Range: [-0.0281, +0.0112]
+    Wins:  candidate 14, baseline 21, ties 15
+
+============================================================
+PHASE 4: TEST PREDICTIONS AND FLIP ANALYSIS
+============================================================
+
+Final model: v3 LogReg C=0.01 + ticket rules (2+ mates)
+
+Ticket rule overrides on test: 48 passengers
+  PID 899:   male Pc2 ticket=248738 0->1
+  PID 901:   male Pc3 ticket=A/4 48871 no_change
+  PID 916: female Pc1 ticket=PC 17608 no_change
+  PID 925: female Pc3 ticket=W./C. 6607 1->0
+  PID 941: female Pc3 ticket=C.A. 37671 no_change
+  PID 947:   male Pc3 ticket=382652 no_change
+  PID 951: female Pc1 ticket=PC 17608 no_change
+  PID 956:   male Pc1 ticket=PC 17608 no_change
+  PID 972:   male Pc3 ticket=2678 1->0
+  PID 1009: female Pc3 ticket=PP 9549 no_change
+  PID 1019: female Pc3 ticket=367226 no_change
+  PID 1024: female Pc3 ticket=4133 no_change
+  PID 1031:   male Pc3 ticket=CA 2144 no_change
+  PID 1032: female Pc3 ticket=CA 2144 no_change
+  PID 1034:   male Pc1 ticket=PC 17608 0->1
+  PID 1042: female Pc1 ticket=11767 no_change
+  PID 1059:   male Pc3 ticket=W./C. 6608 no_change
+  PID 1070: female Pc2 ticket=230136 no_change
+  PID 1080: female Pc3 ticket=CA. 2343 no_change
+  PID 1088:   male Pc1 ticket=16966 no_change
+  PID 1093:   male Pc3 ticket=347080 1->0
+  PID 1095: female Pc2 ticket=26360 no_change
+  PID 1104:   male Pc2 ticket=S.O.C. 14879 no_change
+  PID 1109:   male Pc1 ticket=36928 0->1
+  PID 1117: female Pc3 ticket=2661 no_change
+  PID 1122:   male Pc2 ticket=220845 0->1
+  PID 1134:   male Pc1 ticket=16966 no_change
+  PID 1136:   male Pc3 ticket=W./C. 6607 1->0
+  PID 1176: female Pc3 ticket=370129 1->0
+  PID 1200:   male Pc1 ticket=12749 0->1
+  PID 1208:   male Pc1 ticket=PC 17569 no_change
+  PID 1216: female Pc1 ticket=24160 no_change
+  PID 1218: female Pc2 ticket=230136 no_change
+  PID 1225: female Pc3 ticket=2653 no_change
+  PID 1234:   male Pc3 ticket=CA. 2343 no_change
+  PID 1235: female Pc1 ticket=PC 17755 no_change
+  PID 1244:   male Pc2 ticket=S.O.C. 14879 no_change
+  PID 1245:   male Pc2 ticket=220845 0->1
+  PID 1252:   male Pc3 ticket=CA. 2343 no_change
+  PID 1257: female Pc3 ticket=CA. 2343 no_change
+  PID 1259: female Pc3 ticket=3101295 1->0
+  PID 1263: female Pc1 ticket=16966 no_change
+  PID 1267: female Pc1 ticket=PC 17608 no_change
+  PID 1277: female Pc2 ticket=220845 no_change
+  PID 1281:   male Pc3 ticket=349909 no_change
+  PID 1282:   male Pc1 ticket=12749 0->1
+  PID 1292: female Pc1 ticket=36928 no_change
+  PID 1309:   male Pc3 ticket=2668 no_change
+
+--- Flip analysis vs logreg_v2.csv (plain v2 baseline) ---
+  Total flips: 17 / 418 (4.1%)
+  In bubble (P 0.3-0.7): 4
+  Outside bubble: 13
+
+  Flips by subgroup:
+    female_Pclass3: 3
+    male_Pclass1: 8
+    male_Pclass2: 3
+    male_Pclass3: 3
+
+  Changed PassengerIds: [899, 925, 965, 972, 1034, 1073, 1093, 1109, 1122, 1128, 1136, 1176, 1200, 1245, 1259, 1282, 1296]
+
+    PID Baseline Candidate   Prob    Sex  Pcl Direction
+  -------------------------------------------------------
+    899        0         1  0.950   male    2 died->survived
+    925        1         0  0.050 female    3 survived->died
+    965        0         1  0.545   male    1 died->survived
+    972        1         0  0.050   male    3 survived->died
+   1034        0         1  0.950   male    1 died->survived
+   1073        0         1  0.581   male    1 died->survived
+   1093        1         0  0.050   male    3 survived->died
+   1109        0         1  0.950   male    1 died->survived
+   1122        0         1  0.950   male    2 died->survived
+   1128        0         1  0.576   male    1 died->survived
+   1136        1         0  0.050   male    3 survived->died
+   1176        1         0  0.050 female    3 survived->died
+   1200        0         1  0.950   male    1 died->survived
+   1245        0         1  0.950   male    2 died->survived
+   1259        1         0  0.050 female    3 survived->died
+   1282        0         1  0.950   male    1 died->survived
+   1296        0         1  0.544   male    1 died->survived
+
+--- Flip analysis vs logreg_18_18b_hybrid_2mate.csv (current best) ---
+  Total flips: 4 / 418 (1.0%)
+  In bubble (P 0.3-0.7): 4
+  Outside bubble: 0
+
+  Flips by subgroup:
+    male_Pclass1: 4
+
+  Changed PassengerIds: [965, 1073, 1128, 1296]
+
+    PID Baseline Candidate   Prob    Sex  Pcl Direction
+  -------------------------------------------------------
+    965        0         1  0.545   male    1 died->survived
+   1073        0         1  0.581   male    1 died->survived
+   1128        0         1  0.576   male    1 died->survived
+   1296        0         1  0.544   male    1 died->survived
+
+============================================================
+PHASE 5: SAVE SUBMISSION + SUMMARY
+============================================================
+
+Saved: /Users/glennharless/dev-brain/kaggle/competitions/titanic/submissions/logreg_21_v3_hybrid_2mate.csv
+Survival rate: 0.416 (174/418)
+
+============================================================
+FINAL SUMMARY
+============================================================
+
+Model                                CV Mean  CV Std  Δ v2 BL  Δ v2+rules         W/L/T
+-------------------------------------------------------------------------------------
+v2 baseline (C=0.01)                  0.8301  0.0239       --          --            --
+v3 baseline (C=0.01)                  0.8275  0.0246  -0.0026     +0.0047            --
+v2 + rules (18b inline)               0.8228  0.0223  -0.0073     +0.0000            --
+v3 + rules (C=0.01)                   0.8203  0.0239  -0.0098     -0.0025      14/21/15
+
+Test differences vs 18b: 4 passengers (expected 0-4)
+
+Results presented for human review.
+Do NOT auto-accept or auto-reject based on automated metrics alone.

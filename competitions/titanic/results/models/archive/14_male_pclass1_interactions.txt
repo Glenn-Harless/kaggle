@@ -1,0 +1,232 @@
+warning: The `tool.uv.dev-dependencies` field (used in `pyproject.toml`) is deprecated and will be removed in a future release; use `dependency-groups.dev` instead
+============================================================
+STEP 14: MALE PCLASS=1 INTERACTION EXPERIMENTS
+============================================================
+Baseline: v2 LogReg (15 features, C=0.01)
+Baseline repeated CV: 0.8301 ± 0.0239
+Target subgroup: {'Sex': 'male', 'Pclass': 1}
+
+
+============================================================
+14a: Male_Pclass1_HasCabin
+============================================================
+Mechanism: 1st-class men with known cabins were on upper decks near lifeboats
+
+Train counts: 95 positive out of 891
+Test counts:  40 positive out of 418
+
+============================================================
+EVALUATION: 14a_Male_Pc1_Cabin
+============================================================
+Features: 16
+Feature list: ['Pclass', 'Sex', 'Fare', 'IsAlone', 'IsLargeFamily', 'HasCabin', 'IsChild', 'Title_Master', 'Title_Miss', 'Title_Mr', 'Title_Mrs', 'Title_Rare', 'Emb_C', 'Emb_Q', 'Emb_S', 'Male_Pc1_Cabin']
+
+--- PRIMARY: Repeated Stratified CV (10x5-fold) ---
+  [14a_Male_Pc1_Cabin] Mean:   0.8296
+  [14a_Male_Pc1_Cabin] Std:    0.0244
+  [14a_Male_Pc1_Cabin] Min:    0.7753
+  [14a_Male_Pc1_Cabin] Max:    0.8820
+  [14a_Male_Pc1_Cabin] Range:  0.1067
+
+--- PRIMARY: Paired Comparison vs Baseline ---
+  Delta (candidate - baseline):
+    Mean:  -0.0004
+    Std:   0.0019
+    Range: [-0.0056, +0.0056]
+    Wins:  candidate 1, baseline 5, ties 44
+
+--- PRIMARY: Test Prediction Flip Analysis ---
+  Total flips: 2 / 418 (0.5%)
+  In bubble (P 0.3-0.7): 2
+  Outside bubble: 0
+
+  Flips by subgroup:
+    male_Pclass1: 2
+
+  All flips within target subgroup (Sex=male, Pclass=1): OK
+
+  Changed PassengerIds: [1134, 1144]
+
+    PID Baseline Candidate   Prob    Sex  Pcl Direction
+  -------------------------------------------------------
+   1134        1         0  0.498   male    1 survived->died
+   1144        1         0  0.499   male    1 survived->died
+
+--- SUPPORTING: Prediction Instability ---
+  Mean instability:   0.0112
+  Unstable samples:   19 (any disagreement across folds)
+  Highly unstable:    9 (instability > 0.4)
+
+--- SUPPORTING: Bootstrap .632+ (200 resamples) ---
+  Train accuracy:     0.8352
+  OOB accuracy:       0.8286
+  .632 accuracy:      0.8310
+  .632+ accuracy:     0.8310
+  Overfitting rate R: 0.0219
+
+============================================================
+SUMMARY
+============================================================
+  Repeated CV:  0.8296 ± 0.0244
+  .632+ acc:    0.8310
+  Test flips:   2
+  Delta vs baseline: -0.0004
+  Instability:  0.0112
+
+
+============================================================
+14b: Male_Pclass1_Deck_DE
+============================================================
+Mechanism: D/E decks had strongest survival coefficient in v3 analysis
+
+Train counts: 28 positive out of 891
+Test counts:  11 positive out of 418
+
+============================================================
+EVALUATION: 14b_Male_Pc1_DeckDE
+============================================================
+Features: 16
+Feature list: ['Pclass', 'Sex', 'Fare', 'IsAlone', 'IsLargeFamily', 'HasCabin', 'IsChild', 'Title_Master', 'Title_Miss', 'Title_Mr', 'Title_Mrs', 'Title_Rare', 'Emb_C', 'Emb_Q', 'Emb_S', 'Male_Pc1_DeckDE']
+
+--- PRIMARY: Repeated Stratified CV (10x5-fold) ---
+  [14b_Male_Pc1_DeckDE] Mean:   0.8311
+  [14b_Male_Pc1_DeckDE] Std:    0.0253
+  [14b_Male_Pc1_DeckDE] Min:    0.7809
+  [14b_Male_Pc1_DeckDE] Max:    0.8820
+  [14b_Male_Pc1_DeckDE] Range:  0.1011
+
+--- PRIMARY: Paired Comparison vs Baseline ---
+  Delta (candidate - baseline):
+    Mean:  +0.0010
+    Std:   0.0079
+    Range: [-0.0281, +0.0169]
+    Wins:  candidate 22, baseline 8, ties 20
+
+--- PRIMARY: Test Prediction Flip Analysis ---
+  Total flips: 6 / 418 (1.4%)
+  In bubble (P 0.3-0.7): 6
+  Outside bubble: 0
+
+  Flips by subgroup:
+    male_Pclass1: 6
+
+  All flips within target subgroup (Sex=male, Pclass=1): OK
+
+  Changed PassengerIds: [965, 1073, 1128, 1144, 1208, 1296]
+
+    PID Baseline Candidate   Prob    Sex  Pcl Direction
+  -------------------------------------------------------
+    965        0         1  0.514   male    1 died->survived
+   1073        0         1  0.553   male    1 died->survived
+   1128        0         1  0.548   male    1 died->survived
+   1144        1         0  0.488   male    1 survived->died
+   1208        1         0  0.495   male    1 survived->died
+   1296        0         1  0.517   male    1 died->survived
+
+--- SUPPORTING: Prediction Instability ---
+  Mean instability:   0.0141
+  Unstable samples:   24 (any disagreement across folds)
+  Highly unstable:    12 (instability > 0.4)
+
+--- SUPPORTING: Bootstrap .632+ (200 resamples) ---
+  Train accuracy:     0.8379
+  OOB accuracy:       0.8294
+  .632 accuracy:      0.8325
+  .632+ accuracy:     0.8325
+  Overfitting rate R: 0.0281
+
+============================================================
+SUMMARY
+============================================================
+  Repeated CV:  0.8311 ± 0.0253
+  .632+ acc:    0.8325
+  Test flips:   6
+  Delta vs baseline: +0.0010
+  Instability:  0.0141
+
+
+============================================================
+14c: Male_Pclass1_Emb_C
+============================================================
+Mechanism: Cherbourg 1st-class men were wealthy, potentially better cabin locations
+
+Train counts: 42 positive out of 891
+Test counts:  28 positive out of 418
+
+============================================================
+EVALUATION: 14c_Male_Pc1_EmbC
+============================================================
+Features: 16
+Feature list: ['Pclass', 'Sex', 'Fare', 'IsAlone', 'IsLargeFamily', 'HasCabin', 'IsChild', 'Title_Master', 'Title_Miss', 'Title_Mr', 'Title_Mrs', 'Title_Rare', 'Emb_C', 'Emb_Q', 'Emb_S', 'Male_Pc1_EmbC']
+
+--- PRIMARY: Repeated Stratified CV (10x5-fold) ---
+  [14c_Male_Pc1_EmbC] Mean:   0.8295
+  [14c_Male_Pc1_EmbC] Std:    0.0246
+  [14c_Male_Pc1_EmbC] Min:    0.7753
+  [14c_Male_Pc1_EmbC] Max:    0.8820
+  [14c_Male_Pc1_EmbC] Range:  0.1067
+
+--- PRIMARY: Paired Comparison vs Baseline ---
+  Delta (candidate - baseline):
+    Mean:  -0.0006
+    Std:   0.0041
+    Range: [-0.0112, +0.0112]
+    Wins:  candidate 6, baseline 9, ties 35
+
+--- PRIMARY: Test Prediction Flip Analysis ---
+  Total flips: 4 / 418 (1.0%)
+  In bubble (P 0.3-0.7): 4
+  Outside bubble: 0
+
+  Flips by subgroup:
+    male_Pclass1: 4
+
+  All flips within target subgroup (Sex=male, Pclass=1): OK
+
+  Changed PassengerIds: [1023, 1134, 1144, 1208]
+
+    PID Baseline Candidate   Prob    Sex  Pcl Direction
+  -------------------------------------------------------
+   1023        1         0  0.492   male    1 survived->died
+   1134        1         0  0.476   male    1 survived->died
+   1144        1         0  0.477   male    1 survived->died
+   1208        1         0  0.483   male    1 survived->died
+
+--- SUPPORTING: Prediction Instability ---
+  Mean instability:   0.0074
+  Unstable samples:   14 (any disagreement across folds)
+  Highly unstable:    6 (instability > 0.4)
+
+--- SUPPORTING: Bootstrap .632+ (200 resamples) ---
+  Train accuracy:     0.8352
+  OOB accuracy:       0.8286
+  .632 accuracy:      0.8310
+  .632+ accuracy:     0.8310
+  Overfitting rate R: 0.0219
+
+============================================================
+SUMMARY
+============================================================
+  Repeated CV:  0.8295 ± 0.0246
+  .632+ acc:    0.8310
+  Test flips:   4
+  Delta vs baseline: -0.0006
+  Instability:  0.0074
+
+
+============================================================
+COMPARATIVE SUMMARY
+============================================================
+
+Model                      CV Mean  CV Std   Delta  Flips  Outside
+-----------------------------------------------------------------
+v2 baseline                 0.8301  0.0239      --      0       --
+14a HasCabin                0.8296  0.0244 -0.0004      2        0
+14b Deck DE                 0.8311  0.0253 +0.0010      6        0
+14c Emb C                   0.8295  0.0246 -0.0006      4        0
+
+Note: Positive delta = candidate better than baseline
+      Outside = flips outside target subgroup (male Pclass=1)
+
+Results presented for human review.
+Do NOT auto-accept or auto-reject.

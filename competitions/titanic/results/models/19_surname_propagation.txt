@@ -1,0 +1,556 @@
+============================================================
+STEP 19: SURNAME-BASED SURVIVAL PROPAGATION
+============================================================
+Baseline: v2 LogReg (15 features, C=0.01)
+Baseline repeated CV: 0.8301 ± 0.0239
+
+--- Diagnostics: Surname+Pclass groups ---
+  Unique Surname+Pclass keys in training: 686
+  Keys with 2+ members: 130
+  Keys with 3+ members: 43
+  Keys with 5+ members: 7
+  Largest group: 9 (Andersson_Pc3)
+
+--- Coverage: Test passengers with 2+ mates in training ---
+  Ticket-mates (2+):       72 / 418
+  Surname+Pclass mates (2+): 72 / 418
+  Both ticket AND surname:   48
+  Surname-ONLY (new adds):   24
+  Ticket-ONLY:               24
+
+--- NEW: Test passengers with surname mates but NO ticket mates ---
+  Total new passengers:    24
+  With unanimous mates:    16
+    PID 897:   male Pc3 surname=Svensson (2 mates → DIED)
+    PID 913:   male Pc3 surname=Olsen (3 mates → DIED)
+    PID 929: female Pc3 surname=Cacic (2 mates → DIED)
+    PID 942:   male Pc1 surname=Smith (2 mates → DIED)
+    PID 1011: female Pc2 surname=Chapman (2 mates → DIED)
+    PID 1037:   male Pc3 surname=Vander Planke (3 mates → DIED)
+    PID 1092: female Pc3 surname=Murphy (2 mates → SURVIVED)
+    PID 1172: female Pc3 surname=Oreskovic (2 mates → DIED)
+    PID 1181:   male Pc3 surname=Ford (4 mates → DIED)
+    PID 1191:   male Pc3 surname=Johansson (3 mates → DIED)
+    PID 1192:   male Pc3 surname=Olsson (2 mates → DIED)
+    PID 1201: female Pc3 surname=Hansen (3 mates → DIED)
+    PID 1202:   male Pc3 surname=Cacic (2 mates → DIED)
+    PID 1229:   male Pc3 surname=Elias (3 mates → DIED)
+    PID 1287: female Pc1 surname=Smith (2 mates → DIED)
+    PID 1296:   male Pc1 surname=Frauenthal (2 mates → SURVIVED)
+
+============================================================
+PHASE 1: CUSTOM REPEATED CV (10x5-fold, C=0.01)
+============================================================
+
+--- 18b (inline): Ticket rules only (2+ mates) ---
+  CV Mean: 0.8228 ± 0.0223  (delta vs BL: -0.0073)
+
+--- 19a: Surname+Pclass rules only (2+ mates) ---
+  CV Mean: 0.8247 ± 0.0215  (delta vs BL: -0.0054)
+  vs 18b: +0.0019  W/L/T: 21/12/17
+
+--- 19b: Ticket + Surname rules (ticket priority, 2+ mates) ---
+  CV Mean: 0.8227 ± 0.0203  (delta vs BL: -0.0074)
+  vs 18b: -0.0001  W/L/T: 15/16/19
+  Overrides across all folds: ticket=937, surname=215, total_val=8910
+
+--- 19c: Connected components (ticket ∪ surname+Pclass) ---
+  CV Mean: 0.8223 ± 0.0200  (delta vs BL: -0.0077)
+  vs 18b: -0.0004  W/L/T: 16/18/16
+  Component sizes (first fold, 2+ members): 124 components
+  Largest: 8  Top-5: [8, 7, 6, 6, 5]
+  *** WARNING: Component with 8 members — possible false merges ***
+
+============================================================
+PHASE 2: TEST PREDICTIONS AND FLIP ANALYSIS
+============================================================
+
+--- 19a: Surname+Pclass rules only ---
+  Surname rule overrides on test: 49 passengers
+    PID 897:   male Pc3 surname=Svensson ticket=7538 no_change
+    PID 899:   male Pc2 surname=Caldwell ticket=248738 0->1
+    PID 913:   male Pc3 surname=Olsen ticket=C 17368 1->0
+    PID 916: female Pc1 surname=Ryerson ticket=PC 17608 no_change
+    PID 925: female Pc3 surname=Johnston ticket=W./C. 6607 1->0
+    PID 929: female Pc3 surname=Cacic ticket=315087 1->0
+    PID 941: female Pc3 surname=Coutts ticket=C.A. 37671 no_change
+    PID 942:   male Pc1 surname=Smith ticket=13695 no_change
+    PID 947:   male Pc3 surname=Rice ticket=382652 no_change
+    PID 956:   male Pc1 surname=Ryerson ticket=PC 17608 no_change
+    PID 972:   male Pc3 surname=Boulos ticket=2678 1->0
+    PID 1009: female Pc3 surname=Sandstrom ticket=PP 9549 no_change
+    PID 1011: female Pc2 surname=Chapman ticket=SC/AH 29037 1->0
+    PID 1019: female Pc3 surname=McCoy ticket=367226 no_change
+    PID 1024: female Pc3 surname=Lefebre ticket=4133 no_change
+    PID 1031:   male Pc3 surname=Goodwin ticket=CA 2144 no_change
+    PID 1032: female Pc3 surname=Goodwin ticket=CA 2144 no_change
+    PID 1034:   male Pc1 surname=Ryerson ticket=PC 17608 0->1
+    PID 1037:   male Pc3 surname=Vander Planke ticket=345763 no_change
+    PID 1059:   male Pc3 surname=Ford ticket=W./C. 6608 no_change
+    PID 1070: female Pc2 surname=Becker ticket=230136 no_change
+    PID 1080: female Pc3 surname=Sage ticket=CA. 2343 no_change
+    PID 1092: female Pc3 surname=Murphy ticket=36568 no_change
+    PID 1093:   male Pc3 surname=Danbom ticket=347080 1->0
+    PID 1095: female Pc2 surname=Quick ticket=26360 no_change
+    PID 1109:   male Pc1 surname=Wick ticket=36928 0->1
+    PID 1117: female Pc3 surname=Moubarek ticket=2661 no_change
+    PID 1136:   male Pc3 surname=Johnston ticket=W./C. 6607 1->0
+    PID 1172: female Pc3 surname=Oreskovic ticket=315085 1->0
+    PID 1176: female Pc3 surname=Rosblom ticket=370129 1->0
+    PID 1181:   male Pc3 surname=Ford ticket=A/5 1478 no_change
+    PID 1191:   male Pc3 surname=Johansson ticket=347467 no_change
+    PID 1192:   male Pc3 surname=Olsson ticket=347079 no_change
+    PID 1200:   male Pc1 surname=Hays ticket=12749 0->1
+    PID 1201: female Pc3 surname=Hansen ticket=350026 1->0
+    PID 1202:   male Pc3 surname=Cacic ticket=315091 no_change
+    PID 1206: female Pc1 surname=White ticket=PC 17760 1->0
+    PID 1218: female Pc2 surname=Becker ticket=230136 no_change
+    PID 1225: female Pc3 surname=Nakid ticket=2653 no_change
+    PID 1229:   male Pc3 surname=Elias ticket=2675 no_change
+    PID 1234:   male Pc3 surname=Sage ticket=CA. 2343 no_change
+    PID 1245:   male Pc2 surname=Herman ticket=220845 0->1
+    PID 1252:   male Pc3 surname=Sage ticket=CA. 2343 no_change
+    PID 1257: female Pc3 surname=Sage ticket=CA. 2343 no_change
+    PID 1277: female Pc2 surname=Herman ticket=220845 no_change
+    PID 1281:   male Pc3 surname=Palsson ticket=349909 no_change
+    PID 1287: female Pc1 surname=Smith ticket=13695 1->0
+    PID 1296:   male Pc1 surname=Frauenthal ticket=17765 0->1
+    PID 1309:   male Pc3 surname=Peter ticket=2668 no_change
+
+  Flip analysis vs logreg_v2.csv (plain baseline):
+  Total flips: 18 / 418 (4.3%)
+  In bubble (P 0.3-0.7): 0
+  Outside bubble: 18
+
+  Flips by subgroup:
+    female_Pclass1: 2
+    female_Pclass2: 1
+    female_Pclass3: 5
+    male_Pclass1: 4
+    male_Pclass2: 2
+    male_Pclass3: 4
+
+  Changed PassengerIds: [899, 913, 925, 929, 972, 1011, 1034, 1093, 1109, 1136, 1172, 1176, 1200, 1201, 1206, 1245, 1287, 1296]
+
+    PID Baseline Candidate   Prob    Sex  Pcl Direction
+  -------------------------------------------------------
+    899        0         1  0.950   male    2 died->survived
+    913        1         0  0.050   male    3 survived->died
+    925        1         0  0.050 female    3 survived->died
+    929        1         0  0.050 female    3 survived->died
+    972        1         0  0.050   male    3 survived->died
+   1011        1         0  0.050 female    2 survived->died
+   1034        0         1  0.950   male    1 died->survived
+   1093        1         0  0.050   male    3 survived->died
+   1109        0         1  0.950   male    1 died->survived
+   1136        1         0  0.050   male    3 survived->died
+   1172        1         0  0.050 female    3 survived->died
+   1176        1         0  0.050 female    3 survived->died
+   1200        0         1  0.950   male    1 died->survived
+   1201        1         0  0.050 female    3 survived->died
+   1206        1         0  0.050 female    1 survived->died
+   1245        0         1  0.950   male    2 died->survived
+   1287        1         0  0.050 female    1 survived->died
+   1296        0         1  0.950   male    1 died->survived
+
+  Flip analysis vs logreg_18_18b_hybrid_2mate.csv (current best):
+  Total flips: 11 / 418 (2.6%)
+  In bubble (P 0.3-0.7): 2
+  Outside bubble: 9
+
+  Flips by subgroup:
+    female_Pclass1: 2
+    female_Pclass2: 1
+    female_Pclass3: 4
+    male_Pclass1: 2
+    male_Pclass2: 1
+    male_Pclass3: 1
+
+  Changed PassengerIds: [913, 929, 1011, 1122, 1172, 1201, 1206, 1259, 1282, 1287, 1296]
+
+    PID Baseline Candidate   Prob    Sex  Pcl Direction
+  -------------------------------------------------------
+    913        1         0  0.050   male    3 survived->died
+    929        1         0  0.050 female    3 survived->died
+   1011        1         0  0.050 female    2 survived->died
+   1122        1         0  0.196   male    2 survived->died
+   1172        1         0  0.050 female    3 survived->died
+   1201        1         0  0.050 female    3 survived->died
+   1206        1         0  0.050 female    1 survived->died
+   1259        0         1  0.577 female    3 died->survived
+   1282        1         0  0.388   male    1 survived->died
+   1287        1         0  0.050 female    1 survived->died
+   1296        0         1  0.950   male    1 died->survived
+
+--- 19b: Ticket + Surname rules (ticket priority) ---
+  Ticket overrides: 48 passengers
+    PID 899:   male Pc2 surname=Caldwell ticket=248738 0->1 [ticket]
+    PID 901:   male Pc3 surname=Davies ticket=A/4 48871 no_change [ticket]
+    PID 916: female Pc1 surname=Ryerson ticket=PC 17608 no_change [ticket]
+    PID 925: female Pc3 surname=Johnston ticket=W./C. 6607 1->0 [ticket]
+    PID 941: female Pc3 surname=Coutts ticket=C.A. 37671 no_change [ticket]
+    PID 947:   male Pc3 surname=Rice ticket=382652 no_change [ticket]
+    PID 951: female Pc1 surname=Chaudanson ticket=PC 17608 no_change [ticket]
+    PID 956:   male Pc1 surname=Ryerson ticket=PC 17608 no_change [ticket]
+    PID 972:   male Pc3 surname=Boulos ticket=2678 1->0 [ticket]
+    PID 1009: female Pc3 surname=Sandstrom ticket=PP 9549 no_change [ticket]
+    PID 1019: female Pc3 surname=McCoy ticket=367226 no_change [ticket]
+    PID 1024: female Pc3 surname=Lefebre ticket=4133 no_change [ticket]
+    PID 1031:   male Pc3 surname=Goodwin ticket=CA 2144 no_change [ticket]
+    PID 1032: female Pc3 surname=Goodwin ticket=CA 2144 no_change [ticket]
+    PID 1034:   male Pc1 surname=Ryerson ticket=PC 17608 0->1 [ticket]
+    PID 1042: female Pc1 surname=Earnshaw ticket=11767 no_change [ticket]
+    PID 1059:   male Pc3 surname=Ford ticket=W./C. 6608 no_change [ticket]
+    PID 1070: female Pc2 surname=Becker ticket=230136 no_change [ticket]
+    PID 1080: female Pc3 surname=Sage ticket=CA. 2343 no_change [ticket]
+    PID 1088:   male Pc1 surname=Spedden ticket=16966 no_change [ticket]
+    PID 1093:   male Pc3 surname=Danbom ticket=347080 1->0 [ticket]
+    PID 1095: female Pc2 surname=Quick ticket=26360 no_change [ticket]
+    PID 1104:   male Pc2 surname=Deacon ticket=S.O.C. 14879 no_change [ticket]
+    PID 1109:   male Pc1 surname=Wick ticket=36928 0->1 [ticket]
+    PID 1117: female Pc3 surname=Moubarek ticket=2661 no_change [ticket]
+    PID 1122:   male Pc2 surname=Sweet ticket=220845 0->1 [ticket]
+    PID 1134:   male Pc1 surname=Spedden ticket=16966 no_change [ticket]
+    PID 1136:   male Pc3 surname=Johnston ticket=W./C. 6607 1->0 [ticket]
+    PID 1176: female Pc3 surname=Rosblom ticket=370129 1->0 [ticket]
+    PID 1200:   male Pc1 surname=Hays ticket=12749 0->1 [ticket]
+    PID 1208:   male Pc1 surname=Spencer ticket=PC 17569 no_change [ticket]
+    PID 1216: female Pc1 surname=Kreuchen ticket=24160 no_change [ticket]
+    PID 1218: female Pc2 surname=Becker ticket=230136 no_change [ticket]
+    PID 1225: female Pc3 surname=Nakid ticket=2653 no_change [ticket]
+    PID 1234:   male Pc3 surname=Sage ticket=CA. 2343 no_change [ticket]
+    PID 1235: female Pc1 surname=Cardeza ticket=PC 17755 no_change [ticket]
+    PID 1244:   male Pc2 surname=Dibden ticket=S.O.C. 14879 no_change [ticket]
+    PID 1245:   male Pc2 surname=Herman ticket=220845 0->1 [ticket]
+    PID 1252:   male Pc3 surname=Sage ticket=CA. 2343 no_change [ticket]
+    PID 1257: female Pc3 surname=Sage ticket=CA. 2343 no_change [ticket]
+    PID 1259: female Pc3 surname=Riihivouri ticket=3101295 1->0 [ticket]
+    PID 1263: female Pc1 surname=Wilson ticket=16966 no_change [ticket]
+    PID 1267: female Pc1 surname=Bowen ticket=PC 17608 no_change [ticket]
+    PID 1277: female Pc2 surname=Herman ticket=220845 no_change [ticket]
+    PID 1281:   male Pc3 surname=Palsson ticket=349909 no_change [ticket]
+    PID 1282:   male Pc1 surname=Payne ticket=12749 0->1 [ticket]
+    PID 1292: female Pc1 surname=Bonnell ticket=36928 no_change [ticket]
+    PID 1309:   male Pc3 surname=Peter ticket=2668 no_change [ticket]
+  Surname overrides (NEW): 17 passengers
+    PID 897:   male Pc3 surname=Svensson ticket=7538 no_change [surname]
+    PID 913:   male Pc3 surname=Olsen ticket=C 17368 1->0 [surname]
+    PID 929: female Pc3 surname=Cacic ticket=315087 1->0 [surname]
+    PID 942:   male Pc1 surname=Smith ticket=13695 no_change [surname]
+    PID 1011: female Pc2 surname=Chapman ticket=SC/AH 29037 1->0 [surname]
+    PID 1037:   male Pc3 surname=Vander Planke ticket=345763 no_change [surname]
+    PID 1092: female Pc3 surname=Murphy ticket=36568 no_change [surname]
+    PID 1172: female Pc3 surname=Oreskovic ticket=315085 1->0 [surname]
+    PID 1181:   male Pc3 surname=Ford ticket=A/5 1478 no_change [surname]
+    PID 1191:   male Pc3 surname=Johansson ticket=347467 no_change [surname]
+    PID 1192:   male Pc3 surname=Olsson ticket=347079 no_change [surname]
+    PID 1201: female Pc3 surname=Hansen ticket=350026 1->0 [surname]
+    PID 1202:   male Pc3 surname=Cacic ticket=315091 no_change [surname]
+    PID 1206: female Pc1 surname=White ticket=PC 17760 1->0 [surname]
+    PID 1229:   male Pc3 surname=Elias ticket=2675 no_change [surname]
+    PID 1287: female Pc1 surname=Smith ticket=13695 1->0 [surname]
+    PID 1296:   male Pc1 surname=Frauenthal ticket=17765 0->1 [surname]
+
+  Ticket layer matches 18b submission: True
+
+  Flip analysis vs logreg_v2.csv (plain baseline):
+  Total flips: 21 / 418 (5.0%)
+  In bubble (P 0.3-0.7): 0
+  Outside bubble: 21
+
+  Flips by subgroup:
+    female_Pclass1: 2
+    female_Pclass2: 1
+    female_Pclass3: 6
+    male_Pclass1: 5
+    male_Pclass2: 3
+    male_Pclass3: 4
+
+  Changed PassengerIds: [899, 913, 925, 929, 972, 1011, 1034, 1093, 1109, 1122, 1136, 1172, 1176, 1200, 1201, 1206, 1245, 1259, 1282, 1287, 1296]
+
+    PID Baseline Candidate   Prob    Sex  Pcl Direction
+  -------------------------------------------------------
+    899        0         1  0.950   male    2 died->survived
+    913        1         0  0.050   male    3 survived->died
+    925        1         0  0.050 female    3 survived->died
+    929        1         0  0.050 female    3 survived->died
+    972        1         0  0.050   male    3 survived->died
+   1011        1         0  0.050 female    2 survived->died
+   1034        0         1  0.950   male    1 died->survived
+   1093        1         0  0.050   male    3 survived->died
+   1109        0         1  0.950   male    1 died->survived
+   1122        0         1  0.950   male    2 died->survived
+   1136        1         0  0.050   male    3 survived->died
+   1172        1         0  0.050 female    3 survived->died
+   1176        1         0  0.050 female    3 survived->died
+   1200        0         1  0.950   male    1 died->survived
+   1201        1         0  0.050 female    3 survived->died
+   1206        1         0  0.050 female    1 survived->died
+   1245        0         1  0.950   male    2 died->survived
+   1259        1         0  0.050 female    3 survived->died
+   1282        0         1  0.950   male    1 died->survived
+   1287        1         0  0.050 female    1 survived->died
+   1296        0         1  0.950   male    1 died->survived
+
+  Flip analysis vs logreg_18_18b_hybrid_2mate.csv (current best):
+  Total flips: 8 / 418 (1.9%)
+  In bubble (P 0.3-0.7): 0
+  Outside bubble: 8
+
+  Flips by subgroup:
+    female_Pclass1: 2
+    female_Pclass2: 1
+    female_Pclass3: 3
+    male_Pclass1: 1
+    male_Pclass3: 1
+
+  Changed PassengerIds: [913, 929, 1011, 1172, 1201, 1206, 1287, 1296]
+
+    PID Baseline Candidate   Prob    Sex  Pcl Direction
+  -------------------------------------------------------
+    913        1         0  0.050   male    3 survived->died
+    929        1         0  0.050 female    3 survived->died
+   1011        1         0  0.050 female    2 survived->died
+   1172        1         0  0.050 female    3 survived->died
+   1201        1         0  0.050 female    3 survived->died
+   1206        1         0  0.050 female    1 survived->died
+   1287        1         0  0.050 female    1 survived->died
+   1296        0         1  0.950   male    1 died->survived
+
+--- 19c: Connected components (ticket ∪ surname+Pclass) ---
+  Components with 2+ members: 156
+  Largest: 9  Top-5: [9, 8, 7, 7, 7]
+  Size distribution: 2+:156  3+:57  4+:24  5+:10  6+:8  7+:5  8+:2  
+    Component (root=719, size=8):
+      Johnson | ticket=347742 | Johnson, Mrs. Oscar W (Elisabeth Vilhelmina Berg)
+      Johnson | ticket=347742 | Johnson, Miss. Eleanor Ileen
+      Leonard | ticket=LINE | Leonard, Mr. Lionel
+      Tornquist | ticket=LINE | Tornquist, Mr. William Henry
+      Johnson | ticket=LINE | Johnson, Mr. William Cahoone Jr
+      Johnson | ticket=LINE | Johnson, Mr. Alfred
+      Johnson | ticket=347062 | Johnson, Mr. Malkolm Joackim
+      Johnson | ticket=347742 | Johnson, Master. Harold Theodor
+    Component (root=146, size=9):
+      Andersson | ticket=347082 | Andersson, Mr. Anders Johan
+      Andersson | ticket=3101281 | Andersson, Miss. Erna Alexandra
+      Andersson | ticket=347082 | Andersson, Miss. Ellis Anna Maria
+      Andersson | ticket=350043 | Andersson, Mr. August Edvard ("Wennerstrom")
+      Andersson | ticket=347082 | Andersson, Miss. Ingeborg Constanzia
+      Andersson | ticket=347082 | Andersson, Miss. Sigrid Elisabeth
+      Andersson | ticket=347082 | Andersson, Mrs. Anders Johan (Alfrida Konstantia Brogren)
+      Andersson | ticket=347082 | Andersson, Miss. Ebba Iris Alfrida
+      Andersson | ticket=347082 | Andersson, Master. Sigvard Harald Elias
+    Component (root=885, size=5):
+      Rice | ticket=382652 | Rice, Master. Eugene
+      Rice | ticket=382652 | Rice, Master. Arthur
+      Rice | ticket=382652 | Rice, Master. Eric
+      Rice | ticket=382652 | Rice, Master. George Hugh
+      Rice | ticket=382652 | Rice, Mrs. William (Margaret Norton)
+    Component (root=824, size=6):
+      Panula | ticket=3101295 | Panula, Master. Juha Niilo
+      Panula | ticket=3101295 | Panula, Master. Eino Viljami
+      Panula | ticket=3101295 | Panula, Mr. Ernesti Arvid
+      Panula | ticket=3101295 | Panula, Mrs. Juha (Maria Emilia Ojala)
+      Panula | ticket=3101295 | Panula, Mr. Jaako Arnold
+      Panula | ticket=3101295 | Panula, Master. Urho Abraham
+    Component (root=683, size=6):
+      Goodwin | ticket=CA 2144 | Goodwin, Master. William Frederick
+      Goodwin | ticket=CA 2144 | Goodwin, Miss. Lillian Amy
+      Goodwin | ticket=CA 2144 | Goodwin, Master. Sidney Leonard
+      Goodwin | ticket=CA 2144 | Goodwin, Master. Harold Victor
+      Goodwin | ticket=CA 2144 | Goodwin, Mrs. Frederick (Augusta Tyler)
+      Goodwin | ticket=CA 2144 | Goodwin, Mr. Charles Edward
+    Component (root=819, size=6):
+      Skoog | ticket=347088 | Skoog, Master. Harald
+      Skoog | ticket=347088 | Skoog, Mrs. William (Anna Bernhardina Karlsson)
+      Skoog | ticket=347088 | Skoog, Mr. Wilhelm
+      Skoog | ticket=347088 | Skoog, Miss. Mabel
+      Skoog | ticket=347088 | Skoog, Miss. Margit Elizabeth
+      Skoog | ticket=347088 | Skoog, Master. Karl Thorsten
+    Component (root=549, size=7):
+      Hood | ticket=S.O.C. 14879 | Hood, Mr. Ambrose Jr
+      Hickman | ticket=S.O.C. 14879 | Hickman, Mr. Stanley George
+      Nicholls | ticket=C.A. 33112 | Nicholls, Mr. Joseph Charles
+      Davies | ticket=S.O.C. 14879 | Davies, Mr. Charles Henry
+      Davies | ticket=C.A. 33112 | Davies, Master. John Morgan Jr
+      Hickman | ticket=S.O.C. 14879 | Hickman, Mr. Leonard Mark
+      Hickman | ticket=S.O.C. 14879 | Hickman, Mr. Lewis
+    Component (root=838, size=7):
+      Bing | ticket=1601 | Bing, Mr. Lee
+      Ling | ticket=1601 | Ling, Mr. Lee
+      Lang | ticket=1601 | Lang, Mr. Fang
+      Foo | ticket=1601 | Foo, Mr. Choong
+      Lam | ticket=1601 | Lam, Mr. Ali
+      Lam | ticket=1601 | Lam, Mr. Len
+      Chip | ticket=1601 | Chip, Mr. Chang
+    Component (root=876, size=5):
+      Gustafsson | ticket=3101276 | Gustafsson, Mr. Anders Vilhelm
+      Osen | ticket=7534 | Osen, Mr. Olaf Elon
+      Gustafsson | ticket=347069 | Gustafsson, Mr. Karl Gideon
+      Gustafsson | ticket=3101277 | Gustafsson, Mr. Johan Birger
+      Gustafsson | ticket=7534 | Gustafsson, Mr. Alfred Ossian
+    Component (root=863, size=7):
+      Sage | ticket=CA. 2343 | Sage, Master. Thomas Henry
+      Sage | ticket=CA. 2343 | Sage, Miss. Constance Gladys
+      Sage | ticket=CA. 2343 | Sage, Mr. Frederick
+      Sage | ticket=CA. 2343 | Sage, Mr. George John Jr
+      Sage | ticket=CA. 2343 | Sage, Miss. Stella Anna
+      Sage | ticket=CA. 2343 | Sage, Mr. Douglas Bullen
+      Sage | ticket=CA. 2343 | Sage, Miss. Dorothy Edith "Dolly"
+
+  Rule overrides on test: 65 passengers
+    PID 897:   male Pc3 surname=Svensson ticket=7538 no_change (comp_size=2)
+    PID 899:   male Pc2 surname=Caldwell ticket=248738 0->1 (comp_size=2)
+    PID 901:   male Pc3 surname=Davies ticket=A/4 48871 no_change (comp_size=2)
+    PID 913:   male Pc3 surname=Olsen ticket=C 17368 1->0 (comp_size=3)
+    PID 916: female Pc1 surname=Ryerson ticket=PC 17608 no_change (comp_size=2)
+    PID 925: female Pc3 surname=Johnston ticket=W./C. 6607 1->0 (comp_size=2)
+    PID 929: female Pc3 surname=Cacic ticket=315087 1->0 (comp_size=2)
+    PID 941: female Pc3 surname=Coutts ticket=C.A. 37671 no_change (comp_size=2)
+    PID 942:   male Pc1 surname=Smith ticket=13695 no_change (comp_size=2)
+    PID 947:   male Pc3 surname=Rice ticket=382652 no_change (comp_size=5)
+    PID 951: female Pc1 surname=Chaudanson ticket=PC 17608 no_change (comp_size=2)
+    PID 956:   male Pc1 surname=Ryerson ticket=PC 17608 no_change (comp_size=2)
+    PID 972:   male Pc3 surname=Boulos ticket=2678 1->0 (comp_size=3)
+    PID 997:   male Pc3 surname=Holthen ticket=C 4001 no_change (comp_size=3)
+    PID 1009: female Pc3 surname=Sandstrom ticket=PP 9549 no_change (comp_size=2)
+    PID 1011: female Pc2 surname=Chapman ticket=SC/AH 29037 1->0 (comp_size=2)
+    PID 1019: female Pc3 surname=McCoy ticket=367226 no_change (comp_size=2)
+    PID 1024: female Pc3 surname=Lefebre ticket=4133 no_change (comp_size=4)
+    PID 1031:   male Pc3 surname=Goodwin ticket=CA 2144 no_change (comp_size=6)
+    PID 1032: female Pc3 surname=Goodwin ticket=CA 2144 no_change (comp_size=6)
+    PID 1034:   male Pc1 surname=Ryerson ticket=PC 17608 0->1 (comp_size=2)
+    PID 1037:   male Pc3 surname=Vander Planke ticket=345763 no_change (comp_size=3)
+    PID 1039:   male Pc3 surname=Davies ticket=SC/A4 23568 no_change (comp_size=2)
+    PID 1042: female Pc1 surname=Earnshaw ticket=11767 no_change (comp_size=4)
+    PID 1059:   male Pc3 surname=Ford ticket=W./C. 6608 no_change (comp_size=4)
+    PID 1070: female Pc2 surname=Becker ticket=230136 no_change (comp_size=2)
+    PID 1079:   male Pc3 surname=Davies ticket=A/4 48873 no_change (comp_size=2)
+    PID 1080: female Pc3 surname=Sage ticket=CA. 2343 no_change (comp_size=7)
+    PID 1088:   male Pc1 surname=Spedden ticket=16966 no_change (comp_size=2)
+    PID 1093:   male Pc3 surname=Danbom ticket=347080 1->0 (comp_size=2)
+    PID 1095: female Pc2 surname=Quick ticket=26360 no_change (comp_size=2)
+    PID 1102:   male Pc3 surname=Andersen ticket=C 4001 no_change (comp_size=3)
+    PID 1109:   male Pc1 surname=Wick ticket=36928 0->1 (comp_size=2)
+    PID 1117: female Pc3 surname=Moubarek ticket=2661 no_change (comp_size=2)
+    PID 1122:   male Pc2 surname=Sweet ticket=220845 0->1 (comp_size=2)
+    PID 1134:   male Pc1 surname=Spedden ticket=16966 no_change (comp_size=2)
+    PID 1136:   male Pc3 surname=Johnston ticket=W./C. 6607 1->0 (comp_size=2)
+    PID 1172: female Pc3 surname=Oreskovic ticket=315085 1->0 (comp_size=2)
+    PID 1176: female Pc3 surname=Rosblom ticket=370129 1->0 (comp_size=2)
+    PID 1181:   male Pc3 surname=Ford ticket=A/5 1478 no_change (comp_size=4)
+    PID 1191:   male Pc3 surname=Johansson ticket=347467 no_change (comp_size=3)
+    PID 1192:   male Pc3 surname=Olsson ticket=347079 no_change (comp_size=2)
+    PID 1200:   male Pc1 surname=Hays ticket=12749 0->1 (comp_size=4)
+    PID 1201: female Pc3 surname=Hansen ticket=350026 1->0 (comp_size=3)
+    PID 1202:   male Pc3 surname=Cacic ticket=315091 no_change (comp_size=2)
+    PID 1208:   male Pc1 surname=Spencer ticket=PC 17569 no_change (comp_size=2)
+    PID 1216: female Pc1 surname=Kreuchen ticket=24160 no_change (comp_size=3)
+    PID 1218: female Pc2 surname=Becker ticket=230136 no_change (comp_size=2)
+    PID 1225: female Pc3 surname=Nakid ticket=2653 no_change (comp_size=2)
+    PID 1229:   male Pc3 surname=Elias ticket=2675 no_change (comp_size=3)
+    PID 1234:   male Pc3 surname=Sage ticket=CA. 2343 no_change (comp_size=7)
+    PID 1235: female Pc1 surname=Cardeza ticket=PC 17755 no_change (comp_size=3)
+    PID 1245:   male Pc2 surname=Herman ticket=220845 0->1 (comp_size=2)
+    PID 1252:   male Pc3 surname=Sage ticket=CA. 2343 no_change (comp_size=7)
+    PID 1257: female Pc3 surname=Sage ticket=CA. 2343 no_change (comp_size=7)
+    PID 1259: female Pc3 surname=Riihivouri ticket=3101295 1->0 (comp_size=6)
+    PID 1263: female Pc1 surname=Wilson ticket=16966 no_change (comp_size=2)
+    PID 1267: female Pc1 surname=Bowen ticket=PC 17608 no_change (comp_size=2)
+    PID 1277: female Pc2 surname=Herman ticket=220845 no_change (comp_size=2)
+    PID 1281:   male Pc3 surname=Palsson ticket=349909 no_change (comp_size=4)
+    PID 1282:   male Pc1 surname=Payne ticket=12749 0->1 (comp_size=4)
+    PID 1287: female Pc1 surname=Smith ticket=13695 1->0 (comp_size=2)
+    PID 1292: female Pc1 surname=Bonnell ticket=36928 no_change (comp_size=2)
+    PID 1296:   male Pc1 surname=Frauenthal ticket=17765 0->1 (comp_size=2)
+    PID 1309:   male Pc3 surname=Peter ticket=2668 no_change (comp_size=2)
+
+  Flip analysis vs logreg_v2.csv (plain baseline):
+  Total flips: 20 / 418 (4.8%)
+  In bubble (P 0.3-0.7): 0
+  Outside bubble: 20
+
+  Flips by subgroup:
+    female_Pclass1: 1
+    female_Pclass2: 1
+    female_Pclass3: 6
+    male_Pclass1: 5
+    male_Pclass2: 3
+    male_Pclass3: 4
+
+  Changed PassengerIds: [899, 913, 925, 929, 972, 1011, 1034, 1093, 1109, 1122, 1136, 1172, 1176, 1200, 1201, 1245, 1259, 1282, 1287, 1296]
+
+    PID Baseline Candidate   Prob    Sex  Pcl Direction
+  -------------------------------------------------------
+    899        0         1  0.950   male    2 died->survived
+    913        1         0  0.050   male    3 survived->died
+    925        1         0  0.050 female    3 survived->died
+    929        1         0  0.050 female    3 survived->died
+    972        1         0  0.050   male    3 survived->died
+   1011        1         0  0.050 female    2 survived->died
+   1034        0         1  0.950   male    1 died->survived
+   1093        1         0  0.050   male    3 survived->died
+   1109        0         1  0.950   male    1 died->survived
+   1122        0         1  0.950   male    2 died->survived
+   1136        1         0  0.050   male    3 survived->died
+   1172        1         0  0.050 female    3 survived->died
+   1176        1         0  0.050 female    3 survived->died
+   1200        0         1  0.950   male    1 died->survived
+   1201        1         0  0.050 female    3 survived->died
+   1245        0         1  0.950   male    2 died->survived
+   1259        1         0  0.050 female    3 survived->died
+   1282        0         1  0.950   male    1 died->survived
+   1287        1         0  0.050 female    1 survived->died
+   1296        0         1  0.950   male    1 died->survived
+
+  Flip analysis vs logreg_18_18b_hybrid_2mate.csv (current best):
+  Total flips: 7 / 418 (1.7%)
+  In bubble (P 0.3-0.7): 0
+  Outside bubble: 7
+
+  Flips by subgroup:
+    female_Pclass1: 1
+    female_Pclass2: 1
+    female_Pclass3: 3
+    male_Pclass1: 1
+    male_Pclass3: 1
+
+  Changed PassengerIds: [913, 929, 1011, 1172, 1201, 1287, 1296]
+
+    PID Baseline Candidate   Prob    Sex  Pcl Direction
+  -------------------------------------------------------
+    913        1         0  0.050   male    3 survived->died
+    929        1         0  0.050 female    3 survived->died
+   1011        1         0  0.050 female    2 survived->died
+   1172        1         0  0.050 female    3 survived->died
+   1201        1         0  0.050 female    3 survived->died
+   1287        1         0  0.050 female    1 survived->died
+   1296        0         1  0.950   male    1 died->survived
+
+============================================================
+PHASE 3: SAVE SUBMISSIONS + SUMMARY
+============================================================
+
+  Saved: /Users/glennharless/dev-brain/kaggle/competitions/titanic/submissions/logreg_19_19a_surname_pc.csv
+    Survival rate: 0.390 (163/418)
+  Saved: /Users/glennharless/dev-brain/kaggle/competitions/titanic/submissions/logreg_19_19b_ticket_surname.csv
+    Survival rate: 0.392 (164/418)
+  Saved: /Users/glennharless/dev-brain/kaggle/competitions/titanic/submissions/logreg_19_19c_connected.csv
+    Survival rate: 0.395 (165/418)
+
+============================================================
+FINAL SUMMARY
+============================================================
+
+Model                                CV Mean  CV Std    Δ BL   Δ 18b  W/L/T vs 18b
+--------------------------------------------------------------------------------
+v2 baseline (C=0.01)                  0.8301  0.0239      --      --            --
+18b ticket (inline)                   0.8228  0.0223 -0.0073 +0.0000        0/0/50
+19a surname+Pc only                   0.8247  0.0215 -0.0054 +0.0019      21/12/17
+19b ticket+surname                    0.8227  0.0203 -0.0074 -0.0001      15/16/19
+19c connected comp                    0.8223  0.0200 -0.0077 -0.0004      16/18/16
+
+*** RISK: 17 surname overrides on test (>15 threshold) ***
+
+Results presented for human review.
+Do NOT auto-accept or auto-reject based on automated metrics alone.

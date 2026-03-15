@@ -1,0 +1,93 @@
+============================================================
+EVALUATION: 16_RBF_SVM_C100_g0.1
+============================================================
+Features: 15
+Feature list: ['Pclass', 'Sex', 'Fare', 'IsAlone', 'IsLargeFamily', 'HasCabin', 'IsChild', 'Title_Master', 'Title_Miss', 'Title_Mr', 'Title_Mrs', 'Title_Rare', 'Emb_C', 'Emb_Q', 'Emb_S']
+
+--- PRIMARY: Repeated Stratified CV (10x5-fold) ---
+  [16_RBF_SVM_C100_g0.1] Mean:   0.8296
+  [16_RBF_SVM_C100_g0.1] Std:    0.0214
+  [16_RBF_SVM_C100_g0.1] Min:    0.7865
+  [16_RBF_SVM_C100_g0.1] Max:    0.8764
+  [16_RBF_SVM_C100_g0.1] Range:  0.0899
+
+--- PRIMARY: Paired Comparison vs Baseline ---
+  Delta (candidate - baseline):
+    Mean:  -0.0005
+    Std:   0.0208
+    Range: [-0.0393, +0.0337]
+    Wins:  candidate 21, baseline 22, ties 7
+
+--- PRIMARY: Test Prediction Flip Analysis ---
+  Total flips: 35 / 418 (8.4%)
+  In bubble (P 0.3-0.7): 2
+  Outside bubble: 33
+
+  Flips by subgroup:
+    female_Pclass1: 2
+    female_Pclass3: 18
+    male_Pclass1: 11
+    male_Pclass2: 2
+    male_Pclass3: 2
+
+  Changed PassengerIds: [910, 926, 928, 929, 931, 956, 964, 967, 979, 990, 1001, 1004, 1017, 1030, 1049, 1061, 1069, 1073, 1089, 1100, 1106, 1126, 1128, 1134, 1144, 1160, 1172, 1208, 1214, 1237, 1259, 1268, 1284, 1299, 1304]
+
+    PID Baseline Candidate   Prob    Sex  Pcl Direction
+  -------------------------------------------------------
+    910        1         0  0.191 female    3 survived->died
+    926        0         1  0.798   male    1 died->survived
+    928        1         0  0.187 female    3 survived->died
+    929        1         0  0.187 female    3 survived->died
+    931        0         1  0.741   male    3 died->survived
+    956        1         0  0.383   male    1 survived->died
+    964        1         0  0.187 female    3 survived->died
+    967        1         0  0.000   male    1 survived->died
+    979        1         0  0.187 female    3 survived->died
+    990        1         0  0.187 female    3 survived->died
+   1001        0         1  0.788   male    2 died->survived
+   1004        1         0  0.256 female    1 survived->died
+   1017        1         0  0.176 female    3 survived->died
+   1030        1         0  0.187 female    3 survived->died
+   1049        1         0  0.187 female    3 survived->died
+   1061        1         0  0.187 female    3 survived->died
+   1069        0         1  0.788   male    1 died->survived
+   1073        0         1  0.743   male    1 died->survived
+   1089        1         0  0.187 female    3 survived->died
+   1100        1         0  0.168 female    1 survived->died
+   1106        0         1  0.792 female    3 died->survived
+   1126        0         1  0.807   male    1 died->survived
+   1128        0         1  0.794   male    1 died->survived
+   1134        1         0  0.014   male    1 survived->died
+   1144        1         0  0.010   male    1 survived->died
+   1160        1         0  0.187 female    3 survived->died
+   1172        1         0  0.187 female    3 survived->died
+   1208        1         0  0.003   male    1 survived->died
+   1214        0         1  0.788   male    2 died->survived
+   1237        1         0  0.187 female    3 survived->died
+   1259        1         0  0.220 female    3 survived->died
+   1268        1         0  0.190 female    3 survived->died
+   1284        0         1  0.500   male    3 died->survived
+   1299        1         0  0.000   male    1 survived->died
+   1304        1         0  0.187 female    3 survived->died
+
+--- SUPPORTING: Prediction Instability ---
+  Mean instability:   0.0543
+  Unstable samples:   106 (any disagreement across folds)
+  Highly unstable:    41 (instability > 0.4)
+
+--- SUPPORTING: Bootstrap .632+ (200 resamples) ---
+  Train accuracy:     0.8778
+  OOB accuracy:       0.8137
+  .632 accuracy:      0.8373
+  .632+ accuracy:     0.8343
+  Overfitting rate R: 0.1896
+
+============================================================
+SUMMARY
+============================================================
+  Repeated CV:  0.8296 ± 0.0214
+  .632+ acc:    0.8343
+  Test flips:   35
+  Delta vs baseline: -0.0005
+  Instability:  0.0543
+
