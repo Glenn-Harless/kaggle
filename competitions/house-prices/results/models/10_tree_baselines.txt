@@ -1,0 +1,79 @@
+House Prices: Step 10 — Tree Model Baselines
+============================================================
+
+Train: (1460, 238) (FULL data, no outlier removal)
+Test:  (1459, 238)
+Target: log1p(SalePrice) for all models
+CV: KFold(5, shuffle=True, random_state=42) — same folds for all
+
+============================================================
+ELASTICNET (Phase 2-4 best, full data reference)
+  StandardScaler + ElasticNet(a=0.02848, l1=0.1)
+============================================================
+    Fold 1: RMSLE = 0.12054
+    Fold 2: RMSLE = 0.11346
+    Fold 3: RMSLE = 0.21696
+    Fold 4: RMSLE = 0.13898
+    Fold 5: RMSLE = 0.10436
+  [ElasticNet] Mean RMSLE: 0.13886
+  [ElasticNet] Std:        0.04067
+  [ElasticNet] Per fold:   0.12054, 0.11346, 0.21696, 0.13898, 0.10436
+
+============================================================
+XGBOOST (conservative defaults)
+  max_depth=3, lr=0.05, subsample=0.8, colsample=0.8
+  Early stopping: 80/20 inner split, patience=default
+============================================================
+    Fold 1: RMSLE = 0.12951  (stopped at round 926)
+    Fold 2: RMSLE = 0.11729  (stopped at round 376)
+    Fold 3: RMSLE = 0.15758  (stopped at round 389)
+    Fold 4: RMSLE = 0.13590  (stopped at round 165)
+    Fold 5: RMSLE = 0.10827  (stopped at round 338)
+    Avg rounds: 439
+  [XGBoost] Mean RMSLE: 0.12971
+  [XGBoost] Std:        0.01691
+  [XGBoost] Per fold:   0.12951, 0.11729, 0.15758, 0.13590, 0.10827
+
+============================================================
+LIGHTGBM (conservative defaults)
+  num_leaves=31, lr=0.05, subsample=0.8, colsample=0.8
+  Early stopping: 80/20 inner split, patience=50 rounds
+============================================================
+    Fold 1: RMSLE = 0.13884  (stopped at round 302)
+    Fold 2: RMSLE = 0.12114  (stopped at round 126)
+    Fold 3: RMSLE = 0.16162  (stopped at round 335)
+    Fold 4: RMSLE = 0.13189  (stopped at round 175)
+    Fold 5: RMSLE = 0.11526  (stopped at round 222)
+    Avg rounds: 232
+  [LightGBM] Mean RMSLE: 0.13375
+  [LightGBM] Std:        0.01617
+  [LightGBM] Per fold:   0.13884, 0.12114, 0.16162, 0.13189, 0.11526
+
+============================================================
+COMPARISON (same 5 folds, full data, lower is better)
+============================================================
+
+  Model                  Mean RMSLE        Std  Best Fold  Worst Fold
+  --------------------------------------------------------------------
+  XGBoost                   0.12971    0.01691    0.10827     0.15758 <--
+  LightGBM                  0.13375    0.01617    0.11526     0.16162
+  ElasticNet                0.13886    0.04067    0.10436     0.21696
+
+  Per-fold head-to-head:
+    Fold   ElasticNet      XGBoost     LightGBM       Winner
+  ----------------------------------------------------------
+       1      0.12054      0.12951      0.13884   ElasticNet
+       2      0.11346      0.11729      0.12114   ElasticNet
+       3      0.21696      0.15758      0.16162      XGBoost
+       4      0.13898      0.13590      0.13189     LightGBM
+       5      0.10436      0.10827      0.11526   ElasticNet
+
+  Overall OOF RMSLE (computed on all 1460 predictions):
+    ElasticNet: 0.14469
+    XGBoost:    0.13081
+    LightGBM:   0.13472
+
+  Quick blend preview (OOF, for Step 13):
+    50/50 ElasticNet+XGBoost:    0.13271
+    Equal 3-way:                 0.13085
+

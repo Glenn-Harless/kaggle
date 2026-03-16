@@ -1,0 +1,134 @@
+House Prices: Step 8 — Final Model + Error Audit
+============================================================
+
+Train: (1456, 238) (4 outliers removed)
+Test: (1459, 238)
+
+============================================================
+FINAL MODEL
+============================================================
+  ElasticNet (alpha=0.02848, l1_ratio=0.1)
+  StandardScaler + log1p target
+  Outlier removal: GrLivArea > 4000 (4 houses)
+
+  OOF RMSLE: 0.11240
+
+============================================================
+ERROR DISTRIBUTION
+============================================================
+
+  Overall:
+    Mean |error|:     $    13,467
+    Median |error|:   $     9,239
+    Mean % error:           8.0%
+    Median % error:         5.7%
+
+  Error distribution:
+         <5%:  649 ( 44.6%) cum  44.6%  ######################
+       5-10%:  438 ( 30.1%) cum  74.7%  ###############
+      10-15%:  181 ( 12.4%) cum  87.1%  ######
+      15-20%:   93 (  6.4%) cum  93.5%  ###
+      20-30%:   65 (  4.5%) cum  97.9%  ##
+      30-50%:   20 (  1.4%) cum  99.3%  
+     50-100%:    8 (  0.5%) cum  99.9%  
+       >100%:    2 (  0.1%) cum 100.0%  
+
+============================================================
+ERRORS BY PROPERTY TYPE
+============================================================
+
+  By BldgType:
+          Type      N  Mean %Err  Median %Err
+  ---------------------------------------------
+          1Fam   1216       8.0%         5.6%
+        2fmCon     31      11.1%         9.2%
+        Duplex     52       9.1%         8.0%
+         Twnhs     43       6.6%         6.1%
+        TwnhsE    114       6.3%         5.5%
+
+  By price tier:
+          Tier      N            Price Range  Mean %Err
+  -------------------------------------------------------
+        Budget    365 $  34,900-$ 129,900      11.2%
+      Moderate    366 $ 130,000-$ 163,000       7.0%
+         Upper    365 $ 163,500-$ 214,000       6.3%
+       Premium    360 $ 214,500-$ 625,000       7.5%
+
+  Neighborhoods with highest error:
+  Neighborhood      N  Mean %Err
+  --------------------------------
+        IDOTRR     37      18.2%
+       ClearCr     28      12.4%
+       OldTown    113      10.9%
+         SWISU     25      10.3%
+       Edwards     98       9.8%
+       BrkSide     58       9.8%
+       Crawfor     51       9.6%
+       Blmngtn     17       8.3%
+
+============================================================
+REMAINING HARD CASES (>20% error)
+============================================================
+
+  95 houses with >20% error (6.5% of training)
+
+  SaleCondition breakdown:
+        Normal:  56 / 1197 (5% of Normal houses are hard)
+       Abnorml:  21 /  100 (21% of Abnorml houses are hard)
+       Partial:   9 /  123 (7% of Partial houses are hard)
+        Alloca:   5 /   12 (42% of Alloca houses are hard)
+        Family:   4 /   20 (20% of Family houses are hard)
+
+  OverallQual distribution:
+    Hard cases mean:  5.6
+    All houses mean:  6.1
+
+  Direction of errors:
+    Model overpredicts (actual > pred): 26
+    Model underpredicts (pred > actual): 69
+
+============================================================
+WHAT'S FIXABLE VS WHAT'S NOISE
+============================================================
+
+  Hard cases from non-normal sales: 39 / 95 (41%)
+  Hard cases from normal sales:     56 / 95 (59%)
+
+  Non-normal sales are inherently hard to predict because
+  the price reflects sale circumstances, not house features.
+  These are likely NOT fixable with better features.
+
+  Normal-sale hard cases (56) — potentially fixable:
+    $   40,000 predicted $   80,973 (102% off) Q=4 IDOTRR
+    $   62,383 predicted $  120,122 (93% off) Q=5 Sawyer
+    $   64,500 predicted $   97,011 (50% off) Q=4 OldTown
+    $  130,500 predicted $  183,512 (41% off) Q=6 Sawyer
+    $   52,000 predicted $   73,114 (41% off) Q=3 BrkSide
+    $  278,000 predicted $  385,712 (39% off) Q=8 NWAmes
+    $   39,300 predicted $   54,493 (39% off) Q=1 BrkSide
+    $   90,000 predicted $  121,936 (35% off) Q=5 OldTown
+    $  180,000 predicted $  243,104 (35% off) Q=7 NAmes
+    $  164,000 predicted $  218,660 (33% off) Q=8 Gilbert
+
+============================================================
+SCORE PROGRESSION: Full Journey
+============================================================
+
+  Step  What changed                      CV RMSLE  Kaggle
+  -------------------------------------------------------
+  2     Ridge (raw, unscaled)               0.236    0.184
+  3     + StandardScaler + log target       0.151      —
+  4     + Tuned alpha (ElasticNet)          0.138      —
+  6     + Outlier removal (4 houses)        0.112    0.136
+  7     Encoding experiment                 ~0.112     —
+  8     Final model (same as Step 6)        0.112      —
+
+  Key drivers of improvement:
+  1. Log transform:    0.236 -> 0.151  (36% better)
+  2. Alpha tuning:     0.151 -> 0.138  ( 9% better)
+  3. Outlier removal:  0.138 -> 0.112  (19% better)
+  4. Feature eng:      no improvement  ( 0%)
+  5. Encoding choice:  no improvement  ( 0%)
+
+  Saved: /Users/glennharless/dev-brain/kaggle/competitions/house-prices/results/analysis/08_error_audit.png
+

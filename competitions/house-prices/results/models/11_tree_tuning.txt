@@ -1,0 +1,189 @@
+House Prices: Step 11 — XGBoost Hyperparameter Tuning
+============================================================
+
+Train: (1460, 238) (full data)
+Method: Randomized search, 60 trials
+CV: KFold(5, shuffle=True, random_state=42)
+Early stopping: 80/20 inner split, patience=50
+
+============================================================
+SEARCH SPACE
+============================================================
+  max_depth                : [2, 3, 4, 5, 6, 7, 8]
+  learning_rate            : [0.01, 0.02, 0.03, 0.05, 0.08, 0.1]
+  subsample                : [0.6, 0.7, 0.8, 0.9, 1.0]
+  colsample_bytree         : [0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
+  min_child_weight         : [1, 2, 3, 5, 7, 10]
+  reg_alpha                : [0, 0.001, 0.01, 0.1, 0.5, 1.0]
+  reg_lambda               : [0.1, 0.5, 1.0, 2.0, 5.0, 10.0]
+
+  Total possible combinations: 272,160
+  Sampling: 60 random trials
+
+============================================================
+RUNNING RANDOMIZED SEARCH
+============================================================
+    Trial   1/60: RMSLE=0.13716  depth=8, lr=0.050, sub=1.0, col=0.7, mcw=7, rounds=200
+    Trial   2/60: RMSLE=0.13195  depth=4, lr=0.030, sub=0.8, col=0.9, mcw=5, rounds=662
+    Trial   3/60: RMSLE=0.13404  depth=6, lr=0.020, sub=0.9, col=1.0, mcw=10, rounds=772
+    Trial   4/60: RMSLE=0.13149  depth=6, lr=0.010, sub=0.9, col=0.6, mcw=10, rounds=1582
+    Trial   5/60: RMSLE=0.12972  depth=2, lr=0.010, sub=0.8, col=0.7, mcw=2, rounds=2345
+    Trial   6/60: RMSLE=0.13573  depth=8, lr=0.100, sub=0.8, col=0.8, mcw=5, rounds=260
+    Trial   7/60: RMSLE=0.13229  depth=6, lr=0.030, sub=1.0, col=0.5, mcw=2, rounds=432
+    Trial   8/60: RMSLE=0.13189  depth=5, lr=0.100, sub=0.7, col=0.6, mcw=1, rounds=232
+    Trial   9/60: RMSLE=0.13018  depth=3, lr=0.050, sub=0.9, col=0.8, mcw=5, rounds=563
+    Trial  10/60: RMSLE=0.13343  depth=7, lr=0.010, sub=0.9, col=0.6, mcw=5, rounds=1386
+    Trial  11/60: RMSLE=0.13361  depth=7, lr=0.100, sub=0.7, col=0.8, mcw=10, rounds=137
+    Trial  12/60: RMSLE=0.13027  depth=3, lr=0.050, sub=0.7, col=0.6, mcw=10, rounds=577
+    Trial  13/60: RMSLE=0.13299  depth=8, lr=0.100, sub=0.9, col=0.5, mcw=10, rounds=171
+    Trial  14/60: RMSLE=0.12846  depth=3, lr=0.080, sub=0.7, col=0.5, mcw=5, rounds=372
+    Trial  15/60: RMSLE=0.13997  depth=6, lr=0.010, sub=1.0, col=0.9, mcw=1, rounds=1475
+    Trial  16/60: RMSLE=0.13073  depth=2, lr=0.050, sub=0.8, col=0.7, mcw=1, rounds=652
+    Trial  17/60: RMSLE=0.13083  depth=2, lr=0.030, sub=1.0, col=0.6, mcw=2, rounds=1403
+    Trial  18/60: RMSLE=0.13605  depth=8, lr=0.010, sub=0.9, col=0.6, mcw=1, rounds=2140
+    Trial  19/60: RMSLE=0.13301  depth=4, lr=0.050, sub=0.8, col=0.7, mcw=1, rounds=312
+    Trial  20/60: RMSLE=0.13254  depth=8, lr=0.100, sub=0.8, col=0.5, mcw=7, rounds=140
+    Trial  21/60: RMSLE=0.13117  depth=8, lr=0.030, sub=0.6, col=0.6, mcw=2, rounds=499
+    Trial  22/60: RMSLE=0.13474  depth=4, lr=0.010, sub=0.9, col=0.9, mcw=5, rounds=2205
+    Trial  23/60: RMSLE=0.13701  depth=8, lr=0.080, sub=0.8, col=0.9, mcw=5, rounds=306
+    Trial  24/60: RMSLE=0.13242  depth=4, lr=0.100, sub=0.9, col=0.6, mcw=2, rounds=227
+    Trial  25/60: RMSLE=0.13226  depth=2, lr=0.080, sub=0.9, col=0.8, mcw=5, rounds=401
+    Trial  26/60: RMSLE=0.13446  depth=7, lr=0.100, sub=0.8, col=0.6, mcw=5, rounds=191
+    Trial  27/60: RMSLE=0.13032  depth=2, lr=0.010, sub=0.6, col=0.7, mcw=10, rounds=1830
+    Trial  28/60: RMSLE=0.13487  depth=6, lr=0.010, sub=0.8, col=1.0, mcw=3, rounds=1616
+    Trial  29/60: RMSLE=0.13231  depth=6, lr=0.010, sub=0.8, col=0.6, mcw=5, rounds=1432
+    Trial  30/60: RMSLE=0.13025  depth=2, lr=0.050, sub=0.6, col=1.0, mcw=1, rounds=500
+    Trial  31/60: RMSLE=0.13279  depth=5, lr=0.100, sub=0.7, col=0.7, mcw=1, rounds=167
+    Trial  32/60: RMSLE=0.13093  depth=2, lr=0.030, sub=0.6, col=0.6, mcw=2, rounds=1069
+    Trial  33/60: RMSLE=0.13442  depth=8, lr=0.080, sub=0.6, col=0.5, mcw=3, rounds=327
+    Trial  34/60: RMSLE=0.13384  depth=6, lr=0.050, sub=0.7, col=1.0, mcw=5, rounds=309
+    Trial  35/60: RMSLE=0.13210  depth=2, lr=0.100, sub=1.0, col=0.8, mcw=2, rounds=470
+    Trial  36/60: RMSLE=0.13208  depth=4, lr=0.010, sub=0.6, col=0.8, mcw=3, rounds=2096
+    Trial  37/60: RMSLE=0.13202  depth=4, lr=0.050, sub=0.9, col=0.7, mcw=5, rounds=350
+    Trial  38/60: RMSLE=0.13132  depth=4, lr=0.030, sub=0.9, col=0.8, mcw=1, rounds=443
+    Trial  39/60: RMSLE=0.12940  depth=2, lr=0.030, sub=0.9, col=0.5, mcw=1, rounds=1209
+    Trial  40/60: RMSLE=0.12992  depth=3, lr=0.030, sub=0.9, col=0.6, mcw=1, rounds=706
+    Trial  41/60: RMSLE=0.13177  depth=2, lr=0.020, sub=0.6, col=1.0, mcw=5, rounds=1293
+    Trial  42/60: RMSLE=0.12869  depth=4, lr=0.010, sub=0.6, col=0.7, mcw=3, rounds=1384
+    Trial  43/60: RMSLE=0.13652  depth=7, lr=0.010, sub=0.9, col=0.7, mcw=1, rounds=1464
+    Trial  44/60: RMSLE=0.13866  depth=5, lr=0.100, sub=0.8, col=1.0, mcw=1, rounds=182
+    Trial  45/60: RMSLE=0.12949  depth=6, lr=0.020, sub=0.7, col=0.6, mcw=10, rounds=702
+    Trial  46/60: RMSLE=0.13126  depth=2, lr=0.050, sub=0.6, col=0.8, mcw=1, rounds=661
+    Trial  47/60: RMSLE=0.12950  depth=5, lr=0.030, sub=0.6, col=0.5, mcw=5, rounds=462
+    Trial  48/60: RMSLE=0.13265  depth=7, lr=0.100, sub=1.0, col=0.7, mcw=10, rounds=191
+    Trial  49/60: RMSLE=0.12993  depth=3, lr=0.080, sub=0.6, col=0.8, mcw=1, rounds=264
+    Trial  50/60: RMSLE=0.13229  depth=6, lr=0.030, sub=0.9, col=0.7, mcw=1, rounds=503
+    Trial  51/60: RMSLE=0.13774  depth=5, lr=0.100, sub=1.0, col=1.0, mcw=7, rounds=124
+    Trial  52/60: RMSLE=0.13801  depth=5, lr=0.010, sub=1.0, col=0.9, mcw=1, rounds=1246
+    Trial  53/60: RMSLE=0.13266  depth=8, lr=0.030, sub=0.9, col=0.5, mcw=5, rounds=546
+    Trial  54/60: RMSLE=0.13390  depth=8, lr=0.010, sub=0.8, col=0.6, mcw=1, rounds=1950
+    Trial  55/60: RMSLE=0.13072  depth=3, lr=0.030, sub=0.7, col=1.0, mcw=2, rounds=603
+    Trial  56/60: RMSLE=0.12946  depth=3, lr=0.020, sub=0.6, col=0.5, mcw=1, rounds=1162
+    Trial  57/60: RMSLE=0.13520  depth=8, lr=0.080, sub=0.7, col=0.6, mcw=3, rounds=226
+    Trial  58/60: RMSLE=0.13116  depth=6, lr=0.050, sub=0.7, col=0.5, mcw=5, rounds=289
+    Trial  59/60: RMSLE=0.13184  depth=2, lr=0.100, sub=0.9, col=0.7, mcw=5, rounds=323
+    Trial  60/60: RMSLE=0.13573  depth=8, lr=0.100, sub=0.8, col=0.5, mcw=2, rounds=289
+
+============================================================
+TOP 10 CONFIGURATIONS
+============================================================
+
+  Rank    RMSLE     Std Depth    LR  Sub  Col  MCW    L1    L2  Rnds
+  ----------------------------------------------------------------------
+     1  0.12846 0.01698     3 0.080  0.7  0.5    5 0.100   2.0   372 <--
+     2  0.12869 0.01735     4 0.010  0.6  0.7    3 0.010   2.0  1384
+     3  0.12940 0.01545     2 0.030  0.9  0.5    1 0.001  10.0  1209
+     4  0.12946 0.01710     3 0.020  0.6  0.5    1 0.010  10.0  1162
+     5  0.12949 0.01715     6 0.020  0.7  0.6   10 0.010   5.0   702
+     6  0.12950 0.01770     5 0.030  0.6  0.5    5 0.010   1.0   462
+     7  0.12972 0.01588     2 0.010  0.8  0.7    2 0.100   2.0  2345
+     8  0.12992 0.01685     3 0.030  0.9  0.6    1 0.100   2.0   706
+     9  0.12993 0.01524     3 0.080  0.6  0.8    1 0.500   2.0   264
+    10  0.13018 0.01615     3 0.050  0.9  0.8    5 0.500   1.0   563
+
+============================================================
+BEST VS STEP 10 DEFAULTS
+============================================================
+
+  Step 10 defaults:  RMSLE = 0.12971
+  Best tuned:        RMSLE = 0.12846
+  Improvement:       +0.96%
+
+  Best hyperparameters:
+    max_depth                : 3
+    learning_rate            : 0.08
+    subsample                : 0.7
+    colsample_bytree         : 0.5
+    min_child_weight         : 5
+    reg_alpha                : 0.1
+    reg_lambda               : 2.0
+    avg_rounds               : 372
+
+  Per-fold scores (best tuned):
+    Fold 1: 0.13136
+    Fold 2: 0.11582
+    Fold 3: 0.15799
+    Fold 4: 0.12870
+    Fold 5: 0.10843
+
+============================================================
+PARAMETER SENSITIVITY (which parameters matter most?)
+============================================================
+  Mean RMSLE by parameter value (averaged across all trials):
+
+  max_depth:
+           2: 0.13095 (n=12) #########
+           3: 0.12985 (n= 7) ##########
+           4: 0.13203 (n= 8) ########
+           5: 0.13476 (n= 6) #######
+           6: 0.13317 (n=10) ########
+           7: 0.13413 (n= 5) #######
+           8: 0.13455 (n=12) #######
+
+  learning_rate:
+        0.01: 0.13372 (n=14) ########
+        0.02: 0.13119 (n= 4) #########
+        0.03: 0.13108 (n=12) #########
+        0.05: 0.13199 (n=10) #########
+        0.08: 0.13288 (n= 6) ########
+         0.1: 0.13394 (n=14) ########
+
+  subsample:
+         0.6: 0.13082 (n=12) #########
+         0.7: 0.13174 (n=10) #########
+         0.8: 0.13389 (n=13) ########
+         0.9: 0.13256 (n=17) ########
+         1.0: 0.13509 (n= 8) #######
+
+  colsample_bytree:
+         0.5: 0.13169 (n=11) #########
+         0.6: 0.13225 (n=15) ########
+         0.7: 0.13231 (n=12) ########
+         0.8: 0.13205 (n= 9) ########
+         0.9: 0.13634 (n= 5) ######
+         1.0: 0.13399 (n= 8) ########
+
+  min_child_weight:
+           1: 0.13308 (n=18) ########
+           2: 0.13177 (n= 9) #########
+           3: 0.13305 (n= 5) ########
+           5: 0.13255 (n=17) ########
+           7: 0.13581 (n= 3) #######
+          10: 0.13186 (n= 8) #########
+
+  reg_alpha:
+           0: 0.13372 (n= 8) ########
+       0.001: 0.13250 (n= 9) ########
+        0.01: 0.13177 (n=13) #########
+         0.1: 0.13128 (n= 9) #########
+         0.5: 0.13276 (n=12) ########
+         1.0: 0.13468 (n= 9) #######
+
+  reg_lambda:
+         0.1: 0.13578 (n= 5) #######
+         0.5: 0.13301 (n= 7) ########
+         1.0: 0.13342 (n= 8) ########
+         2.0: 0.13072 (n=13) #########
+         5.0: 0.13314 (n=13) ########
+        10.0: 0.13247 (n=14) ########
+

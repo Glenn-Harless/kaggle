@@ -195,6 +195,124 @@ Short document covering:
 
 - File: `RETROSPECTIVE.md`
 
+### Phase 5: Beyond Linear Models (Steps 10-14)
+
+**Motivation:** The Phase 2-4 work hit the linear model ceiling at ~0.136 Kaggle.
+A third-party audit showed that basic XGBoost (0.126) already beats our tuned
+ElasticNet (0.139) on full data without any tuning. The residual analysis (Step 5)
+identified the remaining errors as nonlinear patterns — exactly where trees win.
+
+#### Phase 5 Validation Protocol
+
+All experiments in Phase 5 follow these rules to prevent information leakage:
+
+1. **One canonical splitter.** All CV uses `KFold(n_splits=5, shuffle=True, random_state=42)`. Models are compared on the same folds. Repeated CV (5x5) for final comparison only.
+
+2. **Early stopping inside folds.** For boosted models, early stopping uses a held-out portion of the *training fold* (e.g., 80/20 split within each training fold). The validation fold is never touched for early stopping — it is for scoring only.
+
+   ```
+   Full training set (1460 rows)
+   └── CV fold split
+       ├── Training fold (1168 rows)
+       │   ├── Fit portion (934 rows) ← model trains here
+       │   └── Early-stop portion (234 rows) ← monitors overfitting
+       └── Validation fold (292 rows) ← scores here, never seen during training
+   ```
+
+3. **OOF predictions for blending.** Blend weights are fit on out-of-fold predictions only. Each sample's blend input comes from a model that never saw that sample during training. Never tune blend weights on Kaggle feedback.
+
+4. **Full-data CV always.** No outlier removal during validation. The Step 6 outlier-removal CV (0.138 → 0.112) was a validation artifact — Kaggle only moved to 0.136. Models must score well on the full distribution.
+
+5. **Leaderboard hygiene.** Require a local CV improvement before submitting. Cap at 1-2 submissions per step. Phase 5 goal is ~4 total submissions (tree baseline, tuned tree, blend, final).
+
+#### Step 10: Tree Model Baselines (XGBoost + LightGBM)
+
+Train XGBoost and LightGBM on all 1,460 rows with log1p(SalePrice) target.
+Conservative hyperparameters, early stopping per the protocol above.
+Compare to ElasticNet on the SAME full-data CV.
+
+- XGBoost: max_depth=3, learning_rate=0.05, n_estimators=1000, early stopping
+- LightGBM: num_leaves=31, learning_rate=0.05, n_estimators=1000, early stopping
+- Both use the current one-hot/ordinal processed data (238 features)
+- No StandardScaler needed (trees are scale-invariant)
+- Script: `scripts/modeling/10_tree_baselines.py`
+
+**Primer — Why trees handle what linear models can't:**
+
+A linear model learns one coefficient per feature — `price = coef1 * GrLivArea + coef2 * OverallQual + ...`. It can't learn "the effect of GrLivArea depends on OverallQual" without an explicit interaction feature.
+
+Trees learn decision rules: "IF GrLivArea > 3000 AND OverallQual >= 9 THEN predict $400K." Each split creates a region where the model can learn a different relationship. This means:
+- Quality-size interactions are captured automatically
+- Neighborhood-specific price slopes happen naturally
+- Outliers get isolated into their own leaf nodes instead of distorting global coefficients
+- No need for StandardScaler (trees are scale-invariant)
+
+**XGBoost vs LightGBM:** Both are gradient-boosted tree frameworks. XGBoost grows trees level-by-level (balanced). LightGBM grows leaf-by-leaf (potentially unbalanced but faster and often more accurate). LightGBM also supports native categorical splits, but that requires raw category columns — our data is already one-hot/ordinal encoded, so both frameworks see the same numeric matrix here. Native categoricals are out of scope for this phase.
+
+**What you learn:** How tree models compare to linear models on the same data, and whether XGBoost or LightGBM wins on this dataset.
+
+#### Step 11: Tree Hyperparameter Tuning
+
+Tune the better tree model from Step 10. Key hyperparameters:
+
+- `max_depth` / `num_leaves`: tree complexity
+- `min_child_weight` / `min_child_samples`: minimum samples per leaf
+- `subsample` / `bagging_fraction`: row sampling per tree
+- `colsample_bytree` / `feature_fraction`: column sampling per tree
+- `reg_alpha` (L1) and `reg_lambda` (L2): tree-level regularization
+- `n_estimators` + `learning_rate`: boosting rounds vs step size
+
+Use randomized search over these ranges. Early stopping per the validation protocol.
+The inner early-stopping split must be deterministic per outer fold: use
+`random_state=fold_index` so that each fold's 80/20 split is fixed across
+hyperparameter trials. This ensures trial-to-trial comparisons within a fold
+are not confounded by different early-stopping splits.
+
+- Script: `scripts/modeling/11_tree_tuning.py`
+
+**What you learn:** How boosting hyperparameters control the bias-variance tradeoff differently from linear regularization.
+
+#### Step 12: Outliers as Features, Not Deletions
+
+Instead of removing the 4 large homes, handle them as features:
+
+- `is_large_home` = GrLivArea > 4000 (binary flag)
+- `GrLivArea_capped` = min(GrLivArea, 4000) (clip extreme values)
+- Potentially: `SaleCondition_Partial * GrLivArea` interaction
+
+Test each approach with both ElasticNet and the best tree model.
+Trees should handle the raw outliers without any treatment — verify this.
+
+- Script: `scripts/modeling/12_outlier_features.py`
+
+**What you learn:** When to remove outliers vs encode them, and how model type affects that decision.
+
+#### Step 13: OOF Blending
+
+Blend ElasticNet and tree model(s) using OOF predictions:
+
+1. Collect OOF predictions from each model (per the validation protocol)
+2. Simple average: `0.5 * elasticnet_oof + 0.5 * xgboost_oof`
+3. Weighted average: fit weights via constrained linear regression on OOF predictions
+   (never on Kaggle scores). Weights must be non-negative and sum to 1 —
+   no negative weights, no extrapolation beyond the individual models.
+4. If three models (ElasticNet + XGBoost + LightGBM), test 3-way blend
+
+Why blending works: ElasticNet captures the broad linear trend well,
+tree models capture interactions and weird segments. Their errors are
+partially uncorrelated, so averaging cancels some noise.
+
+- Script: `scripts/modeling/13_blending.py`
+
+**What you learn:** Why ensembling works, how to find blend weights without leaking, and when simple averaging beats complex stacking.
+
+#### Step 14: Final Submission + Updated Retrospective
+
+- Best blend submitted to Kaggle
+- Updated RETROSPECTIVE.md with Phase 5 learnings
+- Compare: linear-only score vs tree-only vs blend
+- What would Phase 6 look like? (stacking, neural nets, or diminishing returns?)
+
 ---
 
 ## Principles (carried from Titanic)
@@ -223,7 +341,12 @@ competitions/house-prices/
 │       ├── 05_residual_analysis.py
 │       ├── 06_feature_engineering.py
 │       ├── 07_encoding_experiment.py
-│       └── 08_error_audit.py
+│       ├── 08_error_audit.py
+│       ├── 10_tree_baselines.py
+│       ├── 11_tree_tuning.py
+│       ├── 12_outlier_features.py
+│       ├── 13_blending.py
+│       └── 14_final_submission.py
 ├── results/models/           # CV scores, logs, analysis output
 ├── submissions/              # Kaggle submission CSVs
 └── RETROSPECTIVE.md          # Final reflection

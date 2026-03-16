@@ -1,0 +1,88 @@
+House Prices: Step 7 — Ordinal Encoding Deep Dive
+============================================================
+
+Train: (1456, 238) (outliers removed)
+Quality features to test: 10
+Model: ElasticNet (alpha=0.02848, l1_ratio=0.1, log target)
+
+============================================================
+SPACING ANALYSIS: Is equal spacing (ordinal) appropriate?
+============================================================
+
+  Actual mean prices per quality level:
+  (if spacing is unequal, target encoding captures this)
+
+  Feature              None        Po        Fa        TA        Gd        Ex
+  ----------------------------------------------------------------------
+  ExterQual             ---       ---  $    88K  $   144K  $   231K  $   367K
+  ExterCond             ---  $    76K  $   103K  $   183K  $   169K  $   201K
+  BsmtQual         $   106K       ---  $   116K  $   141K  $   203K  $   322K
+  BsmtCond         $   106K  $    64K  $   122K  $   183K  $   214K       ---
+  HeatingQC             ---  $    87K  $   124K  $   142K  $   157K  $   214K
+  KitchenQual           ---       ---  $   106K  $   140K  $   212K  $   323K
+  FireplaceQu      $   141K  $   130K  $   167K  $   204K  $   227K  $   320K
+  GarageQual       $   103K  $   100K  $   124K  $   187K  $   216K  $   241K
+  GarageCond       $   103K  $   108K  $   115K  $   187K  $   180K  $   124K
+  PoolQC           $   180K       ---  $   216K       ---  $   223K  $   235K
+
+  Feature              None        Po        Fa        TA        Gd        Ex   Equal?
+  ------------------------------------------------------------------------------
+  ExterQual             ---       ---    11.305    11.838    12.309    12.777   ~yes
+  ExterCond             ---    11.245    11.455    12.041    11.969    12.120   ~yes
+  BsmtQual           11.530       ---    11.618    11.811    12.180    12.635   NO (2.4x)
+  BsmtCond           11.530    11.066    11.649    12.040    12.220       ---   ~yes
+  HeatingQC             ---    11.374    11.637    11.816    11.910    12.204   NO (3.1x)
+  KitchenQual           ---       ---    11.505    11.811    12.222    12.627   ~yes
+  FireplaceQu        11.809    11.739    12.009    12.182    12.258    12.632   ~yes
+  GarageQual         11.492    11.473    11.675    12.066    12.220    12.175   ~yes
+  GarageCond         11.492    11.573    11.597    12.068    12.051    11.728   ~yes
+  PoolQC             12.021       ---    12.268       ---    12.287    12.367
+
+============================================================
+ENCODING 1: Ordinal (Ex=5, Gd=4, TA=3, Fa=2, Po=1, None=0)
+  Assumes equal spacing. 10 features stay as 10 numeric columns.
+============================================================
+  [Ordinal] Mean RMSLE: 0.11217
+  [Ordinal] Std:        0.00765
+  [Ordinal] Min:        0.09643
+  [Ordinal] Max:        0.12777
+  [Ordinal] Range:      0.03134
+  Feature count: 238
+
+============================================================
+ENCODING 2: One-hot (each level is an independent dummy)
+  Makes no ordering assumption. 10 features -> ~40 dummies.
+============================================================
+  [One-hot] Mean RMSLE: 0.11180
+  [One-hot] Std:        0.00778
+  [One-hot] Min:        0.09522
+  [One-hot] Max:        0.12634
+  [One-hot] Range:      0.03112
+  Feature count: 278 (was 238, +40)
+
+============================================================
+ENCODING 3: Target-mean (OOF)
+  Replace each level with mean log(SalePrice) for that level.
+  Computed out-of-fold to prevent target leakage.
+  Captures non-equal spacing automatically.
+============================================================
+  [Target-mean] Mean RMSLE: 0.11210
+  [Target-mean] Std:        0.00776
+  [Target-mean] Min:        0.09660
+  [Target-mean] Max:        0.12817
+  [Target-mean] Range:      0.03157
+  Feature count: 238 (same as ordinal)
+
+============================================================
+COMPARISON
+============================================================
+
+  Encoding                    Mean RMSLE        Std   Features
+  ------------------------------------------------------------
+  One-hot                        0.11180    0.00778        278 <--
+  Target-mean (OOF)              0.11210    0.00776        238
+  Ordinal (current)              0.11217    0.00765        238
+
+  Spread (best to worst): 0.00037 RMSLE
+  Best: One-hot
+

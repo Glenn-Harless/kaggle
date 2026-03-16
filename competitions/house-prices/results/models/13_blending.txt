@@ -1,0 +1,86 @@
+House Prices: Step 13 — OOF Blending
+============================================================
+
+Train: (1460, 238) (full data)
+Test:  (1459, 238)
+CV: KFold(5, shuffle=True, random_state=42)
+
+============================================================
+COLLECTING OOF PREDICTIONS
+============================================================
+
+  ElasticNet (alpha=0.02848, l1_ratio=0.1)...
+    OOF RMSLE: 0.14469
+
+  XGBoost (tuned, Step 11 best)...
+    OOF RMSLE: 0.12958
+
+============================================================
+ERROR CORRELATION (do models fail on different houses?)
+============================================================
+
+  Correlation of absolute errors: 0.672
+  (1.0 = identical errors, 0.0 = uncorrelated, <0.5 = good for blending)
+
+  Per-sample wins:
+    ElasticNet better: 761 (52.1%)
+    XGBoost better:    699 (47.9%)
+    Tied:              0
+
+  Houses where ElasticNet is most helpful:
+      Actual    EN Pred   XGB Pred   EN Err  XGB Err
+  --------------------------------------------------
+  $  755,000 $  687,472 $  491,821 $ 67,528 $263,179
+  $  745,000 $  608,182 $  456,755 $136,818 $288,245
+  $  375,000 $  379,252 $  235,714 $  4,252 $139,286
+  $  430,000 $  444,029 $  328,409 $ 14,029 $101,591
+  $  315,000 $  321,525 $  392,123 $  6,525 $ 77,123
+
+============================================================
+BLEND EXPERIMENTS
+============================================================
+
+  50/50 average:     RMSLE = 0.13235
+
+  Weight sweep (ElasticNet weight):
+   EN Weight XGB Weight      RMSLE
+  -----------------------------------
+         0.0        1.0    0.12958 <--
+         0.1        0.9    0.12960
+         0.2        0.8    0.12986
+         0.3        0.7    0.13039
+         0.4        0.6    0.13121
+         0.5        0.5    0.13235
+         0.6        0.4    0.13383
+         0.7        0.3    0.13572
+         0.8        0.2    0.13806
+         0.9        0.1    0.14098
+         1.0        0.0    0.14469
+
+  Constrained optimization:
+    ElasticNet     : 0.0452
+    XGBoost        : 0.9548
+    RMSLE:           0.12956
+
+============================================================
+COMPARISON
+============================================================
+
+  Model                             OOF RMSLE
+  ---------------------------------------------
+  ElasticNet (alone)                  0.14469
+  XGBoost tuned (alone)               0.12958
+  50/50 average                       0.13235
+  Optimized blend                     0.12956
+
+  Blend beats best solo by 0.02%
+
+============================================================
+GENERATING SUBMISSION
+============================================================
+
+  Strategy: Optimized blend (EN=0.045, XGB=0.955)
+  Prediction range: $48,654 - $509,350
+  Saved: submissions/blend_final.csv
+  Saved: submissions/xgboost_tuned.csv
+
