@@ -1,0 +1,117 @@
+House Prices: Step 3 — The Log Transform Experiment
+============================================================
+
+Train: (1460, 238)
+Target: $34,900 - $755,000 (median $163,000, skew 1.883)
+Log target: 10.460 - 13.534 (skew 0.121)
+
+============================================================
+MODEL A: StandardScaler + Ridge → raw SalePrice
+  Loss: minimize (predicted_price - actual_price)^2
+  This optimizes RMSE on dollar amounts, NOT RMSLE.
+============================================================
+  [Model A] Mean RMSLE: 0.36234
+  [Model A] Std:        0.25551
+  [Model A] Min:        0.15043
+  [Model A] Max:        0.78015
+  [Model A] Range:      0.62972
+
+  Residual Analysis — Model A (OOF predictions):
+    Mean residual:       $      -882  (bias)
+    Std of residuals:    $    36,912
+    Mean |error|:        $    19,673
+    Mean % error:             11.8%
+    Residual skewness:      -4.864
+
+    Heteroscedasticity check (errors by price quintile):
+    Quintile                 Price Range    Mean |Error|  Mean % Error
+    --------------------------------------------------------------------
+    Q1 cheapest         $34,900-$124,000 $       16,372         18.1%
+    Q2                 $124,500-$147,000 $       15,175         11.2%
+    Q3                 $147,400-$179,200 $       17,302         10.6%
+    Q4                 $179,400-$230,000 $       19,169          9.7%
+    Q5 priciest        $230,500-$755,000 $       30,488          9.4%
+
+    Absolute error ratio (Q5/Q1):   1.9x
+    Percentage error ratio (Q5/Q1): 0.5x
+    → Relatively homoscedastic: errors are proportional to price
+
+    5 worst predictions:
+          Actual    Predicted        Error    % Off
+    ------------------------------------------------
+    $   160,000 $   882,719 $  -722,719   451.7%
+    $   184,750 $   576,230 $  -391,480   211.9%
+    $   385,000 $         0 $  +385,000   100.0%
+    $   745,000 $   456,396 $  +288,604    38.7%
+    $   235,000 $   489,716 $  -254,716   108.4%
+
+============================================================
+MODEL B: StandardScaler + Ridge → log1p(SalePrice)
+  Loss: minimize (log(predicted) - log(actual))^2
+  This directly optimizes RMSLE (the competition metric).
+============================================================
+  [Model B] Mean RMSLE: 0.15104
+  [Model B] Std:        0.03396
+  [Model B] Min:        0.10912
+  [Model B] Max:        0.22559
+  [Model B] Range:      0.11647
+
+  Residual Analysis — Model B (OOF predictions):
+    Mean residual:       $    -1,432  (bias)
+    Std of residuals:    $    70,383
+    Mean |error|:        $    16,672
+    Mean % error:              9.8%
+    Residual skewness:     -29.222
+
+    Heteroscedasticity check (errors by price quintile):
+    Quintile                 Price Range    Mean |Error|  Mean % Error
+    --------------------------------------------------------------------
+    Q1 cheapest         $34,900-$124,000 $       11,386         12.8%
+    Q2                 $124,500-$147,000 $       10,400          7.6%
+    Q3                 $147,400-$179,200 $       19,669         12.2%
+    Q4                 $179,400-$230,000 $       16,521          8.4%
+    Q5 priciest        $230,500-$755,000 $       25,628          8.2%
+
+    Absolute error ratio (Q5/Q1):   2.3x
+    Percentage error ratio (Q5/Q1): 0.6x
+    → Heteroscedastic: expensive houses have much larger absolute errors
+
+    5 worst predictions:
+          Actual    Predicted        Error    % Off
+    ------------------------------------------------
+    $   160,000 $ 2,601,815 $-2,441,815  1526.1%
+    $   184,750 $   897,944 $  -713,194   386.0%
+    $   385,000 $    80,335 $  +304,665    79.1%
+    $   147,000 $   281,783 $  -134,783    91.7%
+    $   475,000 $   352,910 $  +122,090    25.7%
+
+============================================================
+COMPARISON
+============================================================
+
+                              Mean RMSLE        Std        Min        Max
+  ----------------------------------------------------------------------
+  Step 2 Ridge (no scale)        0.23643    0.16625    0.13814    0.68719
+  Model A (scaled, raw y)        0.36234    0.25551    0.15043    0.78015
+  Model B (scaled, log y)        0.15104    0.03396    0.10912    0.22559
+
+  Scaling effect (Step 2 → Model A): -53.3%
+  Log transform effect (A → B):      +58.3%
+  Combined effect (Step 2 → Model B): +36.1%
+
+  CV stability (lower std = more stable):
+    Step 2: std = 0.16625 (range 0.138-0.687)
+    Model A: std = 0.25551 (range 0.150-0.780)
+    Model B: std = 0.03396 (range 0.109-0.226)
+
+  Verification: RMSE(log space) = RMSLE(original scale)
+    RMSE(log_pred, log_actual) = 0.097127
+    RMSLE(pred, actual)        = 0.097127
+
+============================================================
+SUBMISSION: Model B (scaled Ridge, log target)
+============================================================
+  All predictions positive (log transform prevents negatives)
+  Saved: submissions/ridge_log_target.csv
+  Prediction range: $35,244 - $999,333
+

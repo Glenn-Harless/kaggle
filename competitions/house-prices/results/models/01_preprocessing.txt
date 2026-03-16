@@ -1,0 +1,152 @@
+House Prices: Step 1 — Quick EDA + Preprocessing
+============================================================
+
+Loaded: train=(1460, 81), test=(1459, 80)
+Features: 79 (excluding Id and SalePrice)
+
+============================================================
+TARGET: SalePrice Distribution
+============================================================
+  Count:    1460
+  Mean:     $180,921
+  Median:   $163,000
+  Std:      $79,443
+  Min:      $34,900
+  Max:      $755,000
+  Skewness: 1.883  (>1 = heavy right skew)
+  Kurtosis: 6.536  (>3 = heavy tails)
+
+  After log1p(SalePrice):
+    Skewness: 0.121  (was 1.883)
+    Kurtosis: 0.810  (was 6.536)
+    -> log transform makes it nearly normal (skew near 0)
+
+  Price distribution:
+         <100K:  123 (  8.4%) ####
+      100-150K:  496 ( 34.0%) ################
+      150-200K:  414 ( 28.4%) ##############
+      200-250K:  210 ( 14.4%) #######
+      250-300K:  102 (  7.0%) ###
+      300-500K:  106 (  7.3%) ###
+         500K+:    9 (  0.6%) 
+
+============================================================
+MISSING VALUES
+============================================================
+
+  Train (1460 rows, 81 cols):
+  Total missing: 7829 / 118260 (6.6%)
+    PoolQC              : 1453 ( 99.5%) <- feature absent
+    MiscFeature         : 1406 ( 96.3%) <- feature absent
+    Alley               : 1369 ( 93.8%) <- feature absent
+    Fence               : 1179 ( 80.8%) <- feature absent
+    MasVnrType          :  872 ( 59.7%) <- feature absent
+    FireplaceQu         :  690 ( 47.3%) <- feature absent
+    LotFrontage         :  259 ( 17.7%) <- truly missing
+    GarageType          :   81 (  5.5%) <- feature absent
+    GarageYrBlt         :   81 (  5.5%) <- feature absent (0)
+    GarageFinish        :   81 (  5.5%) <- feature absent
+    GarageQual          :   81 (  5.5%) <- feature absent
+    GarageCond          :   81 (  5.5%) <- feature absent
+    BsmtFinType2        :   38 (  2.6%) <- feature absent
+    BsmtExposure        :   38 (  2.6%) <- feature absent
+    BsmtFinType1        :   37 (  2.5%) <- feature absent
+    BsmtCond            :   37 (  2.5%) <- feature absent
+    BsmtQual            :   37 (  2.5%) <- feature absent
+    MasVnrArea          :    8 (  0.5%) <- feature absent (0)
+    Electrical          :    1 (  0.1%) <- truly missing
+
+  Test (1459 rows, 80 cols):
+  Total missing: 7878 / 116720 (6.7%)
+    PoolQC              : 1456 ( 99.8%) <- feature absent
+    MiscFeature         : 1408 ( 96.5%) <- feature absent
+    Alley               : 1352 ( 92.7%) <- feature absent
+    Fence               : 1169 ( 80.1%) <- feature absent
+    MasVnrType          :  894 ( 61.3%) <- feature absent
+    FireplaceQu         :  730 ( 50.0%) <- feature absent
+    LotFrontage         :  227 ( 15.6%) <- truly missing
+    GarageCond          :   78 (  5.3%) <- feature absent
+    GarageYrBlt         :   78 (  5.3%) <- feature absent (0)
+    GarageQual          :   78 (  5.3%) <- feature absent
+    GarageFinish        :   78 (  5.3%) <- feature absent
+    GarageType          :   76 (  5.2%) <- feature absent
+    BsmtCond            :   45 (  3.1%) <- feature absent
+    BsmtExposure        :   44 (  3.0%) <- feature absent
+    BsmtQual            :   44 (  3.0%) <- feature absent
+    BsmtFinType1        :   42 (  2.9%) <- feature absent
+    BsmtFinType2        :   42 (  2.9%) <- feature absent
+    MasVnrArea          :   15 (  1.0%) <- feature absent (0)
+    MSZoning            :    4 (  0.3%) <- truly missing
+    BsmtFullBath        :    2 (  0.1%) <- feature absent (0)
+    BsmtHalfBath        :    2 (  0.1%) <- feature absent (0)
+    Functional          :    2 (  0.1%) <- truly missing
+    Utilities           :    2 (  0.1%) <- truly missing
+    GarageCars          :    1 (  0.1%) <- feature absent (0)
+    GarageArea          :    1 (  0.1%) <- feature absent (0)
+    TotalBsmtSF         :    1 (  0.1%) <- feature absent (0)
+    KitchenQual         :    1 (  0.1%) <- truly missing
+    BsmtUnfSF           :    1 (  0.1%) <- feature absent (0)
+    BsmtFinSF2          :    1 (  0.1%) <- feature absent (0)
+    BsmtFinSF1          :    1 (  0.1%) <- feature absent (0)
+    Exterior2nd         :    1 (  0.1%) <- truly missing
+    Exterior1st         :    1 (  0.1%) <- truly missing
+    SaleType            :    1 (  0.1%) <- truly missing
+
+============================================================
+PREPROCESSING
+============================================================
+
+  Missing values handled:
+    15 categorical cols: NaN -> 'None' (feature absent)
+    9 numeric cols: NaN -> 0 (feature absent)
+    GarageYrBlt: NaN -> 0 (no garage)
+    Remaining numeric: -> train median
+    Remaining categorical: -> train mode
+    NaN remaining: 0
+
+  Ordinal encoding: 22 features -> numeric
+    Quality scale (10 cols): Ex=5, Gd=4, TA=3, Fa=2, Po=1, None=0
+    Custom scales (12 cols): BsmtExposure, Functional, Fence, etc.
+
+============================================================
+TOP 15 CORRELATIONS WITH SalePrice
+============================================================
+  (numeric + ordinal-encoded features, Pearson r)
+    +0.791 OverallQual               #######################
+    +0.709 GrLivArea                 #####################
+    +0.683 ExterQual                 ####################
+    +0.660 KitchenQual               ###################
+    +0.640 GarageCars                ###################
+    +0.623 GarageArea                ##################
+    +0.614 TotalBsmtSF               ##################
+    +0.606 1stFlrSF                  ##################
+    +0.585 BsmtQual                  #################
+    +0.561 FullBath                  ################
+    +0.549 GarageFinish              ################
+    +0.534 TotRmsAbvGrd              ################
+    +0.523 YearBuilt                 ###############
+    +0.520 FireplaceQu               ###############
+    +0.507 YearRemodAdd              ###############
+
+  One-hot encoding:
+    22 nominal features -> 181 dummy columns
+    drop_first=False (Ridge/Lasso handle collinearity; keeps all info)
+
+  Final shapes:
+    Train features: (1460, 238)
+    Test features:  (1459, 238)
+    NaN (train): 0
+    NaN (test):  0
+
+  Saved:
+    data/train_processed.csv (1460, 240)
+    data/test_processed.csv  (1459, 239)
+
+============================================================
+FEATURE SUMMARY
+============================================================
+  Total features: 238
+  Original numeric:  ~35 (LotArea, GrLivArea, YearBuilt, ...)
+  Ordinal -> numeric: 22 (quality ratings, conditions)
+  One-hot dummies:    181 (neighborhood, exterior, ...)
+

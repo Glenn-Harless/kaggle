@@ -1,0 +1,278 @@
+House Prices: Step 5 — Residual Analysis
+============================================================
+
+Model: ElasticNet (alpha=0.02848, l1_ratio=0.1)
+Train: (1460, 238)
+Collecting OOF predictions (5-fold)...
+OOF RMSLE: 0.14469
+
+============================================================
+1. RESIDUALS VS PREDICTED VALUE
+   Should be random scatter. Patterns = model is biased.
+============================================================
+  Residuals vs Predicted Value:
+  Quintile                    Pred Range    Mean Error   Mean |Error|  Mean %Err
+  ------------------------------------------------------------------------------
+  Q1 low pred           $46,366-$122,687 $       +945 $      11,190      11.6%
+  Q2                   $122,785-$147,244 $     +1,331 $       9,265       7.0%
+  Q3                   $147,377-$180,805 $        +50 $      10,661       6.8%
+  Q4                   $181,158-$226,961 $     -1,537 $      14,361       7.3%
+  Q5 high pred       $227,005-$2,427,334 $     -1,742 $      34,098      13.9%
+
+============================================================
+2. RESIDUALS VS KEY FEATURES
+   Patterns here suggest the model is missing a relationship.
+============================================================
+
+  Residuals vs GrLivArea:
+                      Group      N    Mean Error   Mean |Error|  Mean %Err
+  ------------------------------------------------------------------------
+          (333.999, 1066.6]    292 $       -824 $       8,320       8.6%
+           (1066.6, 1339.0]    293 $       -407 $      10,254       7.9%
+           (1339.0, 1578.0]    292 $     +1,110 $      12,933       7.8%
+           (1578.0, 1869.0]    292 $     +2,229 $      14,558       7.4%
+           (1869.0, 5642.0]    291 $     -3,071 $      33,590      14.8%
+
+  Residuals vs OverallQual:
+                      Group      N    Mean Error   Mean |Error|  Mean %Err
+  ------------------------------------------------------------------------
+                          1      2 $     -3,898 $       9,880      22.4%
+                          2      3 $     -5,418 $      13,216      30.4%
+                          3     20 $       +911 $      12,947      18.6%
+                          4    116 $     +1,918 $      11,527      11.8%
+                          5    397 $       +608 $      10,056       8.0%
+                          6    374 $       -453 $      10,893       6.9%
+                          7    319 $         +9 $      14,814       7.2%
+                          8    168 $     +4,386 $      20,682       7.4%
+                          9     43 $    +22,295 $      30,325       7.6%
+                         10     18 $   -125,855 $     222,785     113.7%
+
+  Residuals vs YearBuilt:
+                      Group      N    Mean Error   Mean |Error|  Mean %Err
+  ------------------------------------------------------------------------
+         (1871.999, 1947.8]    292 $     +1,771 $      14,336      11.6%
+           (1947.8, 1965.0]    298 $       +526 $      10,765       8.1%
+           (1965.0, 1984.0]    292 $     -1,251 $      11,270       7.3%
+           (1984.0, 2003.0]    302 $     +2,713 $      13,710       5.9%
+           (2003.0, 2010.0]    276 $     -5,095 $      30,475      14.0%
+
+  Residuals vs Neighborhood (top 8):
+                      Group      N    Mean Error   Mean |Error|  Mean %Err
+  ------------------------------------------------------------------------
+                    CollgCr    150 $       +559 $      10,080       4.9%
+                    Edwards    100 $    -28,952 $      42,700      28.3%
+                    Gilbert     79 $       +338 $      11,214       5.8%
+                      NAmes    225 $     -1,530 $      10,318       7.1%
+                    NridgHt     77 $     +9,749 $      26,525       7.9%
+                    OldTown    113 $     +1,267 $      13,731      11.3%
+                     Sawyer     74 $       +205 $      10,140       8.3%
+                    Somerst     86 $     +4,347 $      16,820       7.4%
+
+  Residuals vs TotalSF (Bsmt+AboveGrd):
+                      Group      N    Mean Error   Mean |Error|  Mean %Err
+  ------------------------------------------------------------------------
+          (333.999, 1910.8]    292 $     -1,105 $       8,519       9.0%
+           (1910.8, 2281.6]    292 $       -389 $       9,912       7.7%
+           (2281.6, 2678.4]    292 $       +868 $      11,648       7.3%
+           (2678.4, 3166.4]    292 $     +1,705 $      14,641       7.7%
+          (3166.4, 11752.0]    292 $     -2,033 $      34,856      14.8%
+
+  Residuals vs SaleCondition:
+                      Group      N    Mean Error   Mean |Error|  Mean %Err
+  ------------------------------------------------------------------------
+                    Abnorml    101 $       +333 $      17,851      14.7%
+                    AdjLand      4 $     +1,935 $       8,613       8.6%
+                     Alloca     12 $     +3,844 $      27,491      18.6%
+                     Family     20 $     -2,030 $      21,867      16.9%
+                     Normal   1198 $     +1,227 $      11,849       7.1%
+                    Partial    125 $    -14,362 $      51,487      24.2%
+
+  Residuals vs RemodelAge (YrSold-YearRemodAdd):
+                      Group      N    Mean Error   Mean |Error|  Mean %Err
+  ------------------------------------------------------------------------
+              (-1.001, 3.0]    317 $     -4,316 $      28,827      13.7%
+                 (3.0, 9.6]    267 $     +1,241 $      12,870       6.8%
+                (9.6, 28.0]    295 $     +2,166 $      14,358       7.2%
+               (28.0, 47.0]    303 $       -430 $      10,698       7.6%
+               (47.0, 60.0]    278 $       +900 $      11,455      10.8%
+
+============================================================
+3. FEATURES CORRELATED WITH ERROR MAGNITUDE
+   These features predict WHERE the model goes wrong.
+============================================================
+
+  Features most correlated with |residual|:
+  (high correlation = model error is systematic, not random)
+  Feature                                   Corr with |error|
+  --------------------------------------------------------------
+  RoofMatl_ClyTile                         +0.914
+  PoolQC                                   +0.394
+  TotalBsmtSF                              +0.388
+  BsmtFinSF1                               +0.351
+  1stFlrSF                                 +0.345
+  LotFrontage                              +0.332
+  GrLivArea                                +0.326
+  PoolArea                                 +0.320
+  Condition2_PosN                          +0.295
+  RoofMatl_CompShg                         -0.219
+  Exterior1st_Stucco                       +0.193
+  LotArea                                  +0.189
+  Exterior2nd_Stucco                       +0.189
+  GarageArea                               +0.185
+  TotRmsAbvGrd                             +0.169
+
+============================================================
+4. WORST PREDICTIONS
+   What makes these houses hard to predict?
+============================================================
+
+  Top 15 worst predictions (by % error):
+      Actual       Pred    %Err  Qual     SF  YrBlt       Nbhd   SaleCond   BldgType
+  -------------------------------------------------------------------------------------
+  $  160,000 $2,427,334 1417.1%    10   5642   2008    Edwards    Partial       1Fam
+  $  184,750 $  958,092  418.6%    10   4676   2007    Edwards    Partial       1Fam
+  $   82,500 $  180,546  118.8%     7   1411   1977     NWAmes     Family       1Fam
+  $   40,000 $   81,849  104.6%     4   1317   1920     IDOTRR     Normal       1Fam
+  $   37,900 $   74,444   96.4%     3    968   1910    OldTown    Abnorml       1Fam
+  $   62,383 $  120,753   93.6%     5    864   1965     Sawyer     Normal       1Fam
+  $  147,000 $  279,373   90.0%     8   1795   2006    Somerst    Partial       1Fam
+  $  385,000 $   99,633   74.1%    10   2084   2007    NridgHt    Partial       1Fam
+  $   60,000 $  101,274   68.8%     5   1276   1958    Edwards    Abnorml       1Fam
+  $   35,311 $   56,953   61.3%     2    480   1949     IDOTRR    Abnorml       1Fam
+  $   34,900 $   56,223   61.1%     4    720   1920     IDOTRR    Abnorml       1Fam
+  $   55,993 $   88,361   57.8%     5   1044   1952     IDOTRR     Alloca       1Fam
+  $  143,000 $  222,969   55.9%     5   1473   1968    ClearCr    Partial       1Fam
+  $   64,500 $   98,752   53.1%     4    968   1927    OldTown     Normal       1Fam
+  $   52,000 $   77,436   48.9%     3    729   1935    BrkSide     Normal       1Fam
+
+  Patterns in worst predictions:
+    SaleCondition: {'Partial': np.int64(5), 'Normal': np.int64(4), 'Abnorml': np.int64(4), 'Family': np.int64(1), 'Alloca': np.int64(1)}
+    Overvalued (actual > pred): 1
+    Undervalued (actual < pred): 14
+    OverallQual mean: 5.7 (dataset mean: 6.1)
+    YearBuilt mean: 1961 (dataset mean: 1971)
+
+============================================================
+5. OUTLIER CHECK
+   Houses where |error| > 50% — are they data problems
+   or genuinely unusual properties?
+============================================================
+
+  Houses with >50% prediction error: 14 / 1460
+
+  Id=31 — OVERpredicted by 105%
+    Actual: $40,000  Predicted: $81,849
+    OverallQual=4, GrLivArea=1317, YearBuilt=1920
+    Neighborhood=IDOTRR, SaleCondition=Normal, BldgType=1Fam
+    TotalBsmtSF=649, GarageCars=1, LotArea=8500
+
+  Id=411 — OVERpredicted by 69%
+    Actual: $60,000  Predicted: $101,274
+    OverallQual=5, GrLivArea=1276, YearBuilt=1958
+    Neighborhood=Edwards, SaleCondition=Abnorml, BldgType=1Fam
+    TotalBsmtSF=1276, GarageCars=1, LotArea=9571
+
+  Id=463 — OVERpredicted by 94%
+    Actual: $62,383  Predicted: $120,753
+    OverallQual=5, GrLivArea=864, YearBuilt=1965
+    Neighborhood=Sawyer, SaleCondition=Normal, BldgType=1Fam
+    TotalBsmtSF=864, GarageCars=1, LotArea=8281
+
+  Id=496 — OVERpredicted by 61%
+    Actual: $34,900  Predicted: $56,223
+    OverallQual=4, GrLivArea=720, YearBuilt=1920
+    Neighborhood=IDOTRR, SaleCondition=Abnorml, BldgType=1Fam
+    TotalBsmtSF=720, GarageCars=0, LotArea=7879
+
+  Id=524 — OVERpredicted by 419%
+    Actual: $184,750  Predicted: $958,092
+    OverallQual=10, GrLivArea=4676, YearBuilt=2007
+    Neighborhood=Edwards, SaleCondition=Partial, BldgType=1Fam
+    TotalBsmtSF=3138, GarageCars=3, LotArea=40094
+
+  Id=589 — OVERpredicted by 56%
+    Actual: $143,000  Predicted: $222,969
+    OverallQual=5, GrLivArea=1473, YearBuilt=1968
+    Neighborhood=ClearCr, SaleCondition=Partial, BldgType=1Fam
+    TotalBsmtSF=1437, GarageCars=1, LotArea=25095
+
+  Id=633 — OVERpredicted by 119%
+    Actual: $82,500  Predicted: $180,546
+    OverallQual=7, GrLivArea=1411, YearBuilt=1977
+    Neighborhood=NWAmes, SaleCondition=Family, BldgType=1Fam
+    TotalBsmtSF=1386, GarageCars=2, LotArea=11900
+
+  Id=813 — OVERpredicted by 58%
+    Actual: $55,993  Predicted: $88,361
+    OverallQual=5, GrLivArea=1044, YearBuilt=1952
+    Neighborhood=IDOTRR, SaleCondition=Alloca, BldgType=1Fam
+    TotalBsmtSF=540, GarageCars=2, LotArea=8712
+
+  Id=826 — UNDERpredicted by 74%
+    Actual: $385,000  Predicted: $99,633
+    OverallQual=10, GrLivArea=2084, YearBuilt=2007
+    Neighborhood=NridgHt, SaleCondition=Partial, BldgType=1Fam
+    TotalBsmtSF=2078, GarageCars=3, LotArea=14803
+
+  Id=917 — OVERpredicted by 61%
+    Actual: $35,311  Predicted: $56,953
+    OverallQual=2, GrLivArea=480, YearBuilt=1949
+    Neighborhood=IDOTRR, SaleCondition=Abnorml, BldgType=1Fam
+    TotalBsmtSF=480, GarageCars=1, LotArea=9000
+
+  Id=969 — OVERpredicted by 96%
+    Actual: $37,900  Predicted: $74,444
+    OverallQual=3, GrLivArea=968, YearBuilt=1910
+    Neighborhood=OldTown, SaleCondition=Abnorml, BldgType=1Fam
+    TotalBsmtSF=600, GarageCars=0, LotArea=5925
+
+  Id=1299 — OVERpredicted by 1417%
+    Actual: $160,000  Predicted: $2,427,334
+    OverallQual=10, GrLivArea=5642, YearBuilt=2008
+    Neighborhood=Edwards, SaleCondition=Partial, BldgType=1Fam
+    TotalBsmtSF=6110, GarageCars=2, LotArea=63887
+
+  Id=1325 — OVERpredicted by 90%
+    Actual: $147,000  Predicted: $279,373
+    OverallQual=8, GrLivArea=1795, YearBuilt=2006
+    Neighborhood=Somerst, SaleCondition=Partial, BldgType=1Fam
+    TotalBsmtSF=1795, GarageCars=3, LotArea=9986
+
+  Id=1433 — OVERpredicted by 53%
+    Actual: $64,500  Predicted: $98,752
+    OverallQual=4, GrLivArea=968, YearBuilt=1927
+    Neighborhood=OldTown, SaleCondition=Normal, BldgType=1Fam
+    TotalBsmtSF=656, GarageCars=1, LotArea=10800
+
+============================================================
+6. RESIDUAL PLOTS
+============================================================
+
+  Saved: /Users/glennharless/dev-brain/kaggle/competitions/house-prices/results/analysis/05_residual_plots.png
+
+============================================================
+SUMMARY: Patterns to address in Step 6
+============================================================
+
+  Review the residual patterns above to identify:
+
+  1. Systematic bias by price range (Section 1)
+     - Does the model consistently over/underpredict for certain price ranges?
+
+  2. Missing relationships (Section 2)
+     - Are there features where errors aren't random?
+     - E.g., if old houses have large positive residuals, maybe we need
+       an age-related feature (YrSold - YearBuilt)
+
+  3. Error-correlated features (Section 3)
+     - Features that predict error magnitude suggest the model is
+       missing an interaction or nonlinearity involving that feature
+
+  4. Hard-to-predict houses (Section 4)
+     - Abnormal sales, partial sales, unusual properties
+     - Some may be true outliers we should consider removing
+
+  5. True outliers (Section 5)
+     - >50% error houses may be data problems or genuinely unusual
+     - Consider whether removing them from training would help
+

@@ -1,0 +1,114 @@
+House Prices: Step 6 — Residual-Guided Feature Engineering
+============================================================
+
+Train: (1460, 238)
+Model: ElasticNet (alpha=0.02848, l1_ratio=0.1, log target)
+CV: 5x5 repeated KFold
+
+============================================================
+BASELINE: No changes (Step 4 best)
+============================================================
+  [Baseline] Mean RMSLE: 0.13830
+  [Baseline] Std:        0.03567
+  [Baseline] Min:        0.09219
+  [Baseline] Max:        0.21696
+  [Baseline] Range:      0.12477
+
+============================================================
+EXP 1: Remove outliers (GrLivArea > 4000)
+  Two houses with 4,676 and 5,642 sq ft were massively
+  overpredicted. Both are Partial sales in Edwards.
+============================================================
+  Removing 4 houses
+  [No outliers] Mean RMSLE: 0.11217
+  [No outliers] Std:        0.00765
+  [No outliers] Min:        0.09643
+  [No outliers] Max:        0.12777
+  [No outliers] Range:      0.03134
+  Delta vs baseline: -18.90%
+
+============================================================
+EXP 2: +TotalSF (TotalBsmtSF + GrLivArea)
+  Combined living space captures total usable area.
+============================================================
+  [+TotalSF] Mean RMSLE: 0.13868
+  [+TotalSF] Std:        0.03636
+  [+TotalSF] Min:        0.09195
+  [+TotalSF] Max:        0.21886
+  [+TotalSF] Range:      0.12691
+  Delta vs baseline: +0.28%
+
+============================================================
+EXP 3: +HouseAge + RemodelAge
+  Age at sale and years since remodel.
+============================================================
+  [+Age features] Mean RMSLE: 0.13830
+  [+Age features] Std:        0.03578
+  [+Age features] Min:        0.09201
+  [+Age features] Max:        0.21705
+  [+Age features] Range:      0.12504
+  Delta vs baseline: -0.00%
+
+============================================================
+EXP 4: +TotalBath
+  Combined bathroom count (half baths = 0.5).
+============================================================
+  [+TotalBath] Mean RMSLE: 0.13808
+  [+TotalBath] Std:        0.03517
+  [+TotalBath] Min:        0.09224
+  [+TotalBath] Max:        0.21559
+  [+TotalBath] Range:      0.12335
+  Delta vs baseline: -0.16%
+
+============================================================
+EXP 5: +QualxSF (OverallQual * GrLivArea)
+  Quality-size interaction. A quality-10 mansion is worth
+  more than quality and size independently suggest.
+============================================================
+  [+QualxSF] Mean RMSLE: 0.14019
+  [+QualxSF] Std:        0.03797
+  [+QualxSF] Min:        0.09230
+  [+QualxSF] Max:        0.22604
+  [+QualxSF] Range:      0.13373
+  Delta vs baseline: +1.37%
+
+============================================================
+EXP 6: All engineered features combined
+============================================================
+  Features: 238 -> 243 (+5)
+  [All features] Mean RMSLE: 0.13996
+  [All features] Std:        0.03787
+  [All features] Min:        0.09177
+  [All features] Max:        0.22528
+  [All features] Range:      0.13351
+  Delta vs baseline: +1.20%
+
+============================================================
+EXP 7: All features + outlier removal
+============================================================
+  Features: 243, Samples: 1456 (removed 4)
+  [All + no outliers] Mean RMSLE: 0.11217
+  [All + no outliers] Std:        0.00726
+  [All + no outliers] Min:        0.09696
+  [All + no outliers] Max:        0.12713
+  [All + no outliers] Range:      0.03017
+  Delta vs baseline: -18.89%
+
+============================================================
+COMPARISON (lower RMSLE is better)
+============================================================
+
+  Experiment                          RMSLE      Delta
+  -------------------------------------------------------
+  Remove outliers                   0.11217    -18.90% <-- best
+  All + no outliers                 0.11217    -18.89%
+  +TotalBath                        0.13808     -0.16%
+  +HouseAge+RemodelAge              0.13830     -0.00%
+  Baseline                          0.13830        ---
+  +TotalSF                          0.13868     +0.28%
+  All engineered                    0.13996     +1.20%
+  +QualxSF                          0.14019     +1.37%
+
+  Best: Remove outliers
+  Improvement over baseline: 18.90%
+

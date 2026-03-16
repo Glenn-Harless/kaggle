@@ -1,0 +1,100 @@
+House Prices: Step 2 — Baselines
+============================================================
+
+Train: (1460, 238), Test: (1459, 238)
+Target: $34,900 - $755,000 (median $163,000)
+
+============================================================
+BASELINE 1: Median
+  Predict training median for every house.
+  This is the absolute floor — any real model must beat this.
+============================================================
+  [Median] Mean RMSLE: 0.39975
+  [Median] Std:        0.01977
+  [Median] Min:        0.36832
+  [Median] Max:        0.43228
+  [Median] Range:      0.06396
+
+  Training median: $163,000
+  Saved: submissions/median_baseline.csv
+
+============================================================
+BASELINE 2: LinearRegression (GrLivArea + OverallQual)
+  The two features most correlated with SalePrice.
+  No regularization — just OLS on 2 features.
+============================================================
+  [2-Feature] Mean RMSLE: 0.55256
+  [2-Feature] Std:        0.25812
+  [2-Feature] Min:        0.20527
+  [2-Feature] Max:        0.93919
+  [2-Feature] Range:      0.73391
+
+  Coefficients:
+    GrLivArea           : $55.9
+    OverallQual         : $32,849.0
+    Intercept           : $-104,092.7
+
+  WARNING: 7 negative predictions (clipped to 0)
+  Saved: submissions/two_feature.csv
+
+============================================================
+BASELINE 3: Ridge Regression (all features, alpha=1.0)
+  All 238 processed features with L2 regularization.
+  alpha=1.0 is a default — Step 4 will tune it properly.
+============================================================
+  [Ridge] Mean RMSLE: 0.23643
+  [Ridge] Std:        0.16625
+  [Ridge] Min:        0.13814
+  [Ridge] Max:        0.68719
+  [Ridge] Range:      0.54905
+
+  Top 10 positive coefficients:
+    RoofMatl_WdShngl                   : $  98,951.6
+    Neighborhood_StoneBr               : $  39,894.5
+    RoofMatl_CompShg                   : $  36,370.0
+    Neighborhood_NridgHt               : $  35,526.9
+    Condition2_PosA                    : $  31,454.3
+    Neighborhood_NoRidge               : $  28,789.4
+    Exterior2nd_ImStucc                : $  24,620.5
+    RoofMatl_Membran                   : $  23,835.6
+    Utilities                          : $  23,556.7
+    Condition2_Artery                  : $  19,345.4
+
+  Top 5 negative coefficients:
+    RoofMatl_ClyTile                   : $-203,151.0
+    Condition2_PosN                    : $-105,848.5
+    Heating_OthW                       : $ -28,866.6
+    Exterior1st_ImStucc                : $ -22,274.1
+    MSZoning_C (all)                   : $ -21,666.1
+  Saved: submissions/ridge_baseline.csv
+
+============================================================
+COMPARISON (lower RMSLE is better)
+============================================================
+  Model                       Mean RMSLE        Std
+  --------------------------------------------------
+  Median                         0.39975    0.01977
+  2-Feature LR                   0.55256    0.25812
+  Ridge (all)                    0.23643    0.16625
+
+  2-Feature LR improves over Median by -38.2%
+  Ridge (all) improves over Median by 40.9%
+
+============================================================
+KAGGLE SCORES (public leaderboard)
+============================================================
+  Model                     CV RMSLE   Kaggle RMSLE
+  -------------------------------------------------------
+  Median                      0.400      0.41657
+  2-Feature LR                0.553      0.77609
+  Ridge (all, alpha=1.0)      0.236      0.18382
+
+  Notes:
+  - Median: CV and Kaggle agree well (0.400 vs 0.417)
+  - 2-Feature: Kaggle even worse than CV (0.776 vs 0.553)
+    Negative predictions + skewed target = RMSLE disaster
+  - Ridge: Kaggle BETTER than CV (0.184 vs 0.236)
+    CV high-variance folds (max 0.687) pulled mean up
+    High fold variance signals instability — log transform
+    should stabilize this (Step 3)
+

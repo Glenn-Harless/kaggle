@@ -677,3 +677,56 @@ def reconstruct_v2_features(df):
         extra_cols.append("PassengerId")
 
     return df[extra_cols + v2_features]
+
+
+# ============================================================
+# REGRESSION: RMSLE and Repeated KFold CV
+# ============================================================
+
+def rmsle(y_true, y_pred):
+    """
+    Root Mean Squared Log Error.
+
+    RMSLE = sqrt(mean((log(pred+1) - log(actual+1))^2))
+    Negative predictions are clipped to 0 before log.
+    """
+    y_pred = np.clip(np.array(y_pred, dtype=float), 0, None)
+    y_true = np.array(y_true, dtype=float)
+    return np.sqrt(np.mean((np.log1p(y_pred) - np.log1p(y_true)) ** 2))
+
+
+def regression_cv(model, X, y, n_splits=5, n_repeats=5, random_state=42,
+                  scoring_fn=None):
+    """
+    Repeated KFold CV for regression. Returns array of per-fold scores.
+
+    scoring_fn: callable(y_true, y_pred) -> float. Default: RMSLE.
+    Lower is better.
+    """
+    from sklearn.model_selection import KFold
+
+    if scoring_fn is None:
+        scoring_fn = rmsle
+
+    scores = []
+    for repeat in range(n_repeats):
+        kf = KFold(n_splits=n_splits, shuffle=True,
+                    random_state=random_state + repeat)
+        for train_idx, val_idx in kf.split(X):
+            m = clone(model)
+            m.fit(X.iloc[train_idx], y.iloc[train_idx])
+            preds = m.predict(X.iloc[val_idx])
+            score = scoring_fn(y.iloc[val_idx], preds)
+            scores.append(score)
+
+    return np.array(scores)
+
+
+def report_regression_cv(scores, label=""):
+    """Print regression CV summary (lower is better for RMSLE)."""
+    prefix = f"[{label}] " if label else ""
+    print(f"  {prefix}Mean RMSLE: {scores.mean():.5f}")
+    print(f"  {prefix}Std:        {scores.std():.5f}")
+    print(f"  {prefix}Min:        {scores.min():.5f}")
+    print(f"  {prefix}Max:        {scores.max():.5f}")
+    print(f"  {prefix}Range:      {scores.max() - scores.min():.5f}")
