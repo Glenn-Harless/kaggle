@@ -1,0 +1,127 @@
+Disaster Tweets: Step 7 — Fine-tune DistilBERT
+============================================================
+
+  Device: mps
+  Train: 7613 tweets
+  Test:  3263 tweets
+  Current best (GloVe + TF-IDF concat): F1 = 0.773
+
+
+============================================================
+TOKENIZATION
+============================================================
+
+  DistilBERT uses WordPiece tokenization — different from our simple
+  whitespace splitting:
+
+  Simple:    "earthquake" → ["earthquake"]     (1 token)
+  WordPiece: "earthquake" → ["earth", "##quake"] (2 tokens)
+
+  The ## prefix means "continuation of previous word." This lets the
+  model handle ANY word by breaking it into known subword pieces.
+  Even misspellings and slang get tokenized, solving the OOV problem
+  that GloVe had (9.4% unknown tokens).
+
+  Max sequence length: 128 tokens (tweets are short, rarely hit this).
+
+  "Forest fire near La Ronge Sask. Canada"
+    → ['forest', 'fire', 'near', 'la', 'ron', '##ge', 'sas', '##k', '.', 'canada']
+
+  "OMG that mixtape is fire 🔥🔥🔥"
+    → ['om', '##g', 'that', 'mixtape', 'is', 'fire', '[UNK]']
+
+  "earthquake measuring 7.1 magnitude hits Nepal"
+    → ['earthquake', 'measuring', '7', '.', '1', 'magnitude', 'hits', 'nepal']
+
+
+
+============================================================
+5-FOLD CROSS-VALIDATION
+============================================================
+
+  Hyperparameters:
+    Epochs:        3
+    Batch size:    32
+    Learning rate: 2e-05
+    Max seq len:   128
+    Warmup:        10% of total steps
+    Weight decay:  0.01
+
+
+  --- Fold 1/5 ---
+    Epoch 1/3: loss=0.4851, val_F1=0.8065
+    Epoch 2/3: loss=0.3396, val_F1=0.8076
+    Epoch 3/3: loss=0.2826, val_F1=0.8087
+    Fold 1 final F1: 0.8087
+
+  --- Fold 2/5 ---
+    Epoch 1/3: loss=0.4930, val_F1=0.7831
+    Epoch 2/3: loss=0.3460, val_F1=0.8029
+    Epoch 3/3: loss=0.2851, val_F1=0.8022
+    Fold 2 final F1: 0.8022
+
+  --- Fold 3/5 ---
+    Epoch 1/3: loss=0.4826, val_F1=0.7994
+    Epoch 2/3: loss=0.3339, val_F1=0.7974
+    Epoch 3/3: loss=0.2753, val_F1=0.8032
+    Fold 3 final F1: 0.8032
+
+  --- Fold 4/5 ---
+    Epoch 1/3: loss=0.4856, val_F1=0.7847
+    Epoch 2/3: loss=0.3468, val_F1=0.8162
+    Epoch 3/3: loss=0.2832, val_F1=0.8177
+    Fold 4 final F1: 0.8177
+
+  --- Fold 5/5 ---
+    Epoch 1/3: loss=0.4811, val_F1=0.7961
+    Epoch 2/3: loss=0.3433, val_F1=0.7945
+    Epoch 3/3: loss=0.2802, val_F1=0.7991
+    Fold 5 final F1: 0.7991
+
+
+============================================================
+RESULTS
+============================================================
+  [DistilBERT] Mean F1: 0.80618
+  [DistilBERT] Std:     0.00656
+  [DistilBERT] Min:     0.79906
+  [DistilBERT] Max:     0.81774
+  [DistilBERT] Range:   0.01868
+
+  Overall OOF F1: 0.80613
+
+
+============================================================
+COMPARISON — ALL PHASES
+============================================================
+
+  Model                                  Mean F1      Delta
+  ----------------------------------------------------------
+  Keyword-only (Step 2)                  0.67270          —
+  TF-IDF + LogReg (Step 2)               0.75478   baseline
+  GloVe + TF-IDF concat (Step 5)         0.77273     +0.018
+  DistilBERT (Step 7)                    0.80618   +0.05140
+
+============================================================
+WHAT WE LEARNED
+============================================================
+
+  1. DistilBERT produces CONTEXT-DEPENDENT embeddings. Unlike GloVe,
+     "fire" gets a different vector in "forest fire" vs "you're fired."
+     This is the fundamental advantage of transformers.
+
+  2. FINE-TUNING means: DistilBERT already knows English from pre-training.
+     We taught it the narrow task "is this tweet about a real disaster?"
+     by training a small classification head on top.
+
+  3. WORDPIECE TOKENIZATION solves the OOV problem: unknown words get split
+     into known subword pieces. No more 9.4% unknown tokens.
+
+  4. The training loop: forward pass → compute loss → backward pass →
+     update weights. Same as any neural network, just with a pre-trained
+     starting point instead of random initialization.
+
+  5. LEARNING RATE is critical for transformers: 2e-5 is tiny compared to
+     training from scratch. We're making small adjustments to weights that
+     already encode rich language understanding.
+

@@ -1,0 +1,166 @@
+Disaster Tweets: Step 4 — Feature Engineering + Model Comparison
+============================================================
+
+  Train: 7613 tweets
+  Current best (TF-IDF + LogReg, raw text): F1 = 0.75478
+
+
+============================================================
+FEATURE ENGINEERING
+============================================================
+
+  These features capture structural patterns that TF-IDF misses:
+  - TF-IDF knows WHICH words appear
+  - Engineered features know HOW the tweet is written
+
+  Engineered 17 structural features:
+    char_len              mean=101.037  std=33.781
+    word_count            mean=14.904  std=5.733
+    avg_word_len          mean=7.054  std=1.661
+    n_urls                mean=0.620  std=0.664
+    n_hashtags            mean=0.437  std=1.086
+    n_mentions            mean=0.357  std=0.715
+    has_url               mean=0.522  std=0.500
+    has_hashtag           mean=0.229  std=0.420
+    has_mention           mean=0.264  std=0.441
+    n_exclamation         mean=0.154  std=0.619
+    n_question            mean=0.411  std=1.833
+    n_periods             mean=1.536  std=1.560
+    n_caps_words          mean=0.722  std=1.913
+    caps_ratio            mean=0.100  std=0.107
+    has_number            mean=0.594  std=0.491
+    n_numbers             mean=1.368  std=1.721
+    has_keyword           mean=0.992  std=0.089
+
+
+============================================================
+FEATURE CORRELATION WITH TARGET
+============================================================
+
+  Feature               Correlation
+  -----------------------------------
+  has_url                    0.2474 ***
+  has_number                 0.2301 ***
+  n_urls                     0.1957 ***
+  avg_word_len               0.1825 ***
+  n_numbers                  0.1821 ***
+  char_len                   0.1818 ***
+  n_periods                  0.1563 ***
+  has_hashtag                0.0689
+  n_hashtags                 0.0516
+  word_count                 0.0400
+  caps_ratio                 0.0182
+  n_caps_words               0.0119
+  has_keyword               -0.0470
+  n_exclamation             -0.0745
+  n_question                -0.0841
+  n_mentions                -0.1027 ***
+  has_mention               -0.1187 ***
+
+
+============================================================
+EXPERIMENT 1: TF-IDF ONLY (baseline)
+============================================================
+  [TF-IDF only] Mean F1: 0.75478
+  [TF-IDF only] Std:     0.00956
+  [TF-IDF only] Min:     0.74415
+  [TF-IDF only] Max:     0.76974
+  [TF-IDF only] Range:   0.02560
+
+
+============================================================
+EXPERIMENT 2: ENGINEERED FEATURES ONLY (no text content)
+============================================================
+  [Features only] Mean F1: 0.58674
+  [Features only] Std:     0.00855
+  [Features only] Min:     0.57120
+  [Features only] Max:     0.59429
+  [Features only] Range:   0.02309
+
+
+============================================================
+EXPERIMENT 3: TF-IDF + ENGINEERED FEATURES (combined)
+============================================================
+
+  We horizontally stack the sparse TF-IDF matrix (10,000 columns)
+  with the dense engineered features (17 columns).
+  The model sees both WHAT words appear AND HOW the tweet is structured.
+
+
+  --- Logistic Regression ---
+  [TF-IDF + Features + LogReg] Mean F1: 0.75473
+  [TF-IDF + Features + LogReg] Std:     0.01129
+  [TF-IDF + Features + LogReg] Min:     0.73761
+  [TF-IDF + Features + LogReg] Max:     0.77085
+  [TF-IDF + Features + LogReg] Range:   0.03324
+
+  --- Linear SVM ---
+  [TF-IDF + Features + SVM] Mean F1: 0.75471
+  [TF-IDF + Features + SVM] Std:     0.01153
+  [TF-IDF + Features + SVM] Min:     0.74156
+  [TF-IDF + Features + SVM] Max:     0.77404
+  [TF-IDF + Features + SVM] Range:   0.03248
+
+  --- XGBoost ---
+  [TF-IDF + Features + XGBoost] Mean F1: 0.72914
+  [TF-IDF + Features + XGBoost] Std:     0.00464
+  [TF-IDF + Features + XGBoost] Min:     0.72348
+  [TF-IDF + Features + XGBoost] Max:     0.73613
+  [TF-IDF + Features + XGBoost] Range:   0.01266
+
+
+============================================================
+EXPERIMENT 4: TF-IDF + FEATURES + KEYWORD (target-encoded)
+============================================================
+
+  Target encoding: replace each keyword with its training-fold disaster
+  rate. This encodes the keyword's predictive power as a single number.
+  Must be computed per-fold to avoid leakage.
+
+  [TF-IDF + Features + Keyword + LogReg] Mean F1: 0.75538
+  [TF-IDF + Features + Keyword + LogReg] Std:     0.01369
+  [TF-IDF + Features + Keyword + LogReg] Min:     0.73193
+  [TF-IDF + Features + Keyword + LogReg] Max:     0.77331
+  [TF-IDF + Features + Keyword + LogReg] Range:   0.04138
+
+
+============================================================
+FINAL COMPARISON — ALL EXPERIMENTS
+============================================================
+
+  Model                                  Mean F1        Std      Delta
+  --------------------------------------------------------------------
+  TF-IDF only (baseline)                 0.75478    0.00956   +0.00000
+  Features only (no text)                0.58674    0.00855   -0.16804
+  TF-IDF + Features + LogReg             0.75473    0.01129   -0.00005
+  TF-IDF + Features + SVM                0.75471    0.01153   -0.00007
+  TF-IDF + Features + XGBoost            0.72914    0.00464   -0.02564
+  TF-IDF + Feat + KW + LogReg            0.75538    0.01369   +0.00060
+
+  Best: TF-IDF + Feat + KW + LogReg (F1 = 0.75538)
+
+
+============================================================
+WHAT WE LEARNED
+============================================================
+
+  1. ENGINEERED FEATURES ALONE are much weaker than TF-IDF — knowing HOW
+     a tweet is written matters less than knowing WHAT words it contains.
+
+  2. COMBINING TF-IDF + engineered features: do the structural features
+     add signal beyond what TF-IDF already captures?
+
+  3. SVM vs LogReg vs XGBoost: SVMs often excel on high-dimensional sparse
+     text features (large margin in high-D space). XGBoost works differently
+     — it builds trees on individual features, which is awkward for sparse
+     TF-IDF where most features are zero.
+
+  4. KEYWORD TARGET ENCODING adds the keyword's predictive power as a single
+     dense feature. Since we know keywords carry real signal (F1=0.673 alone),
+     encoding them properly should help.
+
+  5. NEXT STEP: We've now exhausted what bag-of-words can do. Steps 5-6
+     will replace word counts with word EMBEDDINGS — dense vectors that
+     capture meaning. "fire" and "blaze" will be nearby in vector space,
+     letting the model generalize beyond exact word matches.
+

@@ -1,0 +1,186 @@
+Disaster Tweets: Step 2 — Bag-of-Words Baselines
+============================================================
+
+  Train: 7613 tweets, 3271 disaster (43.0%)
+  Test:  3263 tweets
+
+
+============================================================
+BASELINE 1: KEYWORD-ONLY
+============================================================
+
+  Strategy: For each keyword, compute its disaster rate from the training
+  fold. If rate > 0.5, predict disaster. Missing keywords get base rate.
+
+  This is a 'lookup table' classifier — no ML model at all. It tells us
+  how much signal lives in the keyword column vs the text content.
+
+  Fold 1: F1 = 0.6932
+  Fold 2: F1 = 0.6598
+  Fold 3: F1 = 0.6445
+  Fold 4: F1 = 0.6854
+  Fold 5: F1 = 0.6806
+
+  [Keyword-only] Mean F1: 0.67270
+  [Keyword-only] Std:     0.01790
+  [Keyword-only] Min:     0.64453
+  [Keyword-only] Max:     0.69318
+  [Keyword-only] Range:   0.04865
+
+
+============================================================
+BASELINE 2: CountVectorizer + LOGISTIC REGRESSION
+============================================================
+
+  How it works:
+  1. Tokenize each tweet into words
+  2. Count word occurrences → sparse feature matrix (N_tweets x N_vocab)
+  3. Logistic Regression learns a weight per word
+
+  Key hyperparameters:
+  - max_features: limit vocabulary size (reduces noise from rare words)
+  - C=1.0: regularization strength (default, we'll tune later)
+
+  [CountVec + LogReg] Mean F1: 0.75064
+  [CountVec + LogReg] Std:     0.00933
+  [CountVec + LogReg] Min:     0.74038
+  [CountVec + LogReg] Max:     0.76245
+  [CountVec + LogReg] Range:   0.02207
+
+  Vocabulary size: 10,000
+
+  Top 15 words with highest DISASTER weight (positive coefficients):
+  Word                  Coefficient
+  -----------------------------------
+  hiroshima                  2.6018
+  fires                      2.2987
+  wildfire                   2.2873
+  earthquake                 2.1683
+  derailment                 2.1101
+  floods                     1.9551
+  typhoon                    1.9396
+  storm                      1.9256
+  bombing                    1.8343
+  massacre                   1.8230
+  drought                    1.7959
+  hailstorm                  1.7635
+  spill                      1.7161
+  flood                      1.6399
+  riots                      1.6316
+
+  Top 15 words with highest NON-DISASTER weight (negative coefficients):
+  Word                  Coefficient
+  -----------------------------------
+  myself                    -1.3472
+  nowplaying                -1.2558
+  ebay                      -1.2531
+  bags                      -1.2348
+  poll                      -1.2283
+  cake                      -1.2265
+  blew                      -1.2188
+  full                      -1.2108
+  art                       -1.2090
+  mode                      -1.1784
+  song                      -1.1666
+  better                    -1.1528
+  upheaval                  -1.1499
+  jobs                      -1.1304
+  long                      -1.1204
+
+
+============================================================
+BASELINE 3: TF-IDF + LOGISTIC REGRESSION
+============================================================
+
+  TF-IDF = Term Frequency * Inverse Document Frequency
+
+  Why better than counts:
+  - "earthquake" in 50 tweets → high IDF → high weight (distinctive)
+  - "the" in 6000 tweets → low IDF → low weight (uninformative)
+
+  TF-IDF automatically downweights common words — like built-in
+  feature selection for free.
+
+  [TF-IDF + LogReg] Mean F1: 0.75478
+  [TF-IDF + LogReg] Std:     0.00956
+  [TF-IDF + LogReg] Min:     0.74415
+  [TF-IDF + LogReg] Max:     0.76974
+  [TF-IDF + LogReg] Range:   0.02560
+
+  Top 15 TF-IDF disaster words:
+  Word                  Coefficient
+  -----------------------------------
+  hiroshima                  3.5698
+  in                         3.4112
+  fires                      3.3766
+  california                 2.9349
+  storm                      2.6166
+  fire                       2.6036
+  train                      2.5781
+  wildfire                   2.5304
+  bombing                    2.4495
+  suicide                    2.4046
+  killed                     2.2917
+  earthquake                 2.2897
+  disaster                   2.2560
+  near                       2.2032
+  typhoon                    2.2021
+
+  Top 15 TF-IDF non-disaster words:
+  Word                  Coefficient
+  -----------------------------------
+  you                       -3.3868
+  my                        -2.7495
+  new                       -2.3621
+  full                      -2.1362
+  body                      -1.8061
+  love                      -1.7412
+  bags                      -1.6157
+  nowplaying                -1.5868
+  he                        -1.5377
+  traumatised               -1.5280
+  panic                     -1.4842
+  upheaval                  -1.4568
+  blew                      -1.4553
+  your                      -1.4537
+  ebay                      -1.4033
+
+
+============================================================
+COMPARISON — ALL BASELINES
+============================================================
+
+  Model                        Mean F1        Std        Min        Max
+  --------------------------------------------------------------------
+  Keyword-only                 0.67270    0.01790    0.64453    0.69318
+  CountVec + LogReg            0.75064    0.00933    0.74038    0.76245
+  TF-IDF + LogReg              0.75478    0.00956    0.74415    0.76974
+
+  Best baseline: TF-IDF + LogReg (F1 = 0.75478)
+
+  Text model improvement over keyword-only: +0.08208 F1 (0.67270 → 0.75478)
+  TF-IDF improvement over raw counts: +0.00414 F1
+
+
+============================================================
+WHAT WE LEARNED
+============================================================
+
+  1. KEYWORD-ONLY baseline provides a useful floor. The keyword column
+     carries real signal, but can't capture the nuance in tweet text.
+
+  2. CountVectorizer + LogReg: each tweet becomes a sparse vector of word
+     counts. LogReg learns a weight per word. Simple but effective because
+     many words are strongly associated with disaster/non-disaster.
+
+  3. TF-IDF weighting should improve over raw counts by downweighting
+     ubiquitous words ("the", "is") and upweighting distinctive ones
+     ("earthquake", "wildfire").
+
+  4. All three methods treat text as an unordered set of words.
+     "Man bites dog" = "Dog bites man". Later phases will add:
+     - Text cleaning (remove URLs, punctuation) in Step 3
+     - Engineered features (text length, hashtags) in Step 4
+     - Word order via embeddings in Step 5
+     - Context-dependent meaning via transformers in Step 7
+

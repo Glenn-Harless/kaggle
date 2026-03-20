@@ -1,0 +1,233 @@
+Disaster Tweets: Step 8 — Transformer Experiments
+============================================================
+
+  Device: mps
+  Train: 7613 tweets
+  Current best (DistilBERT, lr=2e-5, 3 epochs): F1 = 0.806
+
+
+============================================================
+EXPERIMENT 1: LEARNING RATE SWEEP (DistilBERT, 3 epochs)
+============================================================
+
+  Transformers are very sensitive to learning rate. Too high = destroy
+  pre-trained knowledge. Too low = don't learn the task.
+  Testing: 1e-5, 2e-5, 3e-5, 5e-5
+
+
+  --- lr = 1e-05 ---
+    Fold 1: F1 = 0.7991
+    Fold 2: F1 = 0.8115
+    Fold 3: F1 = 0.8047
+    Fold 4: F1 = 0.8201
+    Fold 5: F1 = 0.8031
+  [lr=1e-05] Mean F1: 0.80769
+  [lr=1e-05] Std:     0.00738
+  [lr=1e-05] Min:     0.79905
+  [lr=1e-05] Max:     0.82010
+  [lr=1e-05] Range:   0.02104
+
+  --- lr = 2e-05 ---
+    Fold 1: F1 = 0.8088
+    Fold 2: F1 = 0.8041
+    Fold 3: F1 = 0.7981
+    Fold 4: F1 = 0.8151
+    Fold 5: F1 = 0.8032
+  [lr=2e-05] Mean F1: 0.80587
+  [lr=2e-05] Std:     0.00574
+  [lr=2e-05] Min:     0.79810
+  [lr=2e-05] Max:     0.81511
+  [lr=2e-05] Range:   0.01701
+
+  --- lr = 3e-05 ---
+    Fold 1: F1 = 0.8118
+    Fold 2: F1 = 0.8055
+    Fold 3: F1 = 0.7940
+    Fold 4: F1 = 0.8085
+    Fold 5: F1 = 0.8078
+  [lr=3e-05] Mean F1: 0.80552
+  [lr=3e-05] Std:     0.00609
+  [lr=3e-05] Min:     0.79403
+  [lr=3e-05] Max:     0.81176
+  [lr=3e-05] Range:   0.01773
+
+  --- lr = 5e-05 ---
+    Fold 1: F1 = 0.8041
+    Fold 2: F1 = 0.8079
+    Fold 3: F1 = 0.7847
+    Fold 4: F1 = 0.8058
+    Fold 5: F1 = 0.8111
+  [lr=5e-05] Mean F1: 0.80271
+  [lr=5e-05] Std:     0.00930
+  [lr=5e-05] Min:     0.78471
+  [lr=5e-05] Max:     0.81110
+  [lr=5e-05] Range:   0.02639
+
+  Best learning rate: 1e-05 (F1 = 0.80769)
+
+
+============================================================
+EXPERIMENT 2: EPOCH COUNT (DistilBERT, lr=1e-05)
+============================================================
+
+  More epochs = more passes through data. Risk of overfitting on
+  small datasets. BERT paper recommends 2-4 epochs.
+
+
+  --- 2 epochs ---
+    Fold 1: F1 = 0.8038
+    Fold 2: F1 = 0.8090
+    Fold 3: F1 = 0.8000
+    Fold 4: F1 = 0.8177
+    Fold 5: F1 = 0.7911
+  [2 epochs] Mean F1: 0.80430
+  [2 epochs] Std:     0.00888
+  [2 epochs] Min:     0.79109
+  [2 epochs] Max:     0.81768
+  [2 epochs] Range:   0.02659
+
+  --- 3 epochs ---
+    Fold 1: F1 = 0.8079
+    Fold 2: F1 = 0.8166
+    Fold 3: F1 = 0.8006
+    Fold 4: F1 = 0.8164
+    Fold 5: F1 = 0.8013
+  [3 epochs] Mean F1: 0.80855
+  [3 epochs] Std:     0.00696
+  [3 epochs] Min:     0.80063
+  [3 epochs] Max:     0.81659
+  [3 epochs] Range:   0.01596
+
+  --- 4 epochs ---
+    Fold 1: F1 = 0.8041
+    Fold 2: F1 = 0.8045
+    Fold 3: F1 = 0.7984
+    Fold 4: F1 = 0.8126
+    Fold 5: F1 = 0.8054
+  [4 epochs] Mean F1: 0.80497
+  [4 epochs] Std:     0.00451
+  [4 epochs] Min:     0.79841
+  [4 epochs] Max:     0.81255
+  [4 epochs] Range:   0.01414
+
+  --- 5 epochs ---
+    Fold 1: F1 = 0.8109
+    Fold 2: F1 = 0.8039
+    Fold 3: F1 = 0.7987
+    Fold 4: F1 = 0.8169
+    Fold 5: F1 = 0.8045
+  [5 epochs] Mean F1: 0.80699
+  [5 epochs] Std:     0.00629
+  [5 epochs] Min:     0.79873
+  [5 epochs] Max:     0.81695
+  [5 epochs] Range:   0.01821
+
+  Best epoch count: 3 (F1 = 0.80855)
+
+
+============================================================
+EXPERIMENT 3: DistilBERT vs BERT-base (lr=1e-05, 3 epochs)
+============================================================
+
+  DistilBERT: 6 layers, 66M params — smaller, faster
+  BERT-base:  12 layers, 110M params — more capacity, slower
+
+  Does the extra capacity help on 7,613 short tweets?
+
+
+  --- DistilBERT (already computed) ---
+  [DistilBERT] Mean F1: 0.80855
+  [DistilBERT] Std:     0.00696
+  [DistilBERT] Min:     0.80063
+  [DistilBERT] Max:     0.81659
+  [DistilBERT] Range:   0.01596
+
+  --- BERT-base ---
+    Fold 1: F1 = 0.8031
+    Fold 2: F1 = 0.8047
+    Fold 3: F1 = 0.7940
+    Fold 4: F1 = 0.8196
+    Fold 5: F1 = 0.8064
+  [BERT-base] Mean F1: 0.80557
+  [BERT-base] Std:     0.00823
+  [BERT-base] Min:     0.79398
+  [BERT-base] Max:     0.81962
+  [BERT-base] Range:   0.02564
+
+  BERT-base vs DistilBERT delta: -0.00298 F1
+
+
+============================================================
+EXPERIMENT 4: FREEZE BOTTOM LAYERS (DistilBERT, lr=1e-05, 3 epochs)
+============================================================
+
+  Bottom layers capture general language patterns (grammar, word types).
+  Top layers capture task-specific patterns.
+  Freezing bottom layers = train only the top layers.
+  Faster training, less risk of overfitting, but less capacity to adapt.
+
+
+  --- Freeze 0 layers (full fine-tune, already computed) ---
+  [Freeze 0] Mean F1: 0.80855
+  [Freeze 0] Std:     0.00696
+  [Freeze 0] Min:     0.80063
+  [Freeze 0] Max:     0.81659
+  [Freeze 0] Range:   0.01596
+
+  --- Freeze 3 of 6 layers (bottom half) ---
+    Fold 1: F1 = 0.8025
+    Fold 2: F1 = 0.7991
+    Fold 3: F1 = 0.7894
+    Fold 4: F1 = 0.8035
+    Fold 5: F1 = 0.7886
+  [Freeze 3] Mean F1: 0.79663
+  [Freeze 3] Std:     0.00638
+  [Freeze 3] Min:     0.78864
+  [Freeze 3] Max:     0.80349
+  [Freeze 3] Range:   0.01484
+
+  Freeze 3 vs full fine-tune delta: -0.01192 F1
+
+
+============================================================
+FINAL COMPARISON — ALL TRANSFORMER EXPERIMENTS
+============================================================
+
+  Model                                       Mean F1        Std
+  ---------------------------------------------------------------
+  DistilBERT lr=1e-05 3ep                     0.80855    0.00696 <<<
+  DistilBERT lr=1e-05 5ep                     0.80699    0.00629
+  DistilBERT lr=2e-05 3ep                     0.80587    0.00574
+  BERT-base                                   0.80557    0.00823
+  DistilBERT lr=3e-05 3ep                     0.80552    0.00609
+  DistilBERT lr=1e-05 4ep                     0.80497    0.00451
+  DistilBERT lr=1e-05 2ep                     0.80430    0.00888
+  DistilBERT lr=5e-05 3ep                     0.80271    0.00930
+  DistilBERT freeze3                          0.79663    0.00638
+
+  Best overall: DistilBERT lr=1e-05 3ep (F1 = 0.80855)
+
+
+============================================================
+WHAT WE LEARNED
+============================================================
+
+  1. LEARNING RATE: Transformers are highly sensitive to LR. The difference
+     between best and worst LR is often larger than the gap between model
+     architectures. Always sweep LR first.
+
+  2. EPOCHS: 3-4 is usually the sweet spot for BERT fine-tuning on small
+     datasets. More epochs risk overfitting — the model starts memorizing
+     training tweets rather than learning generalizable patterns.
+
+  3. BERT-base vs DistilBERT: Does 110M params beat 66M params on 7,613
+     tweets? More capacity isn't always better on small datasets — bigger
+     models can overfit more easily.
+
+  4. FREEZING LAYERS: On small datasets, freezing bottom layers can prevent
+     overfitting. But it also limits how much the model can adapt to the
+     task. The tradeoff depends on dataset size and task similarity to
+     pre-training.
+
+  5. The best transformer configuration goes forward to Step 9 (ensemble).
+

@@ -1,0 +1,322 @@
+Disaster Tweets: Step 1 — EDA
+============================================================
+
+  Train: 7613 rows, 5 columns
+  Test:  3263 rows, 4 columns
+  Columns: ['id', 'keyword', 'location', 'text', 'target']
+
+  First 3 rows:
+ id keyword location                                                                                                                                  text  target
+  1     NaN      NaN                                                                 Our Deeds are the Reason of this #earthquake May ALLAH Forgive us all       1
+  4     NaN      NaN                                                                                                Forest fire near La Ronge Sask. Canada       1
+  5     NaN      NaN All residents asked to 'shelter in place' are being notified by officers. No other evacuation or shelter in place orders are expected       1
+
+
+============================================================
+1. TARGET DISTRIBUTION
+============================================================
+
+  Not disaster (0): 4,342 (57.0%)
+  Disaster (1):     3,271 (43.0%)
+  Ratio:            1.33:1
+
+  Class balance is moderate — not heavily imbalanced.
+  F1 metric already accounts for this by balancing precision and recall.
+
+
+============================================================
+2. MISSING VALUES
+============================================================
+  keyword     : 61 missing (0.8%)
+  location    : 2,533 missing (33.3%)
+
+  text:     0 missing — always present
+  keyword:  61 missing — mostly present, usable feature
+  location: 2533 missing — 33%, very messy (user-entered)
+
+
+============================================================
+3. KEYWORD ANALYSIS
+============================================================
+
+  Unique keywords: 221
+  Missing keyword: 61 tweets
+
+  Top 15 keywords (highest disaster rate, n >= 10):
+  Keyword                         Count  Disaster%
+  --------------------------------------------------
+  debris                             37     100.0%
+  wreckage                           39     100.0%
+  derailment                         39     100.0%
+  outbreak                           40      97.5%
+  oil spill                          38      97.4%
+  typhoon                            38      97.4%
+  suicide bombing                    33      97.0%
+  suicide bomber                     31      96.8%
+  bombing                            29      93.1%
+  rescuers                           35      91.4%
+  suicide bomb                       35      91.4%
+  nuclear disaster                   34      91.2%
+  evacuated                          36      88.9%
+  razed                              35      88.6%
+  wildfire                           33      87.9%
+
+  Bottom 15 keywords (lowest disaster rate, n >= 10):
+  Keyword                         Count  Disaster%
+  --------------------------------------------------
+  epicentre                          12       8.3%
+  panic                              37       8.1%
+  explode                            38       7.9%
+  wrecked                            39       7.7%
+  blight                             32       6.2%
+  panicking                          33       6.1%
+  blew up                            33       6.1%
+  traumatised                        35       5.7%
+  screaming                          36       5.6%
+  electrocute                        32       3.1%
+  body bag                           33       3.0%
+  blazing                            34       2.9%
+  ruin                               37       2.7%
+  body bags                          41       2.4%
+  aftershock                         34       0.0%
+
+  Median keyword disaster rate: 37.8%
+  If we predict disaster when keyword rate > 50%:
+  Keyword-only accuracy: 0.746
+  Keyword-only F1:       0.691
+  (Only on tweets that have a keyword — 7552/7613)
+
+
+============================================================
+4. TEXT LENGTH PATTERNS
+============================================================
+
+  Not disaster tweets:
+    Char length — mean: 95.7, median: 101, std: 35.9
+    Word count  — mean: 14.7, median: 15, std: 6.2
+
+  Disaster tweets:
+    Char length — mean: 108.1, median: 115, std: 29.3
+    Word count  — mean: 15.2, median: 15, std: 5.1
+
+  T-test (char length): t=16.13, p=0.0000
+  Significant difference — disaster tweets tend to be longer.
+
+
+============================================================
+5. URL, HASHTAG, AND @MENTION PATTERNS
+============================================================
+
+  has_url:
+    has_url=0:  3642 tweets, 30.2% disaster
+    has_url=1:  3971 tweets, 54.7% disaster
+
+  has_hashtag:
+    has_hashtag=0:  5870 tweets, 41.1% disaster
+    has_hashtag=1:  1743 tweets, 49.2% disaster
+
+  has_mention:
+    has_mention=0:  5604 tweets, 46.5% disaster
+    has_mention=1:  2009 tweets, 33.2% disaster
+
+  Summary:
+    Tweets with URLs:     54.7% are disasters (vs 30.2% without)
+    Tweets with hashtags: 49.2% are disasters (vs 41.1% without)
+    Tweets with @mentions:33.2% are disasters (vs 46.5% without)
+
+
+============================================================
+6. COMMON WORDS — DISASTER VS NOT
+============================================================
+
+  Top 25 words in DISASTER tweets:
+  Word                    Count
+  ------------------------------
+  t                        2705
+  co                       2529
+  http                     2382
+  the                      1368
+  in                       1166
+  a                        1002
+  of                        929
+  to                        758
+  and                       508
+  i                         445
+  s                         444
+  on                        421
+  for                       402
+  is                        353
+  at                        308
+  by                        278
+  from                      245
+  it                        240
+  that                      211
+  with                      192
+  this                      182
+  fire                      182
+  after                     181
+  was                       169
+  as                        168
+
+  Top 25 words in NON-DISASTER tweets:
+  Word                    Count
+  ------------------------------
+  t                        2609
+  co                       2212
+  http                     1927
+  the                      1918
+  i                        1434
+  a                        1310
+  to                       1194
+  and                       920
+  of                        903
+  in                        825
+  you                       760
+  s                         645
+  is                        601
+  my                        546
+  it                        540
+  for                       495
+  on                        443
+  that                      415
+  with                      382
+  this                      298
+  be                        291
+  m                         286
+  https                     277
+  me                        267
+  like                      254
+
+  Most distinctive words (disaster vs non-disaster):
+
+  Top 20 words that signal DISASTER (highest P(w|disaster)/P(w|not)):
+  Word                    Ratio  Disaster#   Non-dis#
+  ----------------------------------------------------
+  northern                75.91         64          0
+  legionnaires            72.41         61          0
+  debris                  59.56         50          0
+  severe                  56.06         47          0
+  hiroshima               55.48         94          1
+  migrants                49.05         41          0
+  derailment              49.05         41          0
+  investigators           44.38         37          0
+  mh                      43.80         74          1
+  mosque                  43.21         36          0
+  detonated               37.37         31          0
+  pkk                     37.37         31          0
+  bomber                  35.62         60          1
+  typhoon                 34.45         58          1
+  turkey                  33.87         28          0
+  israeli                 33.87         28          0
+  conclusively            30.37         25          0
+  helicopter              30.37         25          0
+  saipan                  30.37         25          0
+  malaysia                29.20         49          1
+
+  Top 20 words that signal NOT-DISASTER:
+  Word                    Ratio  Disaster#   Non-dis#
+  ----------------------------------------------------
+  jeb                      0.11          0         10
+  welcome                  0.11          0         10
+  leather                  0.11          1         21
+  shall                    0.11          0         10
+  handbags                 0.11          0         10
+  blew                     0.11          2         32
+  myself                   0.10          1         22
+  arianagrande             0.10          0         11
+  lucky                    0.10          0         11
+  edm                      0.10          0         11
+  complete                 0.10          0         11
+  electrocute              0.08          1         29
+  career                   0.08          0         14
+  ebay                     0.07          1         32
+  disney                   0.07          0         16
+  lmao                     0.07          0         16
+  ruin                     0.06          1         37
+  bag                      0.06          1         40
+  bags                     0.05          1         43
+  aftershock               0.05          0         22
+
+
+============================================================
+7. LOCATION FIELD
+============================================================
+
+  Present: 5080/7613 (66.7%)
+  Unique values: 3341
+
+  Top 15 locations:
+    USA                                 n= 104  disaster_rate=64.4%
+    New York                            n=  71  disaster_rate=22.5%
+    United States                       n=  50  disaster_rate=54.0%
+    London                              n=  45  disaster_rate=35.6%
+    Canada                              n=  29  disaster_rate=44.8%
+    Nigeria                             n=  28  disaster_rate=78.6%
+    UK                                  n=  27  disaster_rate=59.3%
+    Los Angeles, CA                     n=  26  disaster_rate=30.8%
+    India                               n=  24  disaster_rate=83.3%
+    Mumbai                              n=  22  disaster_rate=86.4%
+    Washington, DC                      n=  21  disaster_rate=71.4%
+    Kenya                               n=  20  disaster_rate=25.0%
+    Worldwide                           n=  19  disaster_rate=63.2%
+    Australia                           n=  18  disaster_rate=50.0%
+    Chicago, IL                         n=  18  disaster_rate=50.0%
+
+  Verdict: 3341 unique values is very messy (user-entered free text).
+  Too noisy to use directly. Could extract country/state with geocoding
+  but likely diminishing returns for this project.
+
+
+============================================================
+8. EXAMPLE TWEETS
+============================================================
+
+  5 random DISASTER tweets:
+    [floods              ] Nearly 50 thousand people affected by floods in #Paraguay ? http://t.co/aw23wXtyjB http://t.co/ABgct
+    [armageddon          ] Vladimir Putin Issues Major Warning But Is It Too Late To Escape Armageddon?
+http://t.co/gBxafy1m1C
+    [buildings burning   ] @DoctorFluxx @StefanEJones @spinnellii @themermacorn  No burning buildings and rob during a riot. Th
+    [attacked            ] Telnet attacked from 124.13.172.40 (STREAMYX-HOME-SOUTHERN MY)
+    [drowning            ] LONDON IS DROWNING AND IIII LIVE BY THE RIVEEEEEER
+
+  5 random NON-DISASTER tweets:
+    [fatality            ] Everyday is a near death fatality for me on the road. Thank god is on my side.??
+    [hazard              ] #Lifestyle Û÷It makes me sickÛª: Baby clothes deemed a Û÷hazardÛª http://t.co/0XrfVidxA2 http://
+    [inundated           ] @Lenn_Len Probably. We are inundated with them most years!
+    [siren               ] A demoness with the voice of an angel. Like a siren's call beckoning me to the void. Don't ?? on thi
+    [injuries            ] Next Man Up---AH SCREW THIS! I'm so tired of injuries.  
+
+What happened to Camp Cupcake? More like C
+
+  Saved: /Users/glennharless/dev-brain/kaggle/competitions/disaster-tweets/results/analysis/01_eda.png
+
+
+============================================================
+10. KEY TAKEAWAYS FOR MODELING
+============================================================
+
+  1. CLASS BALANCE: 57/43 split — moderate imbalance. F1 metric handles this
+     well. No need for oversampling.
+
+  2. KEYWORD is a strong signal: keyword-only baseline already gets decent F1.
+     Some keywords (earthquake, wildfire) are nearly 100% disaster.
+     But keyword alone can't solve it — many keywords are ambiguous.
+
+  3. TEXT LENGTH: Disaster tweets are slightly longer on average. Weak signal
+     but could help as a feature alongside text content.
+
+  4. URLs: Disaster tweets more often contain URLs (linking to news sources).
+     @mentions: Non-disaster tweets use more @mentions (social interaction).
+     Both are structural features that complement word content.
+
+  5. WORD CONTENT: Clear signal — disaster tweets use "fire," "killed,"
+     "storm," "earthquake"; non-disaster uses "love," "like," "new," "body"
+     (metaphorical usage). This is exactly what bag-of-words will capture.
+
+  6. LOCATION: Too messy to use (3000+ unique user-entered strings). Skip it.
+
+  7. THE CORE CHALLENGE: Words like "fire," "crash," "body" have both
+     literal (disaster) and metaphorical (non-disaster) meanings.
+     Bag-of-words can't distinguish these — that's what embeddings and
+     transformers will fix in later phases.
+

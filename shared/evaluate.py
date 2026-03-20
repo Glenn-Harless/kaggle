@@ -1,5 +1,5 @@
 """
-Titanic Evaluation Harness
+Kaggle Evaluation Harness
 
 Provides multi-metric model evaluation for small-dataset model selection.
 Primary signals: repeated CV, paired comparison, flip analysis.
@@ -31,6 +31,9 @@ class Tee:
     def flush(self):
         self.file.flush()
         self.stdout.flush()
+
+    def isatty(self):
+        return False
 
     def close(self):
         self.file.close()
@@ -730,3 +733,44 @@ def report_regression_cv(scores, label=""):
     print(f"  {prefix}Min:        {scores.min():.5f}")
     print(f"  {prefix}Max:        {scores.max():.5f}")
     print(f"  {prefix}Range:      {scores.max() - scores.min():.5f}")
+
+
+# ============================================================
+# CLASSIFICATION: F1-based Stratified CV
+# ============================================================
+
+def classification_cv(model, X, y, n_splits=5, n_repeats=1, random_state=42):
+    """
+    Stratified KFold CV for binary classification using F1 score.
+
+    Returns array of per-fold F1 scores (n_splits * n_repeats total).
+    Higher is better.
+    """
+    from sklearn.model_selection import StratifiedKFold
+    from sklearn.metrics import f1_score
+
+    scores = []
+    for repeat in range(n_repeats):
+        skf = StratifiedKFold(n_splits=n_splits, shuffle=True,
+                              random_state=random_state + repeat)
+        for train_idx, val_idx in skf.split(X, y):
+            m = clone(model)
+            X_tr = X.iloc[train_idx] if hasattr(X, 'iloc') else X[train_idx]
+            y_tr = y.iloc[train_idx] if hasattr(y, 'iloc') else y[train_idx]
+            X_val = X.iloc[val_idx] if hasattr(X, 'iloc') else X[val_idx]
+            y_val = y.iloc[val_idx] if hasattr(y, 'iloc') else y[val_idx]
+            m.fit(X_tr, y_tr)
+            preds = m.predict(X_val)
+            scores.append(f1_score(y_val, preds))
+
+    return np.array(scores)
+
+
+def report_f1_cv(scores, label=""):
+    """Print classification F1 CV summary (higher is better)."""
+    prefix = f"[{label}] " if label else ""
+    print(f"  {prefix}Mean F1: {scores.mean():.5f}")
+    print(f"  {prefix}Std:     {scores.std():.5f}")
+    print(f"  {prefix}Min:     {scores.min():.5f}")
+    print(f"  {prefix}Max:     {scores.max():.5f}")
+    print(f"  {prefix}Range:   {scores.max() - scores.min():.5f}")

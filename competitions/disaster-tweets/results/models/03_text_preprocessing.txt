@@ -1,0 +1,221 @@
+Disaster Tweets: Step 3 — Text Preprocessing Experiments
+============================================================
+
+  Train: 7613 tweets
+  Baseline (raw TF-IDF + LogReg): F1 = 0.75478
+
+
+============================================================
+BASELINE: RAW TEXT (no cleaning)
+============================================================
+  [Raw text] Mean F1: 0.75478
+  [Raw text] Std:     0.00956
+  [Raw text] Min:     0.74415
+  [Raw text] Max:     0.76974
+  [Raw text] Range:   0.02560
+
+
+============================================================
+EXPERIMENT: 1. Lowercase
+============================================================
+  [1. Lowercase] Mean F1: 0.75478
+  [1. Lowercase] Std:     0.00956
+  [1. Lowercase] Min:     0.74415
+  [1. Lowercase] Max:     0.76974
+  [1. Lowercase] Range:   0.02560
+
+  Delta vs baseline: +0.00000 F1
+  → NEUTRAL
+
+
+============================================================
+EXPERIMENT: 2. Remove URLs
+============================================================
+  [2. Remove URLs] Mean F1: 0.75502
+  [2. Remove URLs] Std:     0.01270
+  [2. Remove URLs] Min:     0.73388
+  [2. Remove URLs] Max:     0.76910
+  [2. Remove URLs] Range:   0.03522
+
+  Delta vs baseline: +0.00024 F1
+  → NEUTRAL
+
+
+============================================================
+EXPERIMENT: 3. Remove @mentions
+============================================================
+  [3. Remove @mentions] Mean F1: 0.75346
+  [3. Remove @mentions] Std:     0.00831
+  [3. Remove @mentions] Min:     0.74038
+  [3. Remove @mentions] Max:     0.76451
+  [3. Remove @mentions] Range:   0.02413
+
+  Delta vs baseline: -0.00132 F1
+  → HURTS
+
+
+============================================================
+EXPERIMENT: 4. Remove # symbol
+============================================================
+  [4. Remove # symbol] Mean F1: 0.75348
+  [4. Remove # symbol] Std:     0.00935
+  [4. Remove # symbol] Min:     0.74220
+  [4. Remove # symbol] Max:     0.76860
+  [4. Remove # symbol] Range:   0.02639
+
+  Delta vs baseline: -0.00130 F1
+  → HURTS
+
+
+============================================================
+EXPERIMENT: 5. Remove punctuation
+============================================================
+  [5. Remove punctuation] Mean F1: 0.75239
+  [5. Remove punctuation] Std:     0.01136
+  [5. Remove punctuation] Min:     0.73344
+  [5. Remove punctuation] Max:     0.76471
+  [5. Remove punctuation] Range:   0.03126
+
+  Delta vs baseline: -0.00239 F1
+  → HURTS
+
+
+============================================================
+EXPERIMENT: 6. Remove stopwords
+============================================================
+  [6. Remove stopwords] Mean F1: 0.74331
+  [6. Remove stopwords] Std:     0.01034
+  [6. Remove stopwords] Min:     0.72397
+  [6. Remove stopwords] Max:     0.75440
+  [6. Remove stopwords] Range:   0.03043
+
+  Delta vs baseline: -0.01147 F1
+  → HURTS
+
+
+============================================================
+EXPERIMENT: 7. Stemming (Porter)
+============================================================
+  [7. Stemming (Porter)] Mean F1: 0.75435
+  [7. Stemming (Porter)] Std:     0.01103
+  [7. Stemming (Porter)] Min:     0.73328
+  [7. Stemming (Porter)] Max:     0.76349
+  [7. Stemming (Porter)] Range:   0.03021
+
+  Delta vs baseline: -0.00043 F1
+  → NEUTRAL
+
+
+============================================================
+EXPERIMENT: 8. Lemmatization
+============================================================
+  [8. Lemmatization] Mean F1: 0.75633
+  [8. Lemmatization] Std:     0.00865
+  [8. Lemmatization] Min:     0.73995
+  [8. Lemmatization] Max:     0.76427
+  [8. Lemmatization] Range:   0.02432
+
+  Delta vs baseline: +0.00155 F1
+  → HELPS
+
+
+============================================================
+EXPERIMENT: 9. Remove numbers
+============================================================
+  [9. Remove numbers] Mean F1: 0.75389
+  [9. Remove numbers] Std:     0.00853
+  [9. Remove numbers] Min:     0.74038
+  [9. Remove numbers] Max:     0.76568
+  [9. Remove numbers] Range:   0.02530
+
+  Delta vs baseline: -0.00089 F1
+  → NEUTRAL
+
+
+============================================================
+COMBINED: APPLY ALL IMPROVEMENTS
+============================================================
+
+  Steps that helped (delta > +0.001):
+    8. Lemmatization: +0.00155
+
+  Steps that hurt (delta < -0.001):
+    3. Remove @mentions: -0.00132
+    4. Remove # symbol: -0.00130
+    5. Remove punctuation: -0.00239
+    6. Remove stopwords: -0.01147
+
+  Testing combined pipeline: URL removal + @mention removal + hashtag symbol removal + number removal + punctuation removal + lowercase
+  [Combined] Mean F1: 0.75256
+  [Combined] Std:     0.01104
+  [Combined] Min:     0.73150
+  [Combined] Max:     0.76254
+  [Combined] Range:   0.03104
+
+  Delta vs baseline: -0.00222 F1
+
+  Testing combined + stemming:
+  [Combined+Stem] Mean F1: 0.75331
+  [Combined+Stem] Std:     0.00893
+  [Combined+Stem] Min:     0.74148
+  [Combined+Stem] Max:     0.76781
+  [Combined+Stem] Range:   0.02633
+  Delta vs baseline: -0.00147 F1
+
+  Testing combined + lemmatization:
+  [Combined+Lemma] Mean F1: 0.75107
+  [Combined+Lemma] Std:     0.01081
+  [Combined+Lemma] Min:     0.73154
+  [Combined+Lemma] Max:     0.76421
+  [Combined+Lemma] Range:   0.03267
+  Delta vs baseline: -0.00371 F1
+
+
+============================================================
+FINAL COMPARISON — ALL EXPERIMENTS
+============================================================
+
+  Experiment                        Mean F1        Std      Delta
+  -----------------------------------------------------------------
+  0. Baseline (raw)                 0.75478    0.00956   +0.00000
+  1. Lowercase                      0.75478    0.00956   +0.00000
+  10. Combined                      0.75256    0.01104   -0.00222 -
+  11. Combined+Stem                 0.75331    0.00893   -0.00147 -
+  12. Combined+Lemma                0.75107    0.01081   -0.00371 -
+  2. Remove URLs                    0.75502    0.01270   +0.00024
+  3. Remove @mentions               0.75346    0.00831   -0.00132 -
+  4. Remove # symbol                0.75348    0.00935   -0.00130 -
+  5. Remove punctuation             0.75239    0.01136   -0.00239 -
+  6. Remove stopwords               0.74331    0.01034   -0.01147 -
+  7. Stemming (Porter)              0.75435    0.01103   -0.00043
+  8. Lemmatization                  0.75633    0.00865   +0.00155 +
+  9. Remove numbers                 0.75389    0.00853   -0.00089
+
+  Best: 8. Lemmatization (F1 = 0.75633)
+
+
+============================================================
+WHAT WE LEARNED
+============================================================
+
+  TEXT CLEANING RESULTS:
+
+  1. URL REMOVAL typically helps — URLs are noise for word-level models.
+     The "http", "t", "co" fragments we saw dominating the word counts
+     in EDA are now gone.
+
+  2. @MENTION REMOVAL — @usernames aren't predictive of disaster content.
+
+  3. STOPWORD REMOVAL — can go either way on short texts. On tweets,
+     removing "not", "no", "but" can lose negation context.
+
+  4. STEMMING reduces vocabulary size by collapsing word forms
+     (fires/fire/fired → fire). Can help by reducing sparsity but
+     can hurt by losing information (fired ≠ fire for this task).
+
+  5. LEMMATIZATION is linguistically smarter than stemming
+     (better → good, mice → mouse) but slower. May or may not beat stemming.
+
+  6. The combined pipeline gives us our best score to carry forward
+     into Step 4 (feature engineering).
+

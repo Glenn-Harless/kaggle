@@ -1,0 +1,160 @@
+Disaster Tweets: Step 9 — Ensemble + Final Submission
+============================================================
+
+  Device: mps
+  Train: 7613 tweets
+  Test:  3263 tweets
+
+
+============================================================
+MODEL 1: TF-IDF + LogReg
+============================================================
+  Fold 1: F1 = 0.7697
+  Fold 2: F1 = 0.7527
+  Fold 3: F1 = 0.7461
+  Fold 4: F1 = 0.7441
+  Fold 5: F1 = 0.7612
+  OOF F1: 0.75477
+  Test predictions generated.
+
+
+============================================================
+MODEL 2: GloVe + TF-IDF Concat + LogReg
+============================================================
+  Loading GloVe vectors...
+  Loaded 1,193,514 vectors
+  Fold 1: F1 = 0.7830
+  Fold 2: F1 = 0.7758
+  Fold 3: F1 = 0.7640
+  Fold 4: F1 = 0.7594
+  Fold 5: F1 = 0.7814
+  OOF F1: 0.77270
+  Test predictions generated.
+
+
+============================================================
+MODEL 3: DistilBERT (lr=1e-5, 3 epochs)
+============================================================
+  Fold 1/5...
+    F1 = 0.8016
+  Fold 2/5...
+    F1 = 0.8016
+  Fold 3/5...
+    F1 = 0.8006
+  Fold 4/5...
+    F1 = 0.8186
+  Fold 5/5...
+    F1 = 0.8041
+  OOF F1: 0.80532
+  Training on full dataset for test predictions...
+  Test predictions generated.
+
+
+============================================================
+BLEND WEIGHT OPTIMIZATION
+============================================================
+
+  Grid search over weights (w1, w2, w3) that sum to 1.
+  Blended probability = w1*TF-IDF + w2*GloVe + w3*BERT
+  Optimize for F1 on OOF predictions.
+
+  Best weights:
+    TF-IDF + LogReg:         0.20
+    GloVe + TF-IDF concat:   0.15
+    DistilBERT:              0.65
+  Best threshold: 0.5
+  Best blend OOF F1: 0.80630
+
+
+============================================================
+INDIVIDUAL VS BLEND COMPARISON (OOF)
+============================================================
+
+  Model                              OOF F1  Delta vs BERT
+  ---------------------------------------------------------
+  TF-IDF + LogReg                   0.75477       -0.05055
+  GloVe + TF-IDF concat             0.77270       -0.03262
+  DistilBERT                        0.80532       +0.00000
+  Blend (optimized)                 0.80630       +0.00098
+
+
+============================================================
+MODEL AGREEMENT ANALYSIS
+============================================================
+
+  All 3 models agree: 6306 tweets (82.8%)
+  At least 1 disagrees: 1307 tweets (17.2%)
+  F1 when all agree: 0.8454
+
+  On the 1307 disagreement tweets:
+    TF-IDF     F1 = 0.3380
+    GloVe      F1 = 0.4962
+    BERT       F1 = 0.6511
+    Blend      F1 = 0.6541
+
+
+============================================================
+PREDICTION CORRELATION
+============================================================
+
+  Probability correlation matrix:
+                 TF-IDF      GloVe       BERT
+  -------------------------------------------
+  TF-IDF          1.000      0.898      0.827
+  GloVe           0.898      1.000      0.868
+  BERT            0.827      0.868      1.000
+
+
+============================================================
+FINAL SUBMISSION
+============================================================
+
+  Test predictions distribution:
+    Not disaster: 2019 (61.9%)
+    Disaster:     1244 (38.1%)
+
+  Training distribution for reference:
+    Not disaster: 4342 (57.0%)
+    Disaster:     3271 (43.0%)
+
+  Saved: /Users/glennharless/dev-brain/kaggle/competitions/disaster-tweets/submissions/ensemble_v1.csv
+  Shape: (3263, 2)
+  Also saved individual model submissions.
+
+
+============================================================
+FULL PROJECT SCOREBOARD
+============================================================
+
+  Step   Model                                       F1
+  -------------------------------------------------------
+  2      Keyword-only                             0.673
+  2      TF-IDF + LogReg                        0.75477
+  5      GloVe + TF-IDF concat                  0.77270
+  7      DistilBERT (lr=1e-5, 3ep)              0.80532
+  9      Ensemble (blend)                       0.80630
+
+============================================================
+WHAT WE LEARNED
+============================================================
+
+  1. ENSEMBLING combines models with different error patterns.
+     TF-IDF catches keyword signals, GloVe captures meaning similarity,
+     BERT understands context. Together they cover each other's blind spots.
+
+  2. BLEND WEIGHTS reveal which model the ensemble trusts most.
+     Higher BERT weight = the transformer dominates, but the traditional
+     models still contribute on cases where BERT is uncertain.
+
+  3. AGREEMENT ANALYSIS shows where the ensemble adds value — it's on
+     the disagreement tweets (where models see different things) that
+     blending helps most.
+
+  4. PREDICTION CORRELATION: lower correlation between models = more
+     ensemble benefit. If all models made the same errors, blending
+     wouldn't help. We want diverse models.
+
+  5. This completes our NLP progression:
+     Word counting → weighted word counting → word meaning →
+     contextual meaning → blending all three perspectives.
+
