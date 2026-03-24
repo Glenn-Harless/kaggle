@@ -1,0 +1,141 @@
+Criteo Uplift Modeling: Step 4 — T-Learner
+============================================================
+
+Loading Criteo 10% sample...
+
+  Train: 978,572 rows
+  Test:  419,388 rows
+
+
+============================================================
+T-LEARNER: Training Two Separate Models
+============================================================
+
+  Treatment training set: 831,787 rows (85.0%)
+  Control training set:   146,785 rows (15.0%)
+  Treatment visit rate:   4.8544%
+  Control visit rate:     3.8199%
+
+  Training treatment model (831,787 rows)...
+  Training control model (146,785 rows)...
+
+
+============================================================
+T-LEARNER: Predicting Uplift
+============================================================
+
+  P(visit|treated) range:  [0.0002, 0.9366]
+  P(visit|control) range:  [0.0000, 0.9548]
+  Uplift score range:      [-0.3767, 0.6321]
+  Uplift score mean:       0.0077
+  (True ATE:               0.0103)
+
+  Users with negative predicted uplift: 138,776 (33.1%)
+
+
+============================================================
+T-LEARNER: Feature Importance (Treatment vs Control)
+============================================================
+
+   Feature     Treat Imp   Rank(T)   Control Imp   Rank(C)
+  -------------------------------------------------------
+        f0       18324.2         5        6493.7         4
+        f1         406.3        12         119.0        12
+        f2      242987.2         3       43177.6         2
+        f3       14144.3         6        2262.9         7
+        f4        3132.8         9        1461.4         9
+        f5         554.7        11         314.4        11
+        f6       27750.5         4        5116.8         5
+        f7        4194.3         8        1813.0         8
+        f8      979288.9         1      158905.9         1
+        f9      260086.3         2       27512.0         3
+       f10        4563.6         7        2629.5         6
+       f11        1398.0        10         435.2        10
+
+  Features with DIFFERENT importance rankings between treatment and
+  control models suggest interaction with the treatment — these features
+  moderate the treatment effect.
+
+
+============================================================
+EVALUATION: Full Comparison
+============================================================
+
+  Approach                                   AUUC        Qini
+  ------------------------------------------------------------
+  T-Learner (LightGBM)                   0.027227    0.069377
+  S-Learner (LightGBM)                   0.028913    0.073882
+  Standard Classifier (LogReg)           0.030862    0.078650
+  Two Classifiers (LogReg)               0.029034    0.074168
+  Random                                -0.001810   -0.004542
+
+  Ranking by AUUC (higher is better):
+    1. Standard Classifier (LogReg): 0.030862
+    2. Two Classifiers (LogReg): 0.029034
+    3. S-Learner (LightGBM): 0.028913
+    4. T-Learner (LightGBM): 0.027227
+    5. Random: -0.001810
+
+
+============================================================
+UPLIFT DECILE ANALYSIS: T-Learner vs S-Learner
+============================================================
+
+  T-Learner — ATE by predicted uplift decile:
+                          Decile        N   Visit(T)   Visit(C)        ATE     Pred τ
+  --------------------------------------------------------------------------------
+              (-0.378, -0.00176]   41,980     0.1181     0.1090    +0.0091    -0.0188
+           (-0.00176, -0.000229]   42,526     0.0073     0.0072    +0.0001    -0.0007
+          (-0.000229, -3.32e-05]   41,313     0.0020     0.0005    +0.0015    -0.0001
+           (-3.32e-05, 0.000104]   41,939     0.0015     0.0005    +0.0010    +0.0000
+            (0.000104, 0.000435]   42,014     0.0019     0.0016    +0.0004    +0.0002
+            (0.000435, 0.000923]   41,927     0.0038     0.0027    +0.0011    +0.0007
+             (0.000923, 0.00185]   41,904     0.0061     0.0069    -0.0008    +0.0013
+              (0.00185, 0.00526]   41,907     0.0157     0.0134    +0.0023    +0.0030
+               (0.00526, 0.0228]   41,940     0.0639     0.0527    +0.0112    +0.0116
+                 (0.0228, 0.632]   41,938     0.2605     0.2078    +0.0527    +0.0793
+
+  S-Learner — ATE by predicted uplift decile:
+                          Decile        N   Visit(T)   Visit(C)        ATE     Pred τ
+  --------------------------------------------------------------------------------
+             (-0.136, -1.09e-05]   42,700     0.0440     0.0368    +0.0073    -0.0014
+           (-1.09e-05, 1.89e-05]   41,365     0.0006     0.0008    -0.0002    +0.0000
+            (1.89e-05, 8.09e-05]   42,084     0.0010     0.0008    +0.0002    +0.0000
+            (8.09e-05, 0.000176]   41,609     0.0015     0.0014    +0.0001    +0.0001
+            (0.000176, 0.000392]   41,951     0.0036     0.0019    +0.0017    +0.0003
+            (0.000392, 0.000776]   42,071     0.0062     0.0064    -0.0002    +0.0006
+             (0.000776, 0.00121]   41,798     0.0077     0.0070    +0.0007    +0.0009
+              (0.00121, 0.00405]   41,935     0.0285     0.0274    +0.0011    +0.0023
+               (0.00405, 0.0187]   41,936     0.0866     0.0781    +0.0085    +0.0092
+                 (0.0187, 0.317]   41,939     0.2997     0.2448    +0.0550    +0.0571
+
+  KEY COMPARISON:
+  Look at the ATE spread from bottom to top decile for each model.
+  A wider spread means the model better separates high-uplift from
+  low-uplift users.
+
+
+Saved plot: /Users/glennharless/dev-brain/kaggle/competitions/criteo-uplift/results/analysis/04_t_learner.png
+
+
+============================================================
+KEY TAKEAWAYS
+============================================================
+
+  1. T-LEARNER AUUC: 0.027227 — worse than S-Learner (0.028913)
+
+  2. BEST APPROACH SO FAR: Standard Classifier (LogReg) (AUUC = 0.030862)
+
+  3. CONTROL MODEL had 146,785 rows to learn from
+     (vs 831,787 for treatment). The 85/15 imbalance
+     means the control predictions may be noisier.
+
+  4. UPLIFT DISTRIBUTION: Compare the rightmost plot — does the T-learner
+     spread predictions more than the S-learner's spike at zero?
+
+  5. DECILE TABLES: Compare ATE spread (top vs bottom decile) between
+     T-learner and S-learner. Wider spread = better discrimination.
+
+  NEXT: Step 5 — X-Learner, designed specifically for treatment group
+  imbalance like our 85/15 split.
+

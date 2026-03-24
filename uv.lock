@@ -1144,6 +1144,7 @@ dependencies = [
     { name = "numpy" },
     { name = "pandas" },
     { name = "scikit-learn" },
+    { name = "scikit-uplift" },
     { name = "seaborn" },
     { name = "torch" },
     { name = "transformers" },
@@ -1165,6 +1166,7 @@ requires-dist = [
     { name = "numpy", specifier = ">=1.26" },
     { name = "pandas", specifier = ">=2.2" },
     { name = "scikit-learn", specifier = ">=1.5" },
+    { name = "scikit-uplift", specifier = ">=0.5.1" },
     { name = "seaborn", specifier = ">=0.13" },
     { name = "torch", specifier = ">=2.10.0" },
     { name = "transformers", specifier = ">=5.3.0" },
@@ -2674,6 +2676,23 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/c7/57/51f2384575bdec454f4fe4e7a919d696c9ebce914590abf3e52d47607ab8/scikit_learn-1.8.0-cp314-cp314t-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:15fc3b5d19cc2be65404786857f2e13c70c83dd4782676dd6814e3b89dc8f5b9", size = 8922467, upload-time = "2025-12-10T07:08:47.408Z" },
     { url = "https://files.pythonhosted.org/packages/35/4d/748c9e2872637a57981a04adc038dacaa16ba8ca887b23e34953f0b3f742/scikit_learn-1.8.0-cp314-cp314t-win_amd64.whl", hash = "sha256:00d6f1d66fbcf4eba6e356e1420d33cc06c70a45bb1363cd6f6a8e4ebbbdece2", size = 8774395, upload-time = "2025-12-10T07:08:49.337Z" },
     { url = "https://files.pythonhosted.org/packages/60/22/d7b2ebe4704a5e50790ba089d5c2ae308ab6bb852719e6c3bd4f04c3a363/scikit_learn-1.8.0-cp314-cp314t-win_arm64.whl", hash = "sha256:f28dd15c6bb0b66ba09728cf09fd8736c304be29409bd8445a080c1280619e8c", size = 8002647, upload-time = "2025-12-10T07:08:51.601Z" },
+]
+
+[[package]]
+name = "scikit-uplift"
+version = "0.5.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "matplotlib" },
+    { name = "numpy" },
+    { name = "pandas" },
+    { name = "requests" },
+    { name = "scikit-learn" },
+    { name = "tqdm" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/99/39/4fce95a26b4187cb3511cb39dd26b2a0c2d22c645f6e4e7d876bfde745b8/scikit-uplift-0.5.1.tar.gz", hash = "sha256:a182eb731fdbacce8997142d0f30bd539864db8e5236ec2e324ea1ac2bede13f", size = 36419, upload-time = "2022-08-11T20:38:31.481Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/c1/e1/64690394f9798935f73be859404cf46b3d63a17d8e3c25793a5b390cb2ae/scikit_uplift-0.5.1-py3-none-any.whl", hash = "sha256:d25c673c33336407811cded3256b12a76797d21a2f49b163a5041103db6c1282", size = 42112, upload-time = "2022-08-11T20:38:29.31Z" },
 ]
 
 [[package]]

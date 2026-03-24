@@ -1,0 +1,124 @@
+Criteo Uplift Modeling: Step 2 — Naive Baselines
+============================================================
+
+Loading Criteo 10% sample...
+
+  Train: 978,572 rows
+  Test:  419,388 rows
+  Train treatment rate: 85.0%
+  Test treatment rate:  85.0%
+  Train visit rate: 4.70%
+  Test visit rate:  4.70%
+
+
+============================================================
+APPROACH 1: Standard Classifier — P(visit)
+============================================================
+
+  Model: LogisticRegression on all data (ignoring treatment)
+  Using P(visit) as targeting score (higher = target first)
+  Score range: [0.0013, 0.9771]
+  Score mean:  0.0470
+
+  AUUC:  0.030862
+  Qini:  0.078650
+
+
+============================================================
+APPROACH 2: Two Separate Classifiers (Naive T-Learner)
+============================================================
+
+  Treatment model trained on: 831,787 rows
+  Control model trained on:   146,785 rows
+
+  P(visit|treated) range:  [0.0013, 0.9776]
+  P(visit|control) range:  [0.0009, 0.9844]
+  Uplift score range:      [-0.1083, 0.3178]
+  Uplift score mean:       0.0073
+  (Compare to true ATE:    0.0103)
+
+  AUUC:  0.029034
+  Qini:  0.074168
+
+
+============================================================
+APPROACH 3: Random Baseline
+============================================================
+
+  AUUC:  -0.001810
+  Qini:  -0.004542
+
+
+============================================================
+COMPARISON
+============================================================
+
+  Approach                                   AUUC        Qini
+  ------------------------------------------------------------
+  1. Standard Classifier P(visit)        0.030862    0.078650
+  2. Two Classifiers (naive T)           0.029034    0.074168
+  3. Random Baseline                    -0.001810   -0.004542
+
+  Ranking by AUUC (higher is better):
+    1. Standard Classifier: 0.030862
+    2. Two Classifiers: 0.029034
+    3. Random: -0.001810
+
+
+============================================================
+UPLIFT CURVES
+============================================================
+
+  Saved plot: /Users/glennharless/dev-brain/kaggle/competitions/criteo-uplift/results/analysis/02_naive_baselines.png
+
+
+============================================================
+ANALYSIS: Why Standard Classifiers Fail at Uplift
+============================================================
+
+  ATE by propensity decile (standard classifier ranking):
+                     Decile        N   Visit(T)   Visit(C)        ATE   P(visit)
+  ---------------------------------------------------------------------------
+  (0.00026000000000000003, 0.005]   41,939     0.0046     0.0039    +0.0008     0.0040
+           (0.005, 0.00569]   41,939     0.0015     0.0015    -0.0000     0.0054
+         (0.00569, 0.00633]   41,939     0.0020     0.0022    -0.0002     0.0060
+         (0.00633, 0.00695]   41,938     0.0018     0.0008    +0.0010     0.0066
+         (0.00695, 0.00792]   41,939     0.0028     0.0025    +0.0002     0.0074
+         (0.00792, 0.00962]   41,939     0.0042     0.0031    +0.0011     0.0087
+          (0.00962, 0.0129]   41,938     0.0073     0.0045    +0.0028     0.0111
+           (0.0129, 0.0247]   41,939     0.0205     0.0131    +0.0074     0.0173
+            (0.0247, 0.104]   41,939     0.0747     0.0622    +0.0125     0.0519
+             (0.104, 0.977]   41,939     0.3612     0.3122    +0.0490     0.3517
+
+  KEY FINDING:
+  Look at the ATE column. The users ranked HIGHEST by the standard
+  classifier (high P(visit)) do NOT have the highest ATE. In fact,
+  high-propensity deciles often have LOWER uplift than low-propensity ones.
+
+  This confirms the four-quadrant theory:
+  - High P(visit) → Sure Things (would visit anyway, τ ≈ 0)
+  - The standard classifier targets the WRONG users for uplift
+
+  This is why uplift modeling exists: you need models that predict
+  τ(x) = P(visit|treated) - P(visit|control), not just P(visit).
+
+============================================================
+KEY TAKEAWAYS
+============================================================
+
+  1. STANDARD CLASSIFIER FAILS: Ranking by P(visit) targets Sure Things,
+     not Persuadables. Its AUUC is similar to random targeting.
+
+  2. TWO-MODEL APPROACH WORKS BETTER: Subtracting P(visit|treated) - P(visit|control)
+     at least tries to estimate the treatment effect. AUUC: 0.029034
+
+  3. THE "AHA" MOMENT: High propensity ≠ high uplift. Users most likely
+     to visit are NOT the users most affected by the ad.
+
+  4. THE UPLIFT CURVE SHOWS IT: A good uplift model's curve rises steeply
+     at the left (capturing most uplift from a small fraction of users).
+     The standard classifier doesn't show this pattern.
+
+  NEXT: Step 3 — S-Learner, the simplest principled uplift approach.
+  Uses treatment as a feature in a single model.
+

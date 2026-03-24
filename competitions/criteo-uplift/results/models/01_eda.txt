@@ -1,0 +1,212 @@
+Criteo Uplift Modeling: Step 1 — EDA
+============================================================
+
+Loading Criteo 10% sample via scikit-uplift...
+
+  Shape: 1,397,960 rows, 14 columns
+  Columns: ['f0', 'f1', 'f2', 'f3', 'f4', 'f5', 'f6', 'f7', 'f8', 'f9', 'f10', 'f11', 'treatment', 'visit']
+  Dtypes:
+f0           float64
+f1           float64
+f2           float64
+f3           float64
+f4           float64
+f5           float64
+f6           float64
+f7           float64
+f8           float64
+f9           float64
+f10          float64
+f11          float64
+treatment       Int8
+visit           Int8
+
+  First 5 rows:
+          f0         f1        f2        f3         f4        f5         f6        f7        f8         f9       f10       f11  treatment  visit
+0  26.290533  10.059654  8.214383  4.679882  10.280525  4.115453  -1.288207  4.833815  3.971858  13.190056  5.300375 -0.168679          1      0
+1  12.616365  10.059654  8.339021  4.679882  10.280525  4.115453   0.294443  4.833815  3.869313  32.101873  5.300375 -0.168679          0      0
+2  17.293231  10.059654  8.214383  2.293959  10.280525  4.115453  -4.595460  4.833815  3.971858  13.190056  5.300375 -0.168679          1      0
+3  12.616365  10.059654  8.788121  4.679882  10.280525  4.115453   0.294443  4.833815  3.943716  13.190056  5.300375 -0.168679          0      0
+4  20.363292  10.059654  8.563419  2.934780  10.280525  4.115453 -12.570178  4.833815  3.863287  18.380112  5.300375 -0.168679          1      0
+
+  Missing values: 0
+
+
+============================================================
+1. TREATMENT / CONTROL BALANCE
+============================================================
+
+  Total users:    1,397,960
+  Treatment (1):  1,188,267 (85.0%)
+  Control (0):      209,693 (15.0%)
+  Ratio (T:C):   5.67:1
+
+  The ~85/15 split is intentional — Criteo allocated more
+  users to treatment because showing ads is the default.
+  The control group is smaller but still large enough
+  (209,693 users) for reliable estimation.
+
+
+============================================================
+2. OUTCOME RATES AND ATE (Average Treatment Effect)
+============================================================
+
+  VISIT outcome:
+    Treatment group visit rate: 4.8544%
+    Control group visit rate:   3.8199%
+    ATE (visit):                1.0345%
+    Relative lift:              27.1%
+
+    SE(ATE):    0.000463
+    z-stat:     22.36
+    p-value:    0.00e+00
+    *** Highly significant — the ad effect on visits is real ***
+
+  Overall visit rate: 4.6992%
+  Most of the 4.70% visit rate is organic (would happen without ads).
+  The ads cause an additional 1.0345% on top of the 3.8199% baseline.
+
+
+============================================================
+3. FEATURE BALANCE CHECK (Randomization Validation)
+============================================================
+
+  Comparing feature means between treatment and control:
+   Feature     Mean(T)     Mean(C)        Diff    Std Diff     p-value
+  -----------------------------------------------------------------
+        f0     19.6065     19.6334     -0.0269     -0.0050      0.0344
+        f1     10.0706     10.0679     +0.0027     +0.0251      0.0000
+        f2      8.4463      8.4483     -0.0020     -0.0068      0.0039
+        f3      4.1685      4.2293     -0.0608     -0.0454      0.0000
+        f4     10.3393     10.3369     +0.0025     +0.0072      0.0022
+        f5      4.0265      4.0392     -0.0127     -0.0294      0.0000
+        f6     -4.1866     -3.9971     -0.1895     -0.0413      0.0000
+        f7      5.1047      5.0800     +0.0247     +0.0205      0.0000
+        f8      3.9334      3.9347     -0.0013     -0.0227      0.0000
+        f9     16.0572     15.8891     +0.1681     +0.0239      0.0000
+       f10      5.3339      5.3320     +0.0019     +0.0112      0.0000
+       f11     -0.1710     -0.1709     -0.0001     -0.0056      0.0186
+
+  All features have |standardized diff| < 0.05
+  Randomization looks clean — treatment and control are well-balanced.
+
+
+============================================================
+4. FEATURE DISTRIBUTIONS
+============================================================
+
+  Summary statistics for features f0-f11:
+         count  missing       mean       std        min        25%        50%        75%        max  n_unique
+f0   1397960.0        0  19.610508  5.377178  12.616365  12.616365  21.914956  24.421413  26.745249    771434
+f1   1397960.0        0  10.070219  0.106494  10.059654  10.059654  10.059654  10.059654  16.344187        39
+f2   1397960.0        0   8.446581  0.299122   8.214383   8.214383   8.214383   8.722071   9.051962    549153
+f3   1397960.0        0   4.177639  1.338895  -8.398387   4.679882   4.679882   4.679882   4.679882       394
+f4   1397960.0        0  10.338966  0.342463  10.280525  10.280525  10.280525  10.280525  20.677034       136
+f5   1397960.0        0   4.028373  0.432644  -8.737492   4.115453   4.115453   4.115453   4.115453        76
+f6   1397960.0        0  -4.158140  4.582487 -29.738146  -6.699321  -2.411115   0.294443   0.294443      1114
+f7   1397960.0        0   5.101016  1.202784   4.833815   4.833815   4.833815   4.833815  11.998389     72946
+f8   1397960.0        0   3.933560  0.056668   3.648292   3.910792   3.971858   3.971858   3.971858      2280
+f9   1397960.0        0  16.031962  7.022836  13.190056  13.190056  13.190056  13.190056  68.701147       973
+f10  1397960.0        0   5.333649  0.168815   5.300375   5.300375   5.300375   5.300375   6.473915     60080
+f11  1397960.0        0  -0.170967  0.022676  -1.284443  -0.168679  -0.168679  -0.168679  -0.168679        64
+
+  Feature type heuristic (unique values):
+    f0:  771,434 unique values,        0 missing → continuous
+    f1:       39 unique values,        0 missing → continuous
+    f2:  549,153 unique values,        0 missing → continuous
+    f3:      394 unique values,        0 missing → continuous
+    f4:      136 unique values,        0 missing → continuous
+    f5:       76 unique values,        0 missing → continuous
+    f6:    1,114 unique values,        0 missing → continuous
+    f7:   72,946 unique values,        0 missing → continuous
+    f8:    2,280 unique values,        0 missing → continuous
+    f9:      973 unique values,        0 missing → continuous
+    f10:   60,080 unique values,        0 missing → continuous
+    f11:       64 unique values,        0 missing → continuous
+
+
+============================================================
+5. OUTCOME RARITY ANALYSIS
+============================================================
+
+  Visit (1):         65,693 (4.70%)
+  No visit (0):   1,332,267 (95.30%)
+  Ratio (neg:pos): 20.3:1
+
+  Implications for uplift modeling:
+    - With ~4.7% visit rate, most users don't visit regardless
+    - The ATE of 1.0345% means we're looking for a SMALL signal
+    - Need large samples to detect heterogeneous effects (we have 1,397,960)
+    - Uplift (treatment effect) will be even smaller than outcome rate
+    - This is realistic: most ads have tiny per-user effects
+
+
+============================================================
+6. VISIT RATES BY FEATURE DECILES (Treatment Effect Heterogeneity)
+============================================================
+
+  For each feature, bin into deciles and check if the ATE varies
+  across bins. This hints at which features drive heterogeneous effects.
+
+  f0 (quintile):
+                          Bin         N   Visit(T)   Visit(C)        ATE
+    -----------------------------------------------------------------
+             (12.615, 18.088]   559,184     0.0844     0.0654    +0.0190
+             (18.088, 22.765]   279,594     0.0431     0.0336    +0.0095
+             (22.765, 24.825]   279,590     0.0178     0.0157    +0.0021
+             (24.825, 26.745]   279,592     0.0129     0.0118    +0.0011
+
+  f2 (quintile):
+                          Bin         N   Visit(T)   Visit(C)        ATE
+    -----------------------------------------------------------------
+    (8.213000000000001, 8.383]   838,777     0.0471     0.0383    +0.0088
+               (8.383, 8.814]   279,591     0.0891     0.0683    +0.0208
+               (8.814, 9.052]   279,592     0.0121     0.0085    +0.0036
+
+  f5 (quintile):
+                          Bin         N   Visit(T)   Visit(C)        ATE
+    -----------------------------------------------------------------
+              (-8.738, 4.115]  1,397,960     0.0485     0.0382    +0.0103
+
+  f8 (quintile):
+                          Bin         N   Visit(T)   Visit(C)        ATE
+    -----------------------------------------------------------------
+    (3.6470000000000002, 3.893]   285,057     0.2090     0.1729    +0.0361
+               (3.893, 3.944]   287,135     0.0204     0.0151    +0.0053
+               (3.944, 3.972]   825,768     0.0025     0.0017    +0.0008
+
+  f11 (quintile):
+                          Bin         N   Visit(T)   Visit(C)        ATE
+    -----------------------------------------------------------------
+             (-1.285, -0.169]  1,397,960     0.0485     0.0382    +0.0103
+
+
+Saved plot: /Users/glennharless/dev-brain/kaggle/competitions/criteo-uplift/results/analysis/01_eda.png
+
+
+============================================================
+8. KEY TAKEAWAYS
+============================================================
+
+  1. RANDOMIZATION IS CLEAN: Feature distributions are balanced between
+     treatment and control. We can trust ATE estimates are unbiased.
+
+  2. ATE IS SMALL BUT REAL: Ads cause a ~1.035% increase in visit rate
+     on a ~3.82% baseline. Statistically significant (p < 0.001)
+     thanks to the massive sample size.
+
+  3. OUTCOME IS RARE: Only ~4.7% of users visit. The uplift signal
+     we're looking for (1.0345%) is much smaller than the outcome rate.
+     This means uplift models are trying to detect a very subtle effect.
+
+  4. HETEROGENEITY EXISTS: ATE varies across feature deciles, meaning
+     some user segments respond more to ads than others. This is what
+     uplift models will try to capture — the CATE for each user.
+
+  5. SCALE: 1,397,960 users gives us plenty of statistical power.
+     Even the control group (209,693) is large enough for
+     reliable estimation per feature bin.
+
+  NEXT: Step 2 — Naive baselines to see why standard classifiers
+  (predicting P(visit)) fail at the uplift task.
+

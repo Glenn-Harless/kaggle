@@ -1,0 +1,120 @@
+Criteo Uplift Modeling: Step 3 — S-Learner
+============================================================
+
+Loading Criteo 10% sample...
+
+  Train: 978,572 rows
+  Test:  419,388 rows
+
+
+============================================================
+S-LEARNER: Training
+============================================================
+
+  Model: LightGBM S-learner
+  Features: ['f0', 'f1', 'f2', 'f3', 'f4', 'f5', 'f6', 'f7', 'f8', 'f9', 'f10', 'f11', 'treatment']
+  Rounds: 300
+  Num leaves: 31
+
+
+============================================================
+S-LEARNER: Predicting Uplift
+============================================================
+
+  P(visit|treated) range:  [0.0002, 0.9375]
+  P(visit|control) range:  [0.0002, 0.9242]
+  Uplift score range:      [-0.1345, 0.3173]
+  Uplift score mean:       0.0069
+  (True ATE:               0.0103)
+
+  Users with negative predicted uplift: 53,955 (12.9%)
+  These are predicted Sleeping Dogs — users the ad may hurt.
+
+
+============================================================
+S-LEARNER: Feature Importance
+============================================================
+
+  Feature importance (gain):
+       Feature    Importance    Rank
+  -----------------------------------
+            f8      971027.2       1
+            f2      413723.7       2
+            f9      176711.3       3
+            f4      104950.4       4
+            f6       46910.0       5
+            f0       25426.6       6
+            f3       23533.2       7
+           f10        7489.7       8
+            f7        4140.5       9
+     treatment        3218.6      10 ← treatment
+            f5        1014.2      11
+           f11         725.2      12
+            f1         332.0      13
+
+  Treatment feature rank: 10 out of 13
+  Treatment is low-ranked — possible regularization bias (S-learner weakness).
+
+
+============================================================
+EVALUATION: AUUC and Qini
+============================================================
+
+  S-Learner AUUC:  0.028913
+  S-Learner Qini:  0.073882
+
+  Approach                                   AUUC        Qini
+  ------------------------------------------------------------
+  S-Learner (LightGBM)                   0.028913    0.073882
+  Standard Classifier (LogReg)           0.030862    0.078650
+  Two Classifiers (LogReg)               0.029034    0.074168
+  Random                                -0.001810   -0.004542
+
+  S-Learner improvement over best baseline: -6.3%
+
+
+============================================================
+UPLIFT DECILE ANALYSIS
+============================================================
+
+  ATE by S-learner predicted uplift decile:
+                          Decile        N   Visit(T)   Visit(C)        ATE     Pred τ
+  --------------------------------------------------------------------------------
+             (-0.136, -1.09e-05]   42,700     0.0440     0.0368    +0.0073    -0.0014
+           (-1.09e-05, 1.89e-05]   41,365     0.0006     0.0008    -0.0002    +0.0000
+            (1.89e-05, 8.09e-05]   42,084     0.0010     0.0008    +0.0002    +0.0000
+            (8.09e-05, 0.000176]   41,609     0.0015     0.0014    +0.0001    +0.0001
+            (0.000176, 0.000392]   41,951     0.0036     0.0019    +0.0017    +0.0003
+            (0.000392, 0.000776]   42,071     0.0062     0.0064    -0.0002    +0.0006
+             (0.000776, 0.00121]   41,798     0.0077     0.0070    +0.0007    +0.0009
+              (0.00121, 0.00405]   41,935     0.0285     0.0274    +0.0011    +0.0023
+               (0.00405, 0.0187]   41,936     0.0866     0.0781    +0.0085    +0.0092
+                 (0.0187, 0.317]   41,939     0.2997     0.2448    +0.0550    +0.0571
+
+  KEY CHECK: If the model is working, the actual ATE should INCREASE
+  from bottom decile to top decile — the model should rank users with
+  genuinely higher treatment effects at the top.
+
+
+Saved plot: /Users/glennharless/dev-brain/kaggle/competitions/criteo-uplift/results/analysis/03_s_learner.png
+
+
+============================================================
+KEY TAKEAWAYS
+============================================================
+
+  1. S-LEARNER AUUC: 0.028913 (vs best baseline: 0.030862)
+     No improvement over naive baselines.
+
+  2. TREATMENT FEATURE RANK: 10/13 by importance (gain).
+     Possible regularization bias — treatment may be underweighted.
+
+  3. UPLIFT DISTRIBUTION: Range [-0.1345, 0.3173].
+     53,955 users (12.9%) predicted as Sleeping Dogs (negative uplift).
+
+  4. The uplift decile table shows whether predicted uplift correlates
+     with actual treatment effect — the key validation of any uplift model.
+
+  NEXT: Step 4 — T-Learner with LightGBM. Forces treatment effect capture
+  by training separate models on treatment and control data.
+

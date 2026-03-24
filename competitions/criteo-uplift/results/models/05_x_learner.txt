@@ -1,0 +1,146 @@
+Criteo Uplift Modeling: Step 5 — X-Learner
+============================================================
+
+Loading Criteo 10% sample...
+
+  Train: 978,572 rows
+  Test:  419,388 rows
+
+
+============================================================
+STAGE 1: Outcome Models (T-Learner base)
+============================================================
+
+  Training treatment outcome model (831,787 rows)...
+  Training control outcome model (146,785 rows)...
+  Stage 1 complete — same as T-learner so far.
+
+
+============================================================
+STAGE 2: Cross-Impute Treatment Effects
+============================================================
+
+  D_treated (imputed effects for treatment group):
+    N:      831,787
+    Mean:   0.0079
+    Std:    0.1778
+    Range:  [-0.9547, 0.9999]
+
+  D_control (imputed effects for control group):
+    N:      146,785
+    Mean:   0.0063
+    Std:    0.1602
+    Range:  [-0.9996, 0.9328]
+
+  Both means should be close to the true ATE (~0.0103):
+    D_treated mean: 0.0079
+    D_control mean: 0.0063
+
+
+============================================================
+STAGE 3: Model the Imputed Effects
+============================================================
+
+  Training τ_model_1 on treatment users' imputed effects (831,787 rows)...
+  Training τ_model_0 on control users' imputed effects (146,785 rows)...
+  Stage 3 complete — four models total.
+
+
+============================================================
+PREDICTION: Propensity-Weighted Combination
+============================================================
+
+  Propensity score g = P(treatment=1) = 0.8500
+
+  τ_model_1 predictions (treatment perspective):
+    Range: [-0.3201, 0.5413]
+    Mean:  0.0076
+
+  τ_model_0 predictions (control perspective):
+    Range: [-0.4236, 0.5391]
+    Mean:  0.0074
+
+  Final X-learner uplift (weighted combination):
+    Range: [-0.3880, 0.5248]
+    Mean:  0.0074
+    (True ATE: 0.0103)
+
+  Users with negative predicted uplift: 18,496 (4.4%)
+
+
+============================================================
+EVALUATION: Full Comparison (All Approaches)
+============================================================
+
+  Approach                                   AUUC        Qini
+  ------------------------------------------------------------
+  X-Learner (LightGBM)                   0.029374    0.074989
+  T-Learner (LightGBM)                   0.027227    0.069377
+  S-Learner (LightGBM)                   0.028913    0.073882
+  Standard Classifier (LogReg)           0.030862    0.078650
+  Two Classifiers (LogReg)               0.029034    0.074168
+  Random                                -0.001810   -0.004542
+
+  Ranking by AUUC (higher is better):
+    1. Standard Classifier (LogReg): 0.030862
+    2. X-Learner (LightGBM): 0.029374
+    3. Two Classifiers (LogReg): 0.029034
+    4. S-Learner (LightGBM): 0.028913
+    5. T-Learner (LightGBM): 0.027227
+    6. Random: -0.001810
+
+
+============================================================
+UPLIFT DECILE ANALYSIS: X-Learner vs S-Learner
+============================================================
+
+  X-Learner — ATE by predicted uplift decile:
+                          Decile        N   Visit(T)   Visit(C)        ATE     Pred τ
+  --------------------------------------------------------------------------------
+              (-0.389, 0.000182]  116,403     0.0362     0.0333    +0.0029    -0.0047
+            (0.000182, 0.000211]   13,238     0.0011     0.0010    +0.0001    +0.0002
+            (0.000211, 0.000694]   47,003     0.0021     0.0019    +0.0002    +0.0005
+            (0.000694, 0.000873]   33,950     0.0021     0.0010    +0.0011    +0.0007
+             (0.000873, 0.00105]   45,249     0.0077     0.0069    +0.0008    +0.0010
+              (0.00105, 0.00221]   37,789     0.0092     0.0085    +0.0007    +0.0012
+              (0.00221, 0.00459]   41,890     0.0230     0.0211    +0.0019    +0.0032
+               (0.00459, 0.0189]   41,927     0.0673     0.0573    +0.0100    +0.0091
+                 (0.0189, 0.525]   41,939     0.2691     0.2130    +0.0561    +0.0717
+
+  S-Learner — ATE by predicted uplift decile:
+                          Decile        N   Visit(T)   Visit(C)        ATE     Pred τ
+  --------------------------------------------------------------------------------
+             (-0.136, -1.09e-05]   42,700     0.0440     0.0368    +0.0073    -0.0014
+           (-1.09e-05, 1.89e-05]   41,365     0.0006     0.0008    -0.0002    +0.0000
+            (1.89e-05, 8.09e-05]   42,084     0.0010     0.0008    +0.0002    +0.0000
+            (8.09e-05, 0.000176]   41,609     0.0015     0.0014    +0.0001    +0.0001
+            (0.000176, 0.000392]   41,951     0.0036     0.0019    +0.0017    +0.0003
+            (0.000392, 0.000776]   42,071     0.0062     0.0064    -0.0002    +0.0006
+             (0.000776, 0.00121]   41,798     0.0077     0.0070    +0.0007    +0.0009
+              (0.00121, 0.00405]   41,935     0.0285     0.0274    +0.0011    +0.0023
+               (0.00405, 0.0187]   41,936     0.0866     0.0781    +0.0085    +0.0092
+                 (0.0187, 0.317]   41,939     0.2997     0.2448    +0.0550    +0.0571
+
+
+Saved plot: /Users/glennharless/dev-brain/kaggle/competitions/criteo-uplift/results/analysis/05_x_learner.png
+
+
+============================================================
+KEY TAKEAWAYS
+============================================================
+
+  1. X-LEARNER AUUC: 0.029374
+     Best uplift model so far!
+
+  2. RANKING:
+     Standard Classifier (LogReg) (0.0309)  >  X-Learner (LightGBM) (0.0294)  >  Two Classifiers (LogReg) (0.0290)
+
+  3. CALIBRATION: Check decile table — does predicted τ match actual ATE
+     better than S-learner and T-learner?
+
+  4. NEGATIVE UPLIFT: 18,496 users (4.4%) predicted
+     as Sleeping Dogs.
+
+  NEXT: Step 6 — Head-to-head model comparison with uplift@K% analysis
+  (practical targeting decisions).
+

@@ -1,0 +1,206 @@
+Criteo Uplift Modeling: Step 8 — Practical Targeting Analysis
+============================================================
+
+Loading data and building X-learner...
+  X-learner built. Test set: 419,388 users.
+  True ATE: 0.0103
+  Uplift score range: [-0.3880, 0.5248]
+
+
+============================================================
+1. COST-BENEFIT ANALYSIS
+============================================================
+
+  Assumptions:
+    Cost per ad impression:  $0.05
+    Value per conversion:    $25.00
+    Break-even uplift:       0.0020 (0.20%)
+
+  Model-guided targeting:
+    Optimal targeting depth: top 100%
+    Max profit:              $87,500
+    At that depth:
+      Users targeted:        419,388
+      ATE in group:          0.0103
+      Revenue:               $108,469
+      Ad cost:               $20,969
+
+  Blanket targeting (show ads to everyone):
+    Profit:                  $87,500
+    Revenue:                 $108,469
+    Ad cost:                 $20,969
+
+  MODEL ADVANTAGE:
+    Extra profit vs blanket: $0 (+0.0%)
+
+
+============================================================
+2. SENSITIVITY ANALYSIS — Different Ad Costs
+============================================================
+
+  Conversion value fixed at $25.00
+
+     Ad Cost    Break-even   Optimal %    Profit(Model)   Profit(Blanket)       Savings
+  --------------------------------------------------------------------------------
+  $    0.01        0.0004        100%  $       104,275  $        104,275  $          0
+  $    0.02        0.0008        100%  $       100,081  $        100,081  $          0
+  $    0.05        0.0020        100%  $        87,500  $         87,500  $          0
+  $    0.10        0.0040         41%  $        75,690  $         66,530  $      9,159
+  $    0.20        0.0080         23%  $        63,266  $         24,591  $     38,674
+  $    0.50        0.0200         11%  $        39,439  $       -101,225  $    140,664
+
+
+============================================================
+3. SEGMENT ANALYSIS — Uplift by Feature
+============================================================
+
+  For each feature, split into quintiles and show average
+  predicted uplift and actual ATE per quintile.
+
+  f0:
+                   Quintile        N   Pred Uplift   Actual ATE   Visit(T)   Visit(C)
+  --------------------------------------------------------------------------------
+           (12.615, 18.108]  167,755       +0.0131      +0.0184     0.0849     0.0664
+           (18.108, 22.763]   83,879       +0.0068      +0.0124     0.0423     0.0299
+           (22.763, 24.823]   83,876       +0.0020      +0.0015     0.0178     0.0163
+           (24.823, 26.745]   83,878       +0.0023      -0.0006     0.0125     0.0131
+
+  f2:
+                   Quintile        N   Pred Uplift   Actual ATE   Visit(T)   Visit(C)
+  --------------------------------------------------------------------------------
+  (8.213000000000001, 8.383]  251,633       +0.0052      +0.0095     0.0474     0.0379
+             (8.383, 8.813]   83,877       +0.0182      +0.0182     0.0883     0.0701
+             (8.813, 9.052]   83,878       +0.0035      +0.0033     0.0119     0.0085
+
+  f8:
+                   Quintile        N   Pred Uplift   Actual ATE   Visit(T)   Visit(C)
+  --------------------------------------------------------------------------------
+             (3.652, 3.893]   85,540       +0.0288      +0.0357     0.2087     0.1730
+             (3.893, 3.944]   86,077       +0.0048      +0.0049     0.0206     0.0156
+             (3.944, 3.972]  247,771       +0.0010      +0.0010     0.0025     0.0015
+
+  f9:
+                   Quintile        N   Pred Uplift   Actual ATE   Visit(T)   Visit(C)
+  --------------------------------------------------------------------------------
+           (13.189, 16.226]  346,673       +0.0024      +0.0031     0.0095     0.0064
+           (16.226, 68.701]   72,715       +0.0314      +0.0348     0.2330     0.1982
+
+
+============================================================
+4. USER SEGMENT PROFILES
+============================================================
+
+  Top 10% (target these) (N=41,939):
+    Predicted uplift: +0.0717
+    Actual ATE:       +0.0561
+    Visit rate (T):   0.2691
+    Visit rate (C):   0.2130
+    Feature means:
+      f0: 16.66 (overall: 19.61) ↓
+      f1: 10.13 (overall: 10.07) ↑
+      f3: 2.14 (overall: 4.18) ↓
+      f4: 10.55 (overall: 10.34) ↑
+      f5: 3.67 (overall: 4.03) ↓
+      f6: -9.12 (overall: -4.15) ↓
+      f7: 5.88 (overall: 5.10) ↑
+      f8: 3.84 (overall: 3.93) ↓
+      f9: 27.59 (overall: 16.04) ↑
+      f10: 5.44 (overall: 5.33) ↑
+
+  Middle 80% (N=261,046):
+    Predicted uplift: +0.0025
+    Actual ATE:       +0.0026
+    Visit rate (T):   0.0179
+    Visit rate (C):   0.0153
+    Feature means:
+
+  Bottom 10% (skip these) (N=116,403):
+    Predicted uplift: -0.0047
+    Actual ATE:       +0.0029
+    Visit rate (T):   0.0362
+    Visit rate (C):   0.0333
+    Feature means:
+      f0: 23.30 (overall: 19.61) ↑
+      f2: 8.26 (overall: 8.45) ↓
+
+
+============================================================
+5. BUDGET SCENARIOS
+============================================================
+
+  'I have $X to spend on ads. How should I allocate it?'
+  (At $0.05 per impression, $25.00 per conversion)
+
+      Budget       Users  % of Total   Incr. Visits     Revenue      Profit       ROI
+  ---------------------------------------------------------------------------
+  $    1,000      20,000        4.8%           1559  $   38,976  $  +37,976    +3798%
+  $    5,000     100,000       23.8%           3288  $   82,191  $  +77,191    +1544%
+  $   10,000     200,000       47.7%           3790  $   94,738  $  +84,738     +847%
+  $   25,000     419,388      100.0%           4339  $  108,469  $  +83,469     +334%
+  $   50,000     419,388      100.0%           4339  $  108,469  $  +58,469     +117%
+
+
+============================================================
+6. CONNECTION TO GEO EXPERIMENTS
+============================================================
+
+  How uplift modeling complements geo experiment work:
+
+  GEO EXPERIMENTS (what you do now):
+    - Design: pick treatment/control DMAs
+    - Run: spend $70K over 10 weeks
+    - Analyze: difference-in-differences → one ATE number
+    - Limitation: can't see WHICH users drove the lift
+    - Limitation: underpowered for small effects (MDE = 18%)
+
+  UPLIFT MODELING (what you just learned):
+    - Requires: one good RCT (could be a past geo experiment!)
+    - Produces: per-user uplift scores
+    - Enables: targeted ad delivery (show ads only to persuadables)
+    - Enables: budget optimization (cut waste on Sure Things)
+
+  HOW THEY WORK TOGETHER:
+
+  1. Run ONE well-powered geo experiment (or user-level RCT)
+     to collect ground truth treatment/control data
+
+  2. Build an uplift model on that data to identify which
+     user segments respond most to ads
+
+  3. Use the model to make FUTURE campaigns more efficient:
+     - Target only high-uplift segments
+     - Exclude sleeping dogs
+     - Allocate budget to markets/segments with highest CATE
+
+  4. Run a FOLLOW-UP geo experiment to VALIDATE the model's
+     predictions: "did targeting persuadables actually improve ROI?"
+
+  This is the virtuous cycle: experiment → model → smarter targeting
+  → validate with another experiment → refine model → ...
+
+  The Criteo dataset is Step 1-2. Your geo experiments could feed
+  into this same pipeline if you had user-level outcome data.
+
+
+Saved plot: /Users/glennharless/dev-brain/kaggle/competitions/criteo-uplift/results/analysis/08_targeting_analysis.png
+
+
+============================================================
+FINAL TARGETING SUMMARY
+============================================================
+
+  OPTIMAL STRATEGY (at $0.05/impression, $25.0/conversion):
+    Target the top 100% of users by X-learner score
+    Expected profit: $87,500
+    vs. blanket targeting profit: $87,500
+    Uplift model advantage: $0
+
+  PRACTICAL RULES:
+    - Predicted uplift > 0.0020: profitable to target
+    - Predicted uplift < 0: sleeping dogs — do NOT show ads
+    - Top 10% has 5.6% ATE (vs 1.0% overall = 5.4x)
+
+  KEY FEATURES DRIVING UPLIFT:
+    f8 and f0 are the strongest moderators of treatment effect.
+    Users with low f8 and low f0 values respond most to ads.
+
