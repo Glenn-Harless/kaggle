@@ -1,0 +1,394 @@
+Marketing Mix Modeling: Step 1 — EDA
+============================================================
+
+
+============================================================
+1. RAW DATA INVENTORY
+============================================================
+
+--- firstfile.csv (transaction-level sales) ---
+  Shape: 1,578,079 rows x 9 columns
+  Date range: 2015-07-01 00:00:00 to 2016-06-30 00:00:00
+  Columns: ['Date', 'Sales_name', 'gmv_new', 'units', 'product_mrp', 'discount', 'product_category', 'product_subcategory', 'product_vertical']
+  Missing values:
+Date                   0
+Sales_name             0
+gmv_new                0
+units                  0
+product_mrp            0
+discount               0
+product_category       0
+product_subcategory    0
+product_vertical       0
+
+  Product categories (5):
+    EntertainmentSmall                 918,775 txns (58.2%)
+    CameraAccessory                    246,499 txns (15.6%)
+    GamingHardware                     222,773 txns (14.1%)
+    Camera                              99,301 txns (6.3%)
+    GameCDDVD                           90,731 txns (5.7%)
+
+  Sales/promotion names (13):
+    No Promotion                          1,291,840 txns (81.9%)
+    Daussera sale                            93,417 txns (5.9%)
+    Christmas & New Year Sale                42,501 txns (2.7%)
+    Big Diwali Sale                          42,365 txns (2.7%)
+    Pacman                                   25,555 txns (1.6%)
+    BSD-5                                    25,537 txns (1.6%)
+    Republic Day                             22,762 txns (1.4%)
+    FHSD                                     11,792 txns (0.7%)
+    Valentine's Day                           8,074 txns (0.5%)
+    BED                                       7,832 txns (0.5%)
+    Eid & Rathayatra sale                     6,384 txns (0.4%)
+    Rakshabandhan Sale                           15 txns (0.0%)
+    Independence Sale                             5 txns (0.0%)
+
+  GMV (gmv_new) stats:
+    Total:         3,884,723,238
+    Mean:                  2,462
+    Median:                  749
+    Std:                   5,640
+    Min:                      10
+    Max:                 226,947
+
+
+--- MediaInvestment.csv (monthly media spend) ---
+  Shape: 12 rows x 12 columns
+  Months covered: 12 (Jul 2015 - Jun 2016)
+
+  Channel spend summary (units unclear — likely lakhs or crores):
+    TV                         months with data: 12/12  total:     44.4
+    Digital                    months with data: 12/12  total:     29.8
+    Sponsorship                months with data: 12/12  total:    365.4
+    Content Marketing          months with data: 12/12  total:      8.0
+    Online marketing           months with data: 12/12  total:    193.7
+    Affiliates                 months with data: 12/12  total:     61.4
+    SEM                        months with data: 12/12  total:     91.1
+    Radio                      months with data:  3/12  total:      4.7
+    Other                      months with data:  3/12  total:     48.0
+
+  Radio and Other only have data for 3/12 months — very sparse.
+  These channels may need to be dropped or grouped.
+
+
+--- SpecialSale.csv (Indian market promotions) ---
+  Total sale-days: 44
+
+  Events:
+    BED                             2 days  (2016-02-01 to 2016-02-02)
+    BSD-5                           3 days  (2016-03-07 to 2016-03-09)
+    Big Diwali Sale                 8 days  (2015-11-07 to 2015-11-14)
+    Christmas & New Year Sale       10 days  (2015-12-25 to 2016-01-03)
+    Daussera sale                   3 days  (2015-10-15 to 2015-10-17)
+    Eid & Rathayatra sale           2 days  (2015-07-18 to 2015-07-19)
+    FHSD                            2 days  (2016-02-20 to 2016-02-21)
+    Independence Sale               3 days  (2015-08-15 to 2015-08-17)
+    Pacman                          3 days  (2016-05-25 to 2016-05-27)
+    Rakshabandhan Sale              3 days  (2015-08-28 to 2015-08-30)
+    Republic Day                    3 days  (2016-01-20 to 2016-01-22)
+    Valentine's Day                 2 days  (2016-02-14 to 2016-02-15)
+
+
+--- MonthlyNPSscore.csv ---
+  Shape: (12, 2)
+  NPS range: 44.4 to 60.0
+  NPS mean:  49.6
+  NPS std:   4.3
+
+
+============================================================
+2. AGGREGATE TRANSACTIONS TO WEEKLY
+============================================================
+
+  Weekly aggregation:
+    Total weeks: 53
+    Date range:  2015-06-29 00:00:00 to 2016-06-27 00:00:00
+    Mean weekly GMV:         73,296,665
+    Std weekly GMV:          46,987,952
+    CV (std/mean):      0.64
+    Min weekly GMV:              11,712
+    Max weekly GMV:         295,492,714
+    Mean weekly units:           30,424
+    Mean transactions:           29,775
+
+  First week (2015-06-29):
+    Transactions: 271
+    GMV: 623,671
+  Last week (2016-06-27):
+    Transactions: 12,967
+    GMV: 38,967,377
+
+  NOTE: Boundary weeks may be incomplete (partial data).
+  Watch for anomalous drops at the start/end of the series.
+
+
+============================================================
+3. TARGET VARIABLE — WEEKLY GMV OVER TIME
+============================================================
+
+  Weekly GMV distribution:
+    25th percentile:      46,737,426
+    50th percentile:      68,594,514
+    75th percentile:      90,354,547
+    IQR:                  43,617,121
+
+  Outlier weeks (IQR method): 1
+    2015-10-12  GMV=    295,492,714  [HIGH]
+
+  Saved: 01_weekly_gmv_timeseries.png
+
+
+============================================================
+4. MAP MONTHLY MEDIA SPEND TO WEEKLY
+============================================================
+
+  Weeks per month in our data:
+    2015-06: 1 weeks
+    2015-07: 4 weeks
+    2015-08: 5 weeks
+    2015-09: 4 weeks
+    2015-10: 4 weeks
+    2015-11: 5 weeks
+    2015-12: 4 weeks
+    2016-01: 4 weeks
+    2016-02: 5 weeks
+    2016-03: 4 weeks
+    2016-04: 4 weeks
+    2016-05: 5 weeks
+    2016-06: 4 weeks
+
+  After distributing monthly spend to weekly:
+    Shape: (53, 16)
+
+  Weekly channel spend summary (after distribution):
+    TV                         mean=  0.84  std=  0.66  nonzero weeks: 47/53
+    Digital                    mean=  0.56  std=  0.77  nonzero weeks: 52/53
+    Sponsorship                mean=  6.89  std=  6.34  nonzero weeks: 52/53
+    Content Marketing          mean=  0.15  std=  0.22  nonzero weeks: 35/53
+    Online marketing           mean=  3.65  std=  1.98  nonzero weeks: 52/53
+    Affiliates                 mean=  1.16  std=  0.60  nonzero weeks: 52/53
+    SEM                        mean=  1.72  std=  1.89  nonzero weeks: 52/53
+    Radio                      mean=  0.09  std=  0.19  nonzero weeks: 13/53
+    Other                      mean=  0.91  std=  2.00  nonzero weeks: 13/53
+
+  CRITICAL LIMITATION: Within any month, all weeks have identical
+  channel spend values. This means the model's ability to attribute
+  sales to channels is limited to BETWEEN-MONTH variation.
+  With only 12 months, that's very little signal.
+
+
+============================================================
+5. SPECIAL SALE EFFECTS (CONTROL VARIABLES)
+============================================================
+
+  Weeks with any special sale: 15/53 (28%)
+
+  GMV comparison:
+    Sale weeks mean GMV:           95,917,759
+    Non-sale weeks mean GMV:       64,367,286
+    Lift during sale weeks:            +49.0%
+
+  This lift is the effect we need to CONTROL FOR, not attribute
+  to advertising. If we don't, the model will think the ad spend
+  in October caused the Diwali sales spike.
+
+
+============================================================
+6. CHANNEL SPEND ANALYSIS — IDENTIFIABILITY
+============================================================
+
+  For a channel to be identifiable, we need:
+    1. Sufficient variation in spend (high CV)
+    2. Variation that's NOT perfectly correlated with other channels
+    3. Enough non-zero weeks to estimate the effect
+
+  Channel variation (coefficient of variation = std/mean):
+  Channel                        Mean       Std      CV    Zero weeks       Assessment
+  --------------------------------------------------------------------------------
+  TV                             0.84      0.66    0.66      6/ 53                 Good
+  Digital                        0.56      0.77    1.35      1/ 53                 Good
+  Sponsorship                    6.89      6.34    0.90      1/ 53                 Good
+  Content Marketing              0.15      0.22    1.04     18/ 53                 Good
+  Online marketing               3.65      1.98    0.52      1/ 53                 Good
+  Affiliates                     1.16      0.60    0.49      1/ 53                 Good
+  SEM                            1.72      1.89    1.08      1/ 53                 Good
+  Radio                          0.09      0.19    0.60     40/ 53             Marginal
+  Other                          0.91      2.00    0.68     40/ 53             Marginal
+
+  Radio and Other have data in only a few months — likely unusable.
+  Content Marketing has near-zero spend in most months — marginal.
+
+  Saved: 01_media_spend.png
+
+
+============================================================
+7. CORRELATION ANALYSIS — MULTICOLLINEARITY
+============================================================
+
+  Usable channels (>20 non-zero weeks): ['TV', 'Digital', 'Sponsorship', 'Content Marketing', 'Online marketing', 'Affiliates', 'SEM']
+
+  Pairwise correlations:
+                                    TV  Digital Sponsors Content  Online m Affiliat      SEM
+  TV                             1.00     0.36     0.61     0.42     0.71     0.75     0.41 
+  Digital                        0.36     1.00     0.72     0.91     0.35     0.27     0.98 
+  Sponsorship                    0.61     0.72     1.00     0.74     0.58     0.52     0.79 
+  Content Marketing              0.42     0.91     0.74     1.00     0.62     0.54     0.96 
+  Online marketing               0.71     0.35     0.58     0.62     1.00     0.99     0.50 
+  Affiliates                     0.75     0.27     0.52     0.54     0.99     1.00     0.42 
+  SEM                            0.41     0.98     0.79     0.96     0.50     0.42     1.00 
+
+  Highly correlated pairs (|r| > 0.7): **
+    TV <-> Online marketing: r=0.71
+    TV <-> Affiliates: r=0.75
+    Digital <-> Sponsorship: r=0.72
+    Digital <-> Content Marketing: r=0.91
+    Digital <-> SEM: r=0.98
+    Sponsorship <-> Content Marketing: r=0.74
+    Sponsorship <-> SEM: r=0.79
+    Content Marketing <-> SEM: r=0.96
+    Online marketing <-> Affiliates: r=0.99
+
+  WARNING: Monthly-distributed spend inflates correlations because
+  within-month variation is zero. Channels that happen to vary
+  similarly across months will appear highly correlated even if
+  their weekly patterns differ.
+
+  Channel-GMV correlations (raw — NOT causal):
+    TV                         r=+0.42
+    Digital                    r=+0.29
+    Sponsorship                r=+0.43
+    Content Marketing          r=+0.41
+    Online marketing           r=+0.56
+    Affiliates                 r=+0.55
+    SEM                        r=+0.37
+  Note: These correlations include confounders (seasonality, promos).
+  High correlation does NOT mean high causal effect.
+
+  Saved: 01_correlation_heatmap.png
+
+
+============================================================
+8. SEASONALITY ANALYSIS
+============================================================
+
+  Monthly GMV patterns:
+         Month         Mean GMV              Std   Weeks
+  -------------------------------------------------------
+             1       87,107,646       36,710,141       4
+             2       76,320,985        9,933,180       5
+             3       88,657,573       38,779,315       4
+             4       76,611,490       29,434,947       4
+             5       85,610,886       33,792,145       5
+             6       48,842,965       29,901,130       5
+             7       41,275,662        7,165,083       4
+             8       16,400,046       36,602,939       5
+             9       84,515,510       15,762,540       4
+            10      118,241,822      120,225,771       4
+            11       73,144,874       30,001,250       5
+            12       99,371,412       39,832,280       4
+
+  Trend check:
+    GMV vs. time correlation: r=+0.23
+    No strong linear trend — may still have non-linear patterns
+
+  Saved: 01_seasonality.png
+
+
+============================================================
+9. SAMPLE SIZE REALITY CHECK
+============================================================
+
+  Observations: 53 weeks
+
+  Parameter count (full 7-channel model):
+    Channel params:   7 channels × 3 (α, λ, β) = 21
+    Control vars:     3 (trend, sale indicator, NPS)
+    Seasonality:      ~2 (fourier terms)
+    Intercept:        1
+    Noise (σ):        1
+    ────────────────────────────────────────
+    TOTAL:            ~28 parameters
+
+  Observations per parameter: 1.9
+  (Industry minimum guideline: ~5-10 obs/param)
+
+  ╔══════════════════════════════════════════════════════════╗
+  ║  VERDICT: 53 weeks and ~28 parameters is NOT enough     ║
+  ║  for a reliable 7-channel model.                        ║
+  ║                                                         ║
+  ║  Options:                                               ║
+  ║  1. Reduce to 3-4 channel groups → ~13-16 params        ║
+  ║  2. Use strong informative priors (Bayesian helps here) ║
+  ║  3. Accept wide posteriors as honest uncertainty         ║
+  ║  4. Supplement with lift test data (PyMC-Marketing)     ║
+  ╚══════════════════════════════════════════════════════════╝
+
+  Suggested channel grouping for Step 7 (data prep):
+    Group 1: Sponsorship (largest spender, dominates budget)
+    Group 2: Online marketing + Affiliates (performance channels)
+    Group 3: TV + Digital (brand awareness)
+    Group 4: SEM (search — different intent signal)
+    Drop:    Radio, Other (too sparse), Content Marketing (near-zero)
+
+  This reduces to 4 channels × 3 = 12 channel params + 4 controls = ~16 total
+  52 obs / 16 params = 3.2 obs/param — marginal but workable with good priors
+
+
+============================================================
+10. DATA QUALITY — ANOMALY INVESTIGATION
+============================================================
+
+  August 2015 daily transaction counts:
+    Days with data: 26
+    Total txns:     254
+    Total GMV:      401,739
+    Daily txn range: 1 to 174
+
+  Monthly transaction counts:
+    2015-07:     83,474 transactions
+    2015-08:        254 transactions <-- ANOMALY
+    2015-09:    195,781 transactions
+    2015-10:    199,541 transactions
+    2015-11:    124,036 transactions
+    2015-12:    152,782 transactions
+    2016-01:    138,924 transactions
+    2016-02:    139,273 transactions
+    2016-03:    147,745 transactions
+    2016-04:    128,773 transactions
+    2016-05:    151,187 transactions
+    2016-06:    116,309 transactions
+
+  If August 2015 has almost no data, it may be a data collection
+  issue, not real low sales. Consider excluding it from the model.
+
+
+============================================================
+11. SUMMARY — KEY FINDINGS FOR MODEL DESIGN
+============================================================
+
+  DATA:
+  - 1,578,079 transactions → 53 weekly observations
+  - 5 product categories, dominated by EntertainmentSmall
+  - 44 special sale days across ~12 events
+  - 9 media channels (monthly granularity only)
+
+  GOOD NEWS:
+  - GMV has meaningful variation week-to-week (CV = 0.64)
+  - Special sales create identifiable spikes (useful as controls)
+  - Monthly media spend varies substantially across months
+  - Clear seasonal pattern gives us something to model
+
+  BAD NEWS:
+  - Only 53 weekly observations — far below the 104+ week minimum
+  - Media spend is MONTHLY — within-month variation is zero
+  - August 2015 appears to have a data quality issue
+  - Multiple channels are likely correlated (co-vary seasonally)
+  - With 7+ channels, we have ~28 params for 53 observations
+
+  IMPLICATIONS FOR MODELING:
+  - Must reduce channels to 3-4 groups (Step 7)
+  - Results will be heavily influenced by priors — be transparent
+  - Wide posteriors are EXPECTED and HONEST with this data
+  - This dataset is excellent for LEARNING the workflow
+  - Would NOT be suitable for real marketing decisions without more data
+
