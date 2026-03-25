@@ -1,0 +1,191 @@
+Marketing Mix Modeling: Step 3 — Bayesian Primer
+============================================================
+
+Goal: Build Bayesian intuition on simple problems before
+applying it to marketing data.
+
+
+============================================================
+1. COIN FLIP — BAYESIAN UPDATING
+============================================================
+
+  True coin bias: 0.65
+  Flipped 100 times: 68 heads, 32 tails
+  Observed frequency: 0.68
+
+  Analytical posteriors (exact — no MCMC needed):
+  Prior                        Prior Mean   Posterior Mean               95% HDI
+  ---------------------------------------------------------------------------
+  Uniform Beta(1,1)                  0.50            0.676  [0.583, 0.763]
+  Weak Beta(5,5)                     0.50            0.664  [0.573, 0.749]
+  Strong Beta(50,50)                 0.50            0.590  [0.521, 0.657]
+
+  KEY OBSERVATIONS:
+  - Uniform prior: posterior ≈ observed frequency (data dominates)
+  - Weak prior: posterior pulled slightly toward 0.5 (prior has mild influence)
+  - Strong prior: posterior pulled strongly toward 0.5 (prior fights the data)
+  - With 100 observations, even the strong prior yields to the data somewhat
+  - With only 10 observations, the strong prior would dominate (try it!)
+
+  Now verifying with MCMC (PyMC)...
+
+  MCMC result (should match Uniform prior analytical solution):
+           mean      sd  hdi_2.5%  hdi_97.5%  mcse_mean  mcse_sd   ess_bulk  ess_tail  r_hat
+theta  0.6767  0.0462    0.5835     0.7628     0.0008   0.0005  3151.9431  5122.753  1.001
+
+  Analytical: mean=0.6667
+  MCMC:       mean=0.6767
+  Match? Yes
+
+  Saved: 03_coin_flip_updating.png
+  Saved: 03_sample_size_effect.png
+
+  THIS IS THE KEY LESSON FOR MMM:
+  With n=5, your prior heavily influences the result → like our DT Mart (52 weeks)
+  With n=100, data dominates and the prior barely matters → like 3+ years of data
+  Our DT Mart data is on the LEFT side of this spectrum. Priors will matter a lot.
+
+
+============================================================
+2. BAYESIAN LINEAR REGRESSION
+============================================================
+
+  Synthetic data: y = 3.0x + 10.0 + N(0, 5.0)
+  50 data points
+
+  OLS result (point estimates):
+    Slope:     2.888  (true: 3.0)
+    Intercept: 10.483  (true: 10.0)
+
+  Fitting Bayesian regression with PyMC...
+
+  Bayesian result (posterior distributions):
+               mean     sd  hdi_2.5%  hdi_97.5%  mcse_mean  mcse_sd  ess_bulk  ess_tail  r_hat
+slope       2.892  0.235     2.426      3.353      0.004    0.003  3650.230  4313.377  1.001
+intercept  10.459  1.240     8.057     12.933      0.021    0.015  3564.829  4038.151  1.001
+sigma       4.746  0.496     3.849      5.757      0.007    0.006  4606.706  4508.702  1.001
+
+  Comparison:
+                       True       OLS    Bayesian Mean      Bayesian 95% HDI
+  ----------------------------------------------------------------------
+  Slope                3.00      2.89            2.892  [2.436, 3.365]
+  Intercept           10.00     10.48           10.459  [7.993, 12.890]
+
+  The Bayesian mean ≈ OLS estimate (with weak priors and enough data).
+  But Bayesian also gives you the SPREAD — how uncertain are we?
+  OLS just says 'slope = 2.89'. Bayesian says 'slope is
+  probably between 2.4 and 3.4'.
+
+  Saved: 03_bayesian_regression.png
+
+
+============================================================
+3. PRIOR PREDICTIVE CHECKS
+============================================================
+
+  Generating predictions from priors alone (no data used)...
+
+  Good: Normal(0,10):
+    Prior predictive y range: [-220, 283]
+    Actual data y range:      [7, 46]
+    Good: Prior predictive range is in the same ballpark as data.
+
+  Bad: Normal(0,1000):
+    Prior predictive y range: [-21670, 26294]
+    Actual data y range:      [7, 46]
+    PROBLEM: Prior produces values up to ±26294
+    The model thinks y could be in the thousands — clearly wrong.
+
+  Saved: 03_prior_predictive.png
+
+  TAKEAWAY: Always check your priors BEFORE fitting.
+  In MMM, this means: 'Do my priors on adstock decay and channel
+  effectiveness produce weekly sales in a plausible range?'
+  If the prior predictive shows sales of $10 billion/week, fix your priors.
+
+
+============================================================
+4. POSTERIOR PREDICTIVE CHECKS
+============================================================
+
+  Generating predictions from the fitted model...
+
+  Posterior predictive shape: (8000, 50)
+  (each row is one 'simulated dataset' from the fitted model)
+
+  Saved: 03_posterior_predictive.png
+
+  Quantitative posterior predictive check:
+    Mean of actual data:    23.36
+    Mean of simulated data: 23.36
+    Std of actual data:     9.42
+    Std of simulated data:  9.50
+    Residual MAE:           3.65
+
+  If the simulated data has similar mean, std, and shape as the
+  actual data, the model is a reasonable description of reality.
+
+
+============================================================
+5. MCMC MECHANICS — CHAINS, R-HAT, CONVERGENCE
+============================================================
+
+  Generating trace plots for the linear regression model...
+  Saved: 03_trace_plots.png
+
+  Convergence diagnostics:
+
+             mean     sd  hdi_2.5%  hdi_97.5%  mcse_mean  mcse_sd  ess_bulk  ess_tail  r_hat
+slope       2.892  0.235     2.426      3.353      0.004    0.003    3650.0    4313.0    1.0
+intercept  10.459  1.240     8.057     12.933      0.021    0.015    3565.0    4038.0    1.0
+sigma       4.746  0.496     3.849      5.757      0.007    0.006    4607.0    4509.0    1.0
+
+  Reading the diagnostics:
+    slope         R-hat=1.000 (GOOD)  ESS_bulk=3650 (GOOD)
+    intercept     R-hat=1.000 (GOOD)  ESS_bulk=3565 (GOOD)
+    sigma         R-hat=1.000 (GOOD)  ESS_bulk=4607 (GOOD)
+
+  WHAT THESE MEAN:
+  ─────────────────────────────────────────────────────────
+  R-hat < 1.01    → All 4 chains found the same answer (converged)
+  R-hat > 1.01    → Chains disagree — don't trust the results!
+                    Fix: run longer, reparameterize, or simplify model
+
+  ESS > 400       → Enough effective independent samples for reliable estimates
+  ESS < 100       → Estimates are noisy — run more samples or fix the model
+
+  No divergences  → The sampler navigated the posterior smoothly
+  Divergences > 0 → The sampler hit pathological geometry — model may need fixing
+                    Fix: increase target_accept (e.g., 0.95), reparameterize
+
+  Effect of sample count on posterior precision:
+  (Using the coin flip model with fewer samples)
+  Saved: 03_sample_count_effect.png
+
+
+============================================================
+6. SUMMARY — BAYESIAN BUILDING BLOCKS
+============================================================
+
+  CONCEPT                  WHAT IT IS                           MMM ANALOGY
+  ─────────────────────────────────────────────────────────────────────────────
+  Prior                    Your belief before data              "TV ROI is probably 1-5x"
+  Posterior                Your updated belief after data       "TV ROI is 2.1-3.8x (95%)"
+  Prior predictive check   Do priors produce plausible data?    "Do my priors generate realistic weekly sales?"
+  Posterior predictive     Does fitted model reproduce data?    "Does the model capture seasonal patterns?"
+  Trace plot               Sampler's path through param space   Check for "fuzzy caterpillars"
+  R-hat                    Did chains converge? (< 1.01)        All 4 independent runs agree
+  ESS                      Effective independent samples        Enough to trust the estimates
+  Divergences              Sampler hit pathological geometry    Model may need fixing
+
+  KEY TAKEAWAYS:
+  1. Bayesian = distributions, not point estimates
+  2. Priors matter more with less data (our MMM situation!)
+  3. Always check priors BEFORE fitting (prior predictive)
+  4. Always check the fit AFTER fitting (posterior predictive)
+  5. MCMC convergence diagnostics replace train/test accuracy
+  6. With weak priors and enough data, Bayesian ≈ OLS + uncertainty
+
+  You now have the vocabulary and intuition for Steps 4-9.
+  Next: apply these concepts to a real MMM on synthetic data.
+

@@ -1,0 +1,176 @@
+Marketing Mix Modeling: Step 7 — Data Preparation
+============================================================
+
+Goal: Build a clean weekly dataset for the Bayesian MMM.
+
+
+============================================================
+1. AGGREGATE TRANSACTIONS TO WEEKLY GMV
+============================================================
+
+  Raw transactions: 1,578,079
+  Weekly observations: 53
+  Date range: 2015-06-29 to 2016-06-27
+
+
+============================================================
+2. HANDLE AUGUST 2015 ANOMALY
+============================================================
+
+  August 2015 weeks:
+    2015-08-03: 27 txns, GMV=20,264
+    2015-08-10: 13 txns, GMV=11,712
+    2015-08-17: 11 txns, GMV=12,129
+    2015-08-24: 23 txns, GMV=78,769
+    2015-08-31: 42,204 txns, GMV=81,877,356
+
+  First week (2015-06-29): 271 txns
+  This is likely partial (data starts mid-week).
+  Removed partial first week.
+
+  After cleaning: 47 weeks
+
+
+============================================================
+3. JOIN MONTHLY MEDIA SPEND
+============================================================
+
+  Weeks per month:
+    2015-07: 4 weeks
+    2015-09: 4 weeks
+    2015-10: 4 weeks
+    2015-11: 5 weeks
+    2015-12: 4 weeks
+    2016-01: 4 weeks
+    2016-02: 5 weeks
+    2016-03: 4 weeks
+    2016-04: 4 weeks
+    2016-05: 5 weeks
+    2016-06: 4 weeks
+
+  Monthly spend distributed to weekly (each week in a month gets equal share).
+  Limitation: within-month variation is zero.
+
+
+============================================================
+4. GROUP CHANNELS (9 → 4)
+============================================================
+
+  Channel grouping:
+    spend_sponsorship:  Sponsorship (largest single channel)
+    spend_performance:  Online marketing + Affiliates (r=0.99, same intent)
+    spend_brand:        TV + Digital (brand awareness)
+    spend_sem:          SEM (search intent, separate behavior)
+    DROPPED:            Radio, Other (too sparse), Content Marketing (~zero)
+
+  Grouped channel statistics:
+  Group                          Mean       Std      CV    % of total
+  -----------------------------------------------------------------
+  spend_sponsorship              7.75      6.23    0.80        46.7%
+  spend_performance              5.42      2.03    0.37        32.7%
+  spend_brand                    1.55      1.17    0.75         9.3%
+  spend_sem                      1.89      1.94    1.03        11.3%
+
+  Correlation matrix (grouped channels):
+    spend_sponsorship            1.00    0.45    0.78    0.78
+    spend_performance            0.45    1.00    0.54    0.44
+    spend_brand                  0.78    0.54    1.00    0.86
+    spend_sem                    0.78    0.44    0.86    1.00
+
+  WARNING: spend_sponsorship and spend_brand still correlated at r=0.78
+
+  WARNING: spend_sponsorship and spend_sem still correlated at r=0.78
+
+  WARNING: spend_brand and spend_sem still correlated at r=0.86
+
+
+============================================================
+5. CREATE CONTROL VARIABLES
+============================================================
+
+  Special sale weeks: 12/47 (26%)
+  NPS joined: 47/47 weeks have NPS data
+  Trend variable: 0 to 46
+  Month variable: 1 to 12
+
+
+============================================================
+6. FINAL MMM-READY DATASET
+============================================================
+
+  Final dataset shape: (47, 10)
+  Date range: 2015-07-06 to 2016-06-27
+  Weeks: 47
+
+  Columns:
+    date                       dtype=datetime64[us]  mean=>12.2f
+    total_gmv                  dtype=float64  mean= 80895730.58
+    spend_sponsorship          dtype=float64  mean=        7.75
+    spend_performance          dtype=float64  mean=        5.42
+    spend_brand                dtype=float64  mean=        1.55
+    spend_sem                  dtype=float64  mean=        1.89
+    has_special_sale           dtype=int64  mean=        0.26
+    NPS                        dtype=float64  mean=       48.58
+    trend                      dtype=int64  mean=       23.00
+    month                      dtype=int32  mean=        6.34
+
+  Sample rows:
+        date     total_gmv  spend_sponsorship  spend_performance  spend_brand  spend_sem  has_special_sale   NPS  trend  month
+0 2015-07-06  4.100283e+07              1.850               0.45        0.675      1.250                 0  54.6      0      7
+1 2015-07-13  4.758042e+07              1.850               0.45        0.675      1.250                 1  54.6      1      7
+2 2015-07-20  4.518786e+07              1.850               0.45        0.675      1.250                 0  54.6      2      7
+3 2015-07-27  3.133154e+07              1.850               0.45        0.675      1.250                 0  54.6      3      7
+4 2015-09-07  9.090295e+07             15.700               5.35        1.325      1.550                 0  46.9      4      9
+5 2015-09-14  9.128773e+07             15.700               5.35        1.325      1.550                 0  46.9      5      9
+6 2015-09-21  9.484902e+07             15.700               5.35        1.325      1.550                 0  46.9      6      9
+7 2015-09-28  6.102234e+07             15.700               5.35        1.325      1.550                 0  46.9      7      9
+8 2015-10-05  4.107161e+07             21.175               7.85        4.675      7.975                 0  44.4      8     10
+9 2015-10-12  2.954927e+08             21.175               7.85        4.675      7.975                 1  44.4      9     10
+
+  Saved: /Users/glennharless/dev-brain/kaggle/competitions/marketing-mix/data/mmm_weekly.csv
+
+  Parameter budget:
+    Channel params: 4 × 3 = 12
+    Controls:       3
+    Other:          2 (intercept + sigma)
+    Total:          ~17
+    Obs/param:      47/17 = 2.8
+    (guideline: >5, ideal: >10)
+
+    Still tight at 2.8 obs/param.
+    Priors will meaningfully influence results.
+    This is expected and honest — we'll address it in Step 8.
+
+
+============================================================
+7. VISUALIZATION — THE MMM-READY DATA
+============================================================
+
+  Saved: 07_mmm_ready_data.png
+
+
+============================================================
+8. SUMMARY
+============================================================
+
+  WHAT WE BUILT:
+  - 47 weekly observations from 1,578,079 raw transactions
+  - 4 channel groups (from 9 raw channels)
+  - 3 control variables (special sales, NPS, trend)
+  - August 2015 anomaly excluded
+
+  CHANNEL GROUPS:
+  1. Sponsorship — largest single spender
+  2. Performance — Online marketing + Affiliates (r=0.99)
+  3. Brand — TV + Digital (brand awareness combo)
+  4. SEM — Search intent (distinct behavior)
+
+  LIMITATIONS TO CARRY INTO STEP 8:
+  - Media spend is MONTHLY distributed to weekly (within-month variation = 0)
+  - Only 47 observations for ~17 parameters (2.8 obs/param)
+  - Channel groups are still somewhat correlated
+  - Priors will meaningfully influence posteriors
+
+  OUTPUT: /Users/glennharless/dev-brain/kaggle/competitions/marketing-mix/data/mmm_weekly.csv
+  Ready for Step 8 (fitting the Bayesian MMM).
+

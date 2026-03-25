@@ -17,6 +17,10 @@ dependencies = [
     "torch>=2.10.0",
     "transformers>=5.3.0",
     "scikit-uplift>=0.5.1",
+    "statsmodels>=0.14.6",
+    "pymc>=5.28.0",
+    "arviz>=0.23.4",
+    "pymc-marketing>=0.18.2",
 ]
 
 [tool.uv]

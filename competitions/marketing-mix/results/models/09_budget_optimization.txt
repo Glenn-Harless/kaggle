@@ -1,0 +1,164 @@
+Marketing Mix Modeling: Step 9 — Budget Optimization
+============================================================
+
+
+============================================================
+1. REBUILD FITTED MODEL
+============================================================
+  Fitting model (same config as Step 8)...
+Computing ... ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00
+  Done. 27 divergences.
+
+
+============================================================
+2. ROAS BY CHANNEL (Return on Ad Spend)
+============================================================
+
+  Channel                 Total Contrib   Total Spend   ROAS Mean          ROAS 95% HDI
+  -------------------------------------------------------------------------------------
+  sponsorship               472,744,181         364.3   1,297,678  [204 — 3,390,794]
+  performance             3,262,323,731         254.9  12,798,445  [11,252 — 30,305,648]
+  brand                     652,380,628          72.9   8,948,980  [464 — 24,126,521]
+  sem                       418,449,263          88.6   4,722,904  [5,782 — 13,278,629]
+
+  NOTE: ROAS values are in original GMV units per spend unit.
+  The absolute numbers depend on how spend was scaled in the dataset.
+  What matters is the RELATIVE ranking and whether ROAS > 0.
+
+  Saved: 09_roas_distributions.png
+
+
+============================================================
+3. RESPONSE CURVES — SATURATION POSITION
+============================================================
+  Saved: 09_response_curves.png
+
+  Saturation status per channel:
+    sponsorship             100% saturated  [Fully saturated]
+    performance             100% saturated  [Fully saturated]
+    brand                    99% saturated  [Fully saturated]
+    sem                      99% saturated  [Fully saturated]
+
+
+============================================================
+4. BUDGET REALLOCATION
+============================================================
+
+  Current weekly budget allocation:
+  Channel                    Spend   % of Budget
+  ---------------------------------------------
+  sponsorship                364.3        46.7%
+  performance                254.9        32.7%
+  brand                       72.9         9.3%
+  sem                         88.6        11.3%
+  TOTAL                      780.7
+
+  Simple reallocation scenario:
+  → Shift 20% from highest-spending channel (Sponsorship)
+  → To the highest-ROAS channel (Performance)
+
+  Channel                  Current    Proposed      Change
+  -------------------------------------------------------
+  sponsorship                364.3       291.4       -72.9
+  performance                254.9       327.8       +72.9
+  brand                       72.9        72.9        +0.0
+  sem                         88.6        88.6        +0.0
+
+  Estimated impact (using posterior mean response curves):
+    sponsorship           current=0.1337  proposed=0.1337  change=-0.0%
+    performance           current=0.3877  proposed=0.3877  change=+0.0%
+    brand                 current=0.1656  proposed=0.1656  change=+0.0%
+    sem                   current=0.1686  proposed=0.1686  change=+0.0%
+
+    Total media effect change: -0.0%
+    (Same total budget, just reallocated)
+
+  Saved: 09_budget_reallocation.png
+
+
+============================================================
+5. SCENARIO ANALYSIS
+============================================================
+
+  Scenario                          Budget Change    Effect Change
+  -----------------------------------------------------------------
+  Cut Sponsorship 50%                     -23.3%           -0.0%
+  Double Performance                      +32.7%           +0.0%
+  Cut all by 30%                          -30.0%           -1.3%
+  Double Brand                             +9.3%           +0.3%
+
+  KEY OBSERVATIONS:
+  - Cutting Sponsorship 50% saves budget but may lose less effect
+    than you'd think (if it's already saturated)
+  - Doubling Performance could add significant effect (if not saturated)
+  - Cutting all by 30% shows how much budget is "necessary" vs "wasted"
+  - These estimates carry uncertainty — use the posterior distributions
+    for confidence intervals on each scenario
+
+============================================================
+6. HONEST CAVEATS — WHAT TO TELL STAKEHOLDERS
+============================================================
+
+  WHAT THESE RESULTS CAN SUPPORT:
+  ─────────────────────────────────────────────────────
+  ✓ Relative channel ranking (Performance likely #1)
+  ✓ Directional budget shifts (less Sponsorship, more Performance)
+  ✓ General saturation assessment (where channels have room to grow)
+  ✓ Framework for future, better-data analysis
+
+  WHAT THESE RESULTS CANNOT SUPPORT:
+  ─────────────────────────────────────────────────────
+  ✗ Precise ROAS numbers for budget justification
+  ✗ Exact optimal allocation percentages
+  ✗ Causal claims without experimental validation
+  ✗ Predictions for untested spend levels (extrapolation)
+
+  TO MAKE THESE RESULTS PRODUCTION-GRADE:
+  ─────────────────────────────────────────────────────
+  1. Get 2+ years of WEEKLY spend data (from ad platforms directly)
+  2. Run geo experiments to calibrate channel priors
+     → PyMC-Marketing: mmm.add_lift_test_measurements()
+  3. Add more controls (competitor activity, pricing, weather)
+  4. Validate with holdout period (last 8-12 weeks)
+  5. Re-run quarterly as data accumulates
+
+  FOR YOUR WORK (Google/Facebook/TikTok + CTV):
+  ─────────────────────────────────────────────────────
+  - You have 80-100 weeks → 2x better than DT Mart
+  - You have weekly spend from ad platforms → no monthly distribution hack
+  - You have a planned CTV geo experiment → can calibrate CTV prior
+  - 3 main channels → fewer params, tighter posteriors
+  - This puts you in a MUCH better position than this exercise
+
+============================================================
+7. EXECUTIVE SUMMARY — DT MART MMM
+============================================================
+
+  ╔══════════════════════════════════════════════════════════════╗
+  ║           DT MART — MARKETING MIX MODEL RESULTS             ║
+  ╠══════════════════════════════════════════════════════════════╣
+  ║                                                              ║
+  ║  CHANNEL EFFECTIVENESS RANKING:                              ║
+  ║    #1  Performance (Online + Affiliates)  — 62% of media     ║
+  ║    #2  Brand (TV + Digital)               — 15% of media     ║
+  ║    #3  Sponsorship                        — 12% of media     ║
+  ║    #4  SEM                                — 11% of media     ║
+  ║                                                              ║
+  ║  CONFIDENCE:                                                 ║
+  ║    91% confident Performance > Brand                         ║
+  ║    94% confident Performance > SEM                           ║
+  ║    Cannot distinguish Brand vs Sponsorship vs SEM            ║
+  ║                                                              ║
+  ║  RECOMMENDATION:                                             ║
+  ║    Consider shifting budget FROM Sponsorship (47% of spend,  ║
+  ║    12% of effect) TO Performance (33% of spend, 62% of       ║
+  ║    effect). Validate with a controlled test before acting.    ║
+  ║                                                              ║
+  ║  CAVEATS:                                                    ║
+  ║    - 47 weeks of data (below 100+ week minimum)              ║
+  ║    - Monthly spend granularity (weekly preferred)             ║
+  ║    - Channel correlations limit individual attribution        ║
+  ║    - Validate recommendations with geo experiments            ║
+  ║                                                              ║
+  ╚══════════════════════════════════════════════════════════════╝
+
